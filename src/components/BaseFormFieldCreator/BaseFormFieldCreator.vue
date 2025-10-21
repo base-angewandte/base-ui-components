@@ -168,9 +168,10 @@ export default {
     /**
      * add an error message to be displayed below form field if field is invalid.
      * for an example see [BaseInput](BaseInput)
+     * for `field_type` 'group' an Object with the fields can be passed on
      */
     errorMessage: {
-      type: String,
+      type: [String, Object],
       default: '',
     },
     /**
@@ -333,6 +334,8 @@ export default {
         formId: `${this.fieldKey}_${this.field.name}`,
         fieldProps: this.fieldProps,
         dropDownLists: this.fieldGroupDropDownLists,
+        // if type is 'group' error messages need to be passed on - otherwise leave empty object
+        errorMessagesObject: typeof this.errorMessage === 'string' ? {} : this.errorMessage,
       };
     },
     /**
