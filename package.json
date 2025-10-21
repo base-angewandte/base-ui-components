@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "4.0.0",
+  "version": "5.0.0-beta.0",
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
@@ -20,6 +20,7 @@
     "prepublishOnly": "npm run build",
     "styleguide": "concurrently \"vue-docgen -c docgen.config.js --watch\" \"vitepress dev --port 6060 docs\"",
     "styleguide:build": "vue-docgen -c docgen.config.js && vitepress build docs",
+    "styleguide:build-test": "node server.js",
     "svg": "node build/generate-svg-sprite-sheet.cjs",
     "prepare": "husky",
     "changelog": "gulp -f gulpfile.js changelog"
@@ -38,6 +39,7 @@
     "dist/*"
   ],
   "dependencies": {
+    "@kyvg/vue3-notification": "^3.4.1",
     "@vueuse/components": "^13.1.0",
     "@vueuse/core": "^13.1.0",
     "body-scroll-lock": "^4.0.0-beta.0",
@@ -47,6 +49,7 @@
     "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
+    "pdfjs-dist": "^5.4.54",
     "swiper": "^11.2.4",
     "vue-datepicker-next": "^1.0.3",
     "vue-draggable-plus": "^0.6.0"
@@ -55,6 +58,7 @@
     "@babel/eslint-parser": "^7.25.9",
     "@babel/plugin-transform-runtime": "^7.24.7",
     "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.28.4",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "@eslint/js": "^9.14.0",
@@ -64,13 +68,16 @@
     "@vitejs/plugin-vue": "^5.2.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.2.1",
+    "body-parser": "^2.2.0",
     "clean-css-cli": "^5.6.3",
     "concurrently": "^9.1.0",
+    "dotenv": "^17.2.3",
     "es-module-lexer": "^1.5.4",
     "eslint": "^9.15.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-vue": "^10.0.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
+    "express": "^5.1.0",
     "globby": "^14.0.2",
     "gulp": "^5.0.0",
     "gulp-conventional-changelog": "^4.0.0",
@@ -101,12 +108,12 @@
     "last 2 versions"
   ],
   "engines": {
-    "node": ">= 18.0.0 <21.0.0",
+    "node": ">= 20.0.0 <21.0.0",
     "npm": ">= 9.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/base-angewandte/base-ui-components.git"
+    "url": "git+https://github.com/base-angewandte/base-ui-components.git"
   },
   "sideEffects": [
     "*.css",
@@ -114,13 +121,5 @@
   ],
   "lint-staged": {
     "**/*.{js,vue}": "npm run lint:js"
-  },
-  "overrides": {
-    "@babel/traverse": {
-      "globals": "^13.24.0"
-    },
-    "@babel/preset-env": {
-      "globals": "^13.24.0"
-    }
   }
 }

@@ -418,7 +418,7 @@ const showNoOptions = computed(() => {
           tabindex="0"
           @keydown.enter="selected(dropDownOption)"
           @click.stop="selected(dropDownOption)"
-          @touchstart.stop="">
+          @touchstart.stop.passive="">
           <!-- @slot a slot to customize every single option (e.g. display of information other than `[valuePropertyName]`)
             @binding {Object} option - the current option in the options list-->
           <slot

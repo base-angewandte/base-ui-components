@@ -64,7 +64,7 @@ export default {
       default: '',
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
   setup(props) {
     // create id outside of computed to make sure we just have one fixed id
     const internalId = useId();
@@ -102,10 +102,10 @@ export default {
     checkedInt(val) {
       /**
        * event emitted on radio button / checkmark click
-       * @event update:modelValue
+       * @event update:model-value
        * @param {string, boolean} - emitted input value (string for Radio Button, boolean value for Checkmark)
        */
-      this.$emit('update:modelValue', val);
+      this.$emit('update:model-value', val);
     },
   },
 };

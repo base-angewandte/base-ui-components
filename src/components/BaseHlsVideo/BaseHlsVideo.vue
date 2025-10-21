@@ -63,8 +63,9 @@ export default {
     const { getI18nTerm } = useI18n();
     const isLoading = ref(false);
     const hls = ref(() => {});
-    const playButton = useTemplateRef('playButtonEl');
+    const playButton = ref(true);
     const video = useTemplateRef('videoEl');
+
     return {
       getI18nTerm,
       isLoading,
@@ -180,7 +181,6 @@ export default {
 
     <button
       v-if="playButton && !isLoading"
-      ref="playButtonEl"
       :title="`${getI18nTerm(buttonTitle)} Video`"
       class="base-media-video__control"
       @keydown.enter.space="play"

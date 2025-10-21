@@ -4,7 +4,7 @@
 
 ### System Requirements
 
-This project is currently compatible with node versions >= 18.0.0 <21.0.0.
+This project is currently compatible with node versions >= 20 .0.0 <21.0.0.
 
 ### Available Npm Scripts
 

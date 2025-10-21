@@ -145,12 +145,30 @@ export default {
       isSelectedInt: false,
       // how many columns the thumbnail container takes
       columns: 0,
+      // toggle transition-group transition
+      transition: false,
     };
   },
   watch: {
     isSelected(val) {
       this.isSelectedInt = val;
     },
+    /**
+     * watch if selectActive changes and enable the transition
+     * and disable after a certain time
+     */
+    isSelectActive() {
+      this.transition = true;
+      this.disableTransition(500);
+    },
+    /**
+     * watch if thumbnails slot content changes and enable the transition
+     * and disable after a certain time
+     */
+    thumbnailsSlotHasContent() {
+      this.transition = true;
+      this.disableTransition(500);
+    }
   },
   mounted() {
     this.setThumbnailColumns();
@@ -182,6 +200,14 @@ export default {
          */
         this.$emit('clicked');
       }
+    },
+    /**
+     * disable transition after defined delay
+     * @param {Number} delay - time, in milliseconds, until method is executed
+     */
+    disableTransition(delay) {
+      // the delay should be the same as the slide-fade-move transition duration
+      setTimeout(() => this.transition = false, delay || 0);
     },
     slideFadeLeave() {
       // safari fix: somehow transition needs to be triggered manually
@@ -269,36 +295,36 @@ export default {
     <slot
       name="right-side-elements"
       :is-selected="isSelectedInt">
-      <div
-        class="base-menu-entry__transition-container">
-        <TransitionGroup
-          name="slide-fade"
-          @leave="slideFadeLeave"
-          @after-leave="slideFadeAfterLeave">
+      <TransitionGroup
+        v-if="isSelectable || showThumbnails"
+        :name="transition ? 'slide-fade' : 'none'"
+        tag="div"
+        class="base-menu-entry__transition-container"
+        @leave="slideFadeLeave"
+        @after-leave="slideFadeAfterLeave">
+        <div
+          v-if="showThumbnails"
+          :key="entryId + 'thumbnail'"
+          ref="slideFade"
+          class="slide-fade-group base-menu-entry--text-fade-out">
           <div
-            :key="entryId + 'thumbnail'"
-            ref="slideFade"
-            class="slide-fade-group base-menu-entry--text-fade-out">
-            <div
-              v-if="showThumbnails"
-              ref="thumbnailContainer"
-              class="base-menu-entry__thumbnail-container"
-              :style="{ '--cols': columns }">
-              <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
-              <slot name="thumbnails" />
-            </div>
+            ref="thumbnailContainer"
+            class="base-menu-entry__thumbnail-container"
+            :style="{ '--cols': columns }">
+            <!-- @slot Use this slot to supply a list of [BaseIcon](BaseIcon) components that are to be shown in the right area of the menu entry as thumbnails. If using the slot make sure that `showThumbnails` is true.-->
+            <slot name="thumbnails" />
           </div>
-          <BaseCheckmark
-            v-if="isSelectable && selectActive && !isDisabled"
-            :key="entryId + 'checkmark'"
-            :model-value="isSelected"
-            :label="title"
-            title="checkbox"
-            mark-style="checkbox"
-            class="base-menu-entry__checkbox"
-            @update:model-value="clicked" />
-        </TransitionGroup>
-      </div>
+        </div>
+        <BaseCheckmark
+          v-if="isSelectable && selectActive && !isDisabled"
+          :key="entryId + 'checkmark'"
+          :model-value="isSelected"
+          :label="title"
+          title="checkbox"
+          mark-style="checkbox"
+          class="base-menu-entry__checkbox"
+          @update:model-value="clicked" />
+      </TransitionGroup>
     </slot>
   </div>
 </template>
@@ -494,6 +520,8 @@ export default {
       height: 100%;
       padding-left: $spacing;
       z-index: 1;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform: translateZ(0) scale(1, 1);
     }
 
     .slide-fade-group {

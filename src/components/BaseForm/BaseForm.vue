@@ -264,8 +264,10 @@ export default {
      */
     cleanedAndSortedFormFieldList() {
       return Object.entries(this.formFieldJson)
-        // filter out hidden properties and $ref property from JSON
-        .filter(([, value]) => !value.$ref && !value['x-attrs']?.hidden)
+        // filter out $ref property from JSON
+        // do not filter out hidden fields here since they still need to be present
+        // in valueList (for which this variable is used)
+        .filter(([, value]) => !value.$ref)
         // map all fields to include the field key as property `name`
         // and an id for the v-for key
         .map(([key, value]) => ({
@@ -281,8 +283,8 @@ export default {
      * the name of the input field in a variable, also filtered from fields that
      * should not be shown
      *
-     * @returns {Object}
      * @property {string} name - the name of the input field
+     * @returns {Object}
      * @property {*} [*] all other properties contained in the swagger
      */
     formFieldListInt() {
@@ -291,7 +293,11 @@ export default {
       // where fieldList is an array with all fields that consecutively have the same field format
       return this.cleanedAndSortedFormFieldList.reduce((prev, curr) => {
         // save the field_format in a variable
-        const { field_format: fieldFormat, order, field_type: fieldType } = curr['x-attrs'];
+        const { field_format: fieldFormat, order, field_type: fieldType, hidden } = curr['x-attrs'] || {};
+        // hidden fields still need to be initialized (otherwise they are missing from valueList and cause
+        // discrepancies when checking for unsaved changes) so just remove them here (not in
+        // cleanedAndSortedFormFieldLists which is used for initialization)
+        if (hidden) return prev;
         const lastArrayElementIndex = prev.length - 1;
         // check if fields should be grouped (only for 'half' and 'third')
         if (fieldFormat && fieldType !== 'group'
@@ -354,7 +360,8 @@ export default {
     valueListInt: {
       handler(val) {
         // make sure there are any changes not updated yet
-        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
+        if (Object.keys(this.formFieldJson)
+          .some((key) => JSON.stringify(this.modelValue[key]) !== JSON.stringify(val[key]))) {
           /**
            * event triggered when the values of a field were altered or a form
            * field was added or removed
@@ -477,6 +484,8 @@ export default {
     getInitialFieldValue({ name, 'x-attrs': xAttrs, type, items, properties }) {
       // get the current field value
       const value = this.modelValue[name];
+      // if the field is hidden no need to initialize
+      if (xAttrs?.hidden) return value;
       // get the OpenAPI x-attrs (that we use for form config) field type
       const xAttrsFieldType = xAttrs?.field_type;
       // valid types in OpenAPI definition are 'number' and 'integer'

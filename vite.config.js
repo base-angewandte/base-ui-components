@@ -45,7 +45,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, './src/components/index.js'),
+      entry: resolve(__dirname, './src/index.js'),
       name: 'BaseUiComponents',
       fileName: 'base-ui-components',
     },
@@ -64,14 +64,25 @@ export default defineConfig({
         'swiper',
         'hls.light.js',
         'hls.js/dist/hls.light.js',
+        'pdfjs-dist/legacy/build/pdf.mjs',
+        'pdfjs-dist/legacy/build/pdf.worker.mjs',
+        'leaflet',
+        'leaflet.markercluster',
+        'leaflet-responsive-popup',
       ],
       output: {
+        chunkFileNames: 'assets/[name].[hash].js',
         globals: {
           vue: 'Vue',
           swiper: 'Swiper',
           'vue-i18n': 'VueI18n',
           'hls.light.js': 'Hls',
           'hls.js/dist/hls.light.js': 'Hls',
+          'pdfjs-dist/legacy/build/pdf.mjs': 'Pdfjs1',
+          'pdfjs-dist/legacy/build/pdf.worker.mjs': 'Pdfjs2',
+          'leaflet': 'Leaflet',
+          'leaflet.markercluster': 'LeafletMarkerCluster',
+          'leaflet-responsive-popup': 'LeafletResponsivePopup',
         },
       },
       plugins: [

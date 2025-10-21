@@ -3,6 +3,10 @@ import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 
+/**
+ * Component to render a image slider, based on the JS Library <a href="https://swiperjs.com/">Swiper</a>
+ */
+
 export default {
   name: 'BaseCarousel',
   components: {
@@ -28,7 +32,11 @@ export default {
       default: () => ([]),
     },
     /**
-     * specify [swiper API options](https://swiperjs.com/swiper-api)
+     * By default, slides are grouped with a maximum of three elements per view, depending on screen resolution.
+     * If there are fewer than three elements, the single element takes up 50% of the space; otherwise, it takes up 33%.
+     * The default configuration with all settings can be found in the sample file code [BaseCarousel](BaseCarousel#demo).
+     *
+     * Otherwise, you can freely set all [swiper API options](https://swiperjs.com/swiper-api).
      */
     swiperOptions: {
       type: Object,
@@ -102,8 +110,16 @@ export default {
     },
   },
   watch: {
-    data() {
-      this.swiper.update();
+    items: {
+      handler() {
+        if (!this.swiperIsActive) return;
+        // the pagination and a11y doesn't update correctly, when items change,
+        // so destroy swiper but keep instance
+        this.swiper.destroy(false);
+        // reinit swiper
+        this.initSwiper();
+      },
+      deep: true,
     },
     swiperOptions: {
       handler(val) {
@@ -148,6 +164,29 @@ export default {
 
       this.swiperIsActive = true;
       this.swiperOptionsInt.init = false;
+
+      // default swiper options
+      const defaultSwiperOptions = {
+        keyboard: true,
+        rewind: true,
+        spaceBetween: 16,
+        speed: 750,
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        breakpoints: {
+          640: {
+            slidesPerView: 2,
+            slidesPerGroup: 2,
+          },
+          1024: {
+            slidesPerView: this.items.length < 3 ? 2 : 3,
+            slidesPerGroup: this.items.length < 3 ? 2 : 3,
+          },
+        },
+      };
+
+      // if no swiper options are set externally, use the default ones
+      if (!Object.keys(this.swiperOptions).length) this.swiperOptionsInt = defaultSwiperOptions;
 
       // add autoplay settings if needed
       if (this.swiperOptionsInt.autoplay) {

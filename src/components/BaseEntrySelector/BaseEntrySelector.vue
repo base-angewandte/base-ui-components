@@ -246,6 +246,30 @@ export default {
         clearInput: 'Clear input',
       }),
     },
+    /**
+     * this prop gives the option to add assistive text for the pagination:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    paginationAssistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['currentPage', 'nextPage', 'pagination', 'previousPage', 'toPage']
+        .every(prop => Object.keys(val).includes(prop)),
+    }
   },
   emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
   setup(props) {
@@ -364,34 +388,41 @@ export default {
      * watch if entries are updated to set the focus on the first list
      * element
      */
-    entries() {
-      // check if the menu list exist already (which it should on page
-      // change) and if change was triggered by changing the page
-      if (this.$refs.menuList && this.pageChanged) {
-        // wait until the elements are rendered
-        this.$nextTick(() => {
-          // then depending on if select input is shown or not
-          const firstFocusableListElement = this.showOptions
-            // get the first select input element
-            ? this.$refs.menuList.$el.querySelector('input:enabled')
-            // or the first menu entry element (that has tabindex 0 set)
-            : this.$refs.menuList.$el.querySelector('*[tabindex]:not([tabindex="-1"])');
-          // check if an element was found
-          if (firstFocusableListElement) {
-            // if yes - focus
-            firstFocusableListElement.focus();
-          }
-        });
-      }
-      // reset pageChanged flag
-      this.pageChanged = false;
-      // announce that entries have changed
-      this.resultsAnnouncement = this.assistiveText[this.entriesTotal ? 'resultsFound' : 'noResultsFound']
-        .replace('{number}', this.entriesTotal);
-      // and reset afterward so the same text would trigger the watcher again
-      setTimeout(() => {
-        this.resultsAnnouncement = '';
-      }, 300);
+    entries: {
+      handler() {
+        // check if the menu list exist already (which it should on page
+        // change) and if change was triggered by changing the page
+        if (this.$refs.menuList && this.pageChanged) {
+          // wait until the elements are rendered
+          this.$nextTick(() => {
+            // then depending on if select input is shown or not
+            const firstFocusableListElement = this.showOptions
+              // get the first select input element
+              ? this.$refs.menuList.$el.querySelector('input:enabled')
+              // or the first menu entry element (that has tabindex 0 set)
+              : this.$refs.menuList.$el.querySelector('*[tabindex]:not([tabindex="-1"])');
+            // check if an element was found
+            if (firstFocusableListElement) {
+              // if yes - focus
+              firstFocusableListElement.focus();
+            }
+          });
+        }
+        // reset pageChanged flag
+        this.pageChanged = false;
+        // announce that entries have changed
+        const announcementTextKey = this.entriesTotal ? 'resultsFound' : 'noResultsFound';
+        // safeguard against text not existing
+        if (this.assistiveText[announcementTextKey]) {
+          this.resultsAnnouncement = this.assistiveText[announcementTextKey]
+            .replace('{number}', this.entriesTotal);
+        }
+        // and reset afterward so the same text would trigger the watcher again
+        setTimeout(() => {
+          this.resultsAnnouncement = '';
+        }, 300);
+      },
+      deep: true,
     },
     /**
      * watch outside variable to have it in sync with internal 'showOptions'
@@ -422,13 +453,16 @@ export default {
     /**
      * watch selectedEntries to inform parent of changes in selection
      */
-    selectedEntries() {
-      /**
-       * event emitted every time the selected entries change
-       * @event selected-changed
-       * @param {Object[]} - array of updated selected entries
-       */
-      this.$emit('selected-changed', this.selectedEntries);
+    selectedEntries: {
+      handler() {
+        /**
+         * event emitted every time the selected entries change
+         * @event selected-changed
+         * @param {Object[]} - array of updated selected entries
+         */
+        this.$emit('selected-changed', this.selectedEntries);
+      },
+      deep: true,
     },
   },
   created() {
@@ -722,6 +756,7 @@ export default {
       ref="pagination"
       :total="pageTotal"
       :model-value="pageNumber"
+      :assistive-text="paginationAssistiveText"
       @update:model-value="setPage" />
   </div>
 </template>

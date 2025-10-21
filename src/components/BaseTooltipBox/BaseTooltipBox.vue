@@ -142,6 +142,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  /**
+   * specify options for the click-outside handler
+   * https://vueuse.org/core/onClickOutside/#type-declarations
+   */
+  clickOutsideOptions: {
+    type: Object,
+    default: () => ({
+      capture: false,
+    }),
+  },
 });
 
 const emits = defineEmits([
@@ -171,6 +181,7 @@ const isActive = ref(false);
 const { isMobile } = useWindowResize({
   callback: calcPosition,
   mobileMaxSize: props.mobileSize,
+  callOnMounted: true,
 });
 
 /** CLICK OUTSIDE HANDLING */
@@ -194,7 +205,8 @@ function escEventHandler(e) {
 }
 
 useEventListener({
-  target: window,
+  // need to pass a string since window not defined in setup for SSR
+  target: 'window',
   event: 'keydown',
   callback: escEventHandler,
 });
@@ -202,11 +214,15 @@ useEventListener({
 /**
  * intercept click-outside event and close the component
  */
-onClickOutside(tooltipInner, () => {
-  if (isClickOutsideActive.value) {
-    close();
-  }
-});
+onClickOutside(
+  tooltipInner,
+  () => {
+    if (isClickOutsideActive.value) {
+      close();
+    }
+  },
+  props.clickOutsideOptions,
+);
 
 /** FADE OUT RELATED FUNCTIONALITY */
 // use the whole boxFadeOut object instead of destructuring it because otherwise

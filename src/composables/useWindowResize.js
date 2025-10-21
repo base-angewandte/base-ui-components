@@ -25,7 +25,7 @@ export function useWindowResize({
    * variable to store window inner width
    * @type {Ref<UnwrapRef<number>>}
    */
-  const windowInnerWidth = ref(window?.innerWidth || 0);
+  const windowInnerWidth = ref(0);
   /**
    * is window width within mobile size
    * @type {ComputedRef<boolean>}
@@ -42,12 +42,13 @@ export function useWindowResize({
    * execute the function provided to the composable
    */
   function resize() {
-    windowInnerWidth.value = window.innerWidth;
+    // safeguard against window not being defined yet
+    windowInnerWidth.value = window?.innerWidth || 0;
     callback();
   }
 
   useEventListener({
-    target: window,
+    target: 'window',
     event: 'resize',
     callback: resize,
     setDebounce,

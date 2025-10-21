@@ -18,7 +18,7 @@ export function useI18n(language) {
    * @type {ComputedRef<any|boolean>}
    */
   const hasI18n = computed(() => {
-    const i18nEnabled = Boolean(app?.__VUE_I18N__);
+    const i18nEnabled = Boolean(app?.config?.globalProperties?.$i18n);
     // if the __VUE_I18N__ variable is set - return the global $i18n variable
     if (i18nEnabled) {
       // if i18n is present in the app set all the necessary
@@ -28,7 +28,6 @@ export function useI18n(language) {
       t.value = app.config.globalProperties.$t;
       te.value = app.config.globalProperties.$te;
     }
-    // else just return false
     return i18nEnabled;
   });
 
@@ -99,6 +98,7 @@ export function useI18n(language) {
   }
 
   return {
+    hasI18n,
     getI18nTerm,
     setLangLabels,
     getLangLabel,

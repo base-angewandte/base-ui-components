@@ -15,6 +15,7 @@ export default {
     BaseInput: defineAsyncComponent(() => import('@/components/BaseInput/BaseInput.vue')),
     BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
   },
+  inheritAttrs: false,
   props: {
     /**
      * set input value from outside
@@ -490,21 +491,25 @@ export default {
         }
       },
       immediate: true,
+      deep: true,
     },
     /**
      * watch selectedChipsInt to sync with selectedChips prop provided by parent
      * @param {Object[]} val
      */
-    selectedChipsInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
-        /**
-         * inform parent of changes in selected chips
-         *
-         * @event update:selected-chips
-         * @param {Array} - the updated selected options list
-         */
-        this.$emit('update:selected-chips', val);
-      }
+    selectedChipsInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedChips)) {
+          /**
+           * inform parent of changes in selected chips
+           *
+           * @event update:selected-chips
+           * @param {Array} - the updated selected options list
+           */
+          this.$emit('update:selected-chips', val);
+        }
+      },
+      deep: true,
     },
     /**
      * sync internal active state with parent
@@ -573,7 +578,7 @@ export default {
       v-model="inputInt"
       v-model:is-active="isActiveInt"
       v-model:selected-list="selectedChipsModelValue"
-      v-bind="$attrs"
+      v-bind="forwardAttrs"
       :input-id="idInt"
       :date-type="dateFieldType"
       :show-label="false"

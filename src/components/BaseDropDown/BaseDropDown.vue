@@ -111,7 +111,7 @@ export default {
       default: '',
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
   setup(props) {
     /**
      * generally get a reference to the root template element
@@ -249,10 +249,10 @@ export default {
       /**
        * Event emitted when an option is selected
        *
-       * @event update:modelValue
+       * @event update:model-value
        * @param { Object } - the selected option
        */
-      this.$emit('update:modelValue', option);
+      this.$emit('update:model-value', option);
     },
     // adding key navigation for accessibility
     selectByKey(event) {

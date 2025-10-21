@@ -592,6 +592,7 @@ export default {
         }
       },
       immediate: true,
+      deep: true,
     },
     list: {
       /**
@@ -603,6 +604,7 @@ export default {
         this.activeOptionIndex = val.length || (this.allowUnknownEntries && this.input) ? 0 : -1;
       },
       immediate: true,
+      deep: true,
     },
     modelValue: {
       /**
@@ -818,6 +820,9 @@ export default {
           this.activeOptionIndex,
           true,
         );
+        if (this.activeOption && !this.activeOption[this.identifierPropertyName]) {
+          console.warn(`Selected option '${this.activeOption[this.labelPropertyName]}' will not be shown active due to missing identifier property!`);
+        }
       }
     },
 
@@ -893,7 +898,7 @@ export default {
           :drop-down-no-options-info="dropDownNoOptionsInfo"
           class="base-chips-input__drop-down"
           @click.stop="closeDropDown"
-          @touchstart.stop="closeDropDown">
+          @touchstart.stop.passive="closeDropDown">
           <template #option="{ option }">
             <span
               v-if="allowUnknownEntries && option[identifierPropertyName] === 'createNew'"

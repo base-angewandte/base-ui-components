@@ -72,7 +72,7 @@ export default {
         .every(prop => Object.keys(val).includes(prop)),
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['update:model-value'],
   setup(props) {
     /** ACTIVE PAGE NUMBER */
     /**
@@ -218,10 +218,10 @@ export default {
         /**
          * triggered on page select
          *
-         * @event update:modelValue
+         * @event update:model-value
          * @param {number} - the new page number
          */
-        this.$emit('update:modelValue', val);
+        this.$emit('update:model-value', val);
       }
       // adjust the start and end value accordingly (if not all numbers can be displayed)
       this.setStartEnd();
@@ -254,7 +254,10 @@ export default {
     getLinkPath(page) {
       // check if router in project and link element is used and set link path accordingly if yes
       if (!!this.useLinkElement && this.$route) {
-        return ({ path: this.$route.fullPath, query: { page } });
+        return ({ path: this.$route.fullPath, query: {
+          ...this.$route.query,
+          page,
+        }});
       }
       return '';
     },

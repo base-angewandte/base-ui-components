@@ -6,8 +6,9 @@ import { usePopUpLock } from '@/composables/usePopUpLock.js';
 import { useId } from '@/composables/useId.js';
 
 /**
- * Component allowing sliding through images,
- * audio, video (currently only hls format) and files
+ * Component for browsing various file formats.
+ * Supports images, audio, video (currently HLS only), and PDF through dedicated viewers.
+ * For unknown formats, a preview image is shown when available, with an option to download the file.
  */
 
 export default {
@@ -35,6 +36,7 @@ export default {
      *  **orientation** `number` - define how the image should be rotated (EXIF orientation values) (only for type `image`)
      *  **previews** `Object[]` - specify an image `srcset` as an array of objects in the form `{ [mediawidth]: 'url' }` (only for type `image`)
      *  **hlsStartLevel** `number` - define startLevel (size) of hls-video
+     *  **thumbnail** `string` - url of a preview image, used for files for which no special viewer is available
      *
      */
     items: {
@@ -58,14 +60,20 @@ export default {
       default: true,
     },
     /**
-     * define information texts for download and view (for pdfs) buttons
+     * define information texts
+     * e.g. for download and view (for pdfs) buttons or error messages
      */
     infoTexts: {
       type: Object,
       default: () => ({
         download: 'Download',
         view: 'View',
+        error: {
+          pdf: 'The PDF couldn’t be opened in the PDF-Viewer.',
+        }
       }),
+      validator: val => ['download', 'view', 'error'].every(prop => Object.keys(val).includes(prop))
+        && val?.error?.pdf,
     },
     /**
      * steer the display of the lightbox
@@ -86,6 +94,27 @@ export default {
         },
       }),
     },
+    /**
+     * define the initial width (in pixels) for pdf pages
+     */
+    pdfInitialWidth: {
+      type: Number,
+      default: 1000,
+    },
+    /**
+     * defines the width (in pixels) of PDF pages in zoom mode
+     */
+    pdfZoomWidth: {
+      type: Number,
+      default: 2500,
+    },
+    /**
+     * define the max zoom factor in %
+     */
+    zoomMax: {
+      type: Number,
+      default: 250,
+    },
   },
   emits: ['download', 'hide'],
   setup() {
@@ -105,7 +134,22 @@ export default {
   },
   data() {
     return {
+      /**
+       * store the swiper instance
+       */
       swiper: undefined,
+      /**
+       * store the current zoom factor for baseRangeSlider
+       * Note: the id is needed to address the right slide.
+       *       the id is added, when zoom is triggered
+       */
+      currentZoom: {
+        id: null,
+        value: 100,
+      },
+      /**
+       * flag if component is mounted
+       */
       isMounted: false,
     };
   },
@@ -154,6 +198,7 @@ export default {
       const { Swiper } = await import('swiper');
       const { Keyboard } = await import('swiper/modules');
       const { Navigation } = await import('swiper/modules');
+      const { Zoom } = await import('swiper/modules');
 
       const additionalOptions = {
         init: false,
@@ -166,12 +211,47 @@ export default {
         // Threshold value in px.
         // If "touch distance" will be lower than this value then swiper will not move
         threshold: 10,
-        modules: [Navigation, Keyboard],
+        zoom: {
+          // maximum image zoom multiplier
+          maxRatio: this.zoomMax / 100,
+          // disable zoom-in by slide's double tap
+          // Todo: find solution to prevent double click event when it happens 'on' baseRangeSlider
+          toggle: false,
+        },
+        modules: [Navigation, Keyboard, Zoom],
       };
 
       this.swiper = new Swiper(`#${this.swiperId}`, {
         ...this.swiperOptions,
         ...additionalOptions,
+      });
+
+      /**
+       * On slide change, reset the PDF zoom factor to 100% and control rendering
+       * (pause on inactive slides, resume on the active slide).
+       *
+       * A `setTimeout` is used to defer execution:
+       * without it, the pdfViewer's zoom watcher may run
+       * after `stopRendering`, unintentionally resuming rendering.
+       */
+      this.swiper.on('transitionStart', () => {
+        // reset zoom before slide changes
+        if (this.currentZoom.value !== 100) this.currentZoom.value = 100;
+
+        // pause/resume PDF rendering
+        setTimeout(() => {
+          const slides = this.$refs.baseMedia;
+          slides.forEach((slide, i) => {
+            const pdfViewer = slide.$refs.pdfViewer;
+            if (pdfViewer) {
+              if (i === this.swiper.activeIndex) {
+                pdfViewer.resumeRendering();
+              } else {
+                pdfViewer.stopRendering();
+              }
+            }
+          });
+        }, 0);
       });
 
       this.swiper.on('slideChange', () => {
@@ -185,6 +265,12 @@ export default {
           const media = this.$refs.baseMedia[this.swiper.activeIndex];
           media.$el.focus();
         }
+      });
+
+      // update currentZoom
+      this.swiper.on('zoomChange', (swiper, scale) => {
+        // get the value needed here
+        this.currentZoom.value = scale * 100;
       });
 
       // calc of slide width is wrong on first initialization using component in ssr
@@ -249,7 +335,7 @@ export default {
      * @return array
      */
     getFocusableItems() {
-      const focusable = 'button, audio, video[tabindex="0"]';
+      const focusable = 'button, audio, video[tabindex="0"], input[type="range"]';
       const focusableBySlide = [];
 
       this.$refs.baseMedia.forEach((slide) => {
@@ -310,6 +396,14 @@ export default {
        */
       this.$emit('download', value);
     },
+    /**
+     * set a zoom factor for swiper
+     * @param {Object} obj - current zoom factor in %
+     */
+    zoomSlide(obj) {
+      this.currentZoom = obj;
+      this.swiper.zoom.in(obj.value / 100);
+    },
   },
 };
 </script>
@@ -365,7 +459,13 @@ export default {
                 :orientation="media.orientation"
                 :previews="media.previews"
                 :hls-start-level="media.hlsStartLevel"
+                :thumbnail="media.thumbnail"
+                :current-zoom="currentZoom"
+                :zoom-active-width="pdfZoomWidth"
+                :zoom-initial-width="pdfInitialWidth"
+                :zoom-max="zoomMax"
                 tabindex="0"
+                @update:swiper-zoom="zoomSlide"
                 @download="download" />
             </div>
           </div>
@@ -385,6 +485,7 @@ export default {
   @use '../../../node_modules/swiper/modules/pagination.scss';
   @use '../../../node_modules/swiper/modules/keyboard.scss';
   @use '../../../node_modules/swiper/modules/autoplay.scss';
+  @use '../../../node_modules/swiper/modules/zoom.scss';
 
   .base-media-carousel {
     position: fixed;
@@ -395,6 +496,10 @@ export default {
     z-index: map.get($zindex, modal_bg);
     display: flex;
     overflow: hidden;
+
+    @supports (height: 100dvh) {
+      height: 100dvh;
+    }
 
     &__background {
       position: absolute;
@@ -407,13 +512,19 @@ export default {
 
     &__close {
       position: absolute;
-      top: $spacing-large;
+      top: $spacing;
       right: $spacing-large;
       width: $icon-large;
-      height: $icon-large;
+      height: 3rem;
       color: white;
       z-index: 5;
       transition: color 250ms ease-in-out;
+      mix-blend-mode: difference;
+
+      @media screen and (max-width: $mobile) {
+        top: $spacing-small;
+        right: $spacing;
+      }
 
       &:focus,
       &:hover {
@@ -456,5 +567,10 @@ export default {
   .grow-leave-to {
     transform: scale(0.33);
     opacity: 0;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    mix-blend-mode: difference;
   }
 </style>

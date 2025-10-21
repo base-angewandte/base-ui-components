@@ -72,6 +72,25 @@ import './styles/app.scss';
 import 'base-ui-components/base-ui-components.css';
 ```
 
+### Composables
+
+Additionally, base-ui-components export the following composables for re-use:
+
+* **useAnnouncer**: adding a hidden element with `aria-live` attribute set to `assertive`
+* **useDebounce**: set a timeout before function execution and reset timeout if function is called again
+* **useElementFadeOut**: add a fade out via pseudo-elements when child overflows element container
+* **useElementObserver**: composable to use for Resize-, Mutation- or IntersectionObserver
+* **useEventListener**: add and remove event listeners
+* **useExtractAttrs**: split attributes set on root component in attributes that should remain on root (e.g. `class`) and attributes that should be forwarded to a child
+* **useHasSlotContent**: check if a slot has child elements or text set
+* **useHorizontalDragScroll**: enable horizontal dragging of elements via mouse on desktop
+* **useI18n**: get or set localized labels with vue-i18n
+* **useId**: create a persistent element id
+* **useListNavigation**: navigate a list
+* **useNotifications**: composable to trigger the BaseNotification component
+* **usePopUpLock**: set a body scroll lock on pop up opening
+* **useTabKeyHandler**: enable key events to remain within one element (e.g. pop up)
+* **useWindowResize**: listen to and carry out events on window resize
 
 ### License
 

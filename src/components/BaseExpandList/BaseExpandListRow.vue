@@ -357,7 +357,7 @@ export default {
       v-if="!edit && dataInt.label">
       <button
         :id="'base-expand-control-' + internalId"
-        :aria-expanded="expanded ? 'true' : 'false'"
+        :aria-expanded="expanded"
         :aria-controls="'base-expand-region-' + internalId"
         type="button"
         class="base-expand__head base-expand-item"
@@ -385,7 +385,7 @@ export default {
           v-show="expanded"
           :id="'base-expand-region-' + internalId"
           :aria-labelledby="'base-expand-control-' + internalId"
-          :aria-hidden="!expanded ? 'true' : 'false'"
+          :aria-hidden="!expanded"
           class="base-expand__body">
           <!-- Todo: limit levels (counter) -->
           <BaseExpandListRow

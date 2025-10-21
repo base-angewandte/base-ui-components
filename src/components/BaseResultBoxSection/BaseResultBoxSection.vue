@@ -388,6 +388,27 @@ export default {
       }),
     },
     /**
+     * this prop gives the option to add assistive text for the pagination:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    paginationAssistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+    },
+    /**
      * `BaseResultBoxSection` is for example used to display search results - which contain a link
      * to the entry - in this case the focus should be on the link element so that navigation to
      * route link triggers on enter and focus on the list element itself is disabled (if not edit
@@ -422,20 +443,9 @@ export default {
     // try to only do initial box size calculation once
     const initialBoxCalcDone = ref(false);
 
-    /**
-     * calc the number of boxes that fits the space as soon as the container
-     * has been rendered
-     */
-    watch(resultBoxesArea, (value) => {
-      // as soon as area is rendered and variable received a value calc
-      // how much space per box is available
-      if (value) {
-        calcBoxNumber();
-      }
-    });
-
     // recalc box number on window resize
     useWindowResize({
+      target: 'resultboxsection',
       callback: calcBoxNumber,
       setDebounce: 300,
     })
@@ -491,6 +501,26 @@ export default {
             margin-right: var(--spacing-regular);
           }`;
         initialBoxCalcDone.value = true;
+      }
+    }
+
+    /**
+     * calc the number of boxes that fits the space as soon as the container
+     * has been rendered
+     * (we can not use the useWindowResize callOnMounted since this is just considering
+     * window not the component)
+     */
+    watch(resultBoxesArea, (value) => {
+      // as soon as area is rendered and variable received a value calc
+      // how much space per box is available
+      if (value) {
+        calcBoxNumber();
+      }
+    }, { once: true });
+
+    // in order to only trigger event when value has really changed create a watcher
+    watch(itemsPerRow, (val, oldVal) => {
+      if (val !== oldVal) {
         /**
          * communicate to parent when items per row changed, either after initial
          * render space calculations or when window was resized
@@ -499,7 +529,7 @@ export default {
          */
         emit('items-per-row-changed', itemsPerRow.value);
       }
-    }
+    });
 
     /** INTERNATIONALIZATION */
     const { getI18nTerm } = useI18n();
@@ -514,6 +544,7 @@ export default {
       initialBoxCalcDone,
       // i18n
       getI18nTerm,
+      calcBoxNumber,
     };
   },
   data() {
@@ -693,18 +724,21 @@ export default {
       immediate: true,
     },
     // watch selectedList prop and assign to internal value if changes occur
-    selectedListInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
-        /**
-         * inform the parent of the changes in `selectedList` and provide
-         * the ids of all selected.
-         *   the v-model directive may be used on the corresponding prop
-         *
-         * @event update:selected-list
-         * @param {Array} - the list of selected entry ids
-         */
-        this.$emit('update:selected-list', val);
-      }
+    selectedListInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
+          /**
+           * inform the parent of the changes in `selectedList` and provide
+           * the ids of all selected.
+           *   the v-model directive may be used on the corresponding prop
+           *
+           * @event update:selected-list
+           * @param {Array} - the list of selected entry ids
+           */
+          this.$emit('update:selected-list', val);
+        }
+      },
+      deep: true,
     },
     // watch pages in case of deletion of items and take care
     // current page is not higher than total page number
@@ -857,6 +891,15 @@ export default {
     }
   },
   mounted() {
+    /**
+     * Calculate the number of boxes that fit in the space.
+     * Do this during mounting to ensure that page transitions work correctly in Nuxt.
+     * Note: a watcher in setup() is currently triggered before the component is mounted
+     */
+    this.calcBoxNumber();
+    /**
+     * component is initialized and ready
+     */
     this.initialized = true;
   },
   methods: {
@@ -1396,6 +1439,7 @@ export default {
             :total="pages"
             :model-value="currentPageNumberInt"
             :use-link-element="usePaginationLinkElement"
+            :assistive-text="paginationAssistiveText"
             @update:model-value="setPage" />
         </template>
       </div>
