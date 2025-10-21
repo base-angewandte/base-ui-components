@@ -5,17 +5,17 @@ import { withBase } from 'vitepress'
 const currentlyUsedApps = ref([
   {
     name: 'Showroom',
-    icon: '/.vitepress/assets/icons/showroom.svg',
+    icon: 'showroom.svg',
     link: 'https://portfolio-showroom.ac.at/',
   },
   {
     name: 'Portfolio',
-    icon: '/.vitepress/assets/icons/portfolio.svg',
+    icon: 'portfolio.svg',
     link: 'https://portfolio-showroom.ac.at/',
   },
   {
     name: 'Image',
-    icon: '/.vitepress/assets/icons/image.svg',
+    icon: 'image.svg',
     link: 'https://imageplus.at/',
   },
 ]);
