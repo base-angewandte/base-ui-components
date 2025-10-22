@@ -50,6 +50,7 @@ For slot demonstrations see [BaseChipsInput](BaseChipsInput) or [BaseInput](Base
       :search-type="searchType"
       :placeholder="placeholder"
       :show-pre-input-icon="false"
+      :add-chips-input-directly="true"
       label="Advanced Example"
       class="search" />
     <div

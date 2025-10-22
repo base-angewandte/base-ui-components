@@ -1180,7 +1180,7 @@ export default {
       // else check if filter type is chips and there is an active entry in the options list
       if (this.filter.type === 'chips' && this.activeControlledVocabularyEntry) {
         this.addOption(this.activeControlledVocabularyEntry);
-        // if an active entry is present (=selected by key naviagation) add the entry
+        // if an active entry is present (=selected by key navigation) add the entry
       } else if (this.useAutocompleteFunctionality && this.activeEntry) {
         this.addOption(this.activeEntry, this.activeCollectionId);
         // check if filter type is text
@@ -1528,6 +1528,7 @@ export default {
         : labelPropertyName.controlledVocabularyOption"
       :set-focus-on-active="false"
       :clearable="false"
+      :add-chips-input-directly="false"
       :assistive-text="{
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
@@ -1648,7 +1649,7 @@ export default {
             'overflow-y': 'auto',
           }"
           class="base-advanced-search-row__drop-down-body"
-          @touchstart.stop=""
+          @touchstart.stop.passive=""
           @click.stop="">
           <!-- FILTER AREA -->
           <template

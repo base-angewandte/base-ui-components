@@ -170,6 +170,15 @@ export default {
       default: true,
     },
     /**
+     * for `searchType` 'chips': set this false if you want to add the chip
+     * manually e.g. if option is selected from a dropdown, `true` is mainly
+     * just useful if BaseSearch is a standalone element
+     */
+    addChipsInputDirectly : {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * this prop gives the option to add assistive text for screen readers
      * properties:
      *
@@ -599,7 +608,7 @@ export default {
       :label-property-name="isFieldTypeChips ? labelPropertyName : undefined"
       :identifier-property-name="isFieldTypeChips ? identifierPropertyName : undefined"
       :set-focus-on-active="setFocusOnActive"
-      :add-selected-entry-directly="isFieldTypeChips || undefined"
+      :add-selected-entry-directly="isFieldTypeChips && addChipsInputDirectly || undefined"
       :assistive-text="!searchType.includes('date') ? {
         selectedOption: assistiveText.selectedOption,
         loaderActive: assistiveText.loaderActive,
