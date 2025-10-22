@@ -561,7 +561,8 @@ export default {
       // if device has a virtual keyboard open we want to close it on search enter
       // just to be safe also check if the target element (where the keydown came from) is the
       // search input - compare ids
-      if (window.visualViewport.height < window.innerHeight && event.target.id === this.idInt) {
+      // add a few pixels (20) to account for scrollbar which would also alter visualViewport height
+      if (window.visualViewport.height + 20 < window.innerHeight && event.target.id === this.idInt) {
         event.target.blur();
       }
     },
