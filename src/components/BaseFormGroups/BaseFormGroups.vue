@@ -94,6 +94,21 @@ export default {
       default: false,
     },
     /**
+     * provide all error messages for fields in a separate object
+     * same structure as modelValue, final value should be an array
+     * of messages
+     *
+     * example - error in repeatable field group, only the second group has an error:
+     * { [fieldGroupName]: [{}, { amount: ['This field is required.'] }]}
+     *
+     * caveat: if error messages are provided via errorMessagesObject, they take
+     *  priority over `fieldProps` set values
+     */
+    errorMessagesObject: {
+      type: Object,
+      default: () => ({}),
+    },
+    /**
      * if `true` a remove icon will be shown allowing to remove
      * all input at once.
      * for an example on how it looks on an individual form field see [BaseInput](BaseInput)

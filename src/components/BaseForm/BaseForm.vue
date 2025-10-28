@@ -107,6 +107,21 @@ export default {
       default: false,
     },
     /**
+     * provide all error messages for fields in a separate object
+     * same structure as modelValue, final value should be an array
+     * of messages
+     *
+     * example - error in repeatable field group, only the second group has an error:
+     * { [fieldGroupName]: [{}, { amount: ['This field is required.'] }]}
+     *
+     * caveat: if error messages are provided via errorMessagesObject, they take
+     *  priority over `fieldProps` set values
+     */
+    errorMessagesObject: {
+      type: Object,
+      default: () => ({}),
+    },
+    /**
      * if `true` a remove icon will be shown allowing to remove
      * all input at once.
      * for an example on how it looks on an individual form field see [BaseInput](BaseInput)
@@ -633,42 +648,50 @@ export default {
       const fieldRepeatable = valueIndex >= 0;
       // check if field is repeatable
       if (fieldRepeatable) {
-        // if yes get the field Props that are actually settable for each field individually
-        // and present in the fieldProps object
-        const existingIndividualFieldProps = Object.entries(singleFieldProps)
-          .filter(([key]) => INDIVIDUAL_REPEATABLE_FIELDPROPS.includes(key));
-        // now check if any individually settable field props were found for the field
-        if (existingIndividualFieldProps.length) {
-          // now get an object that only contains the fieldProps of repeatable fields where the
-          // index is present in the value object
-          // otherwise delete the value object from the fieldProps completely (since usually not
-          // compatible with actual fieldProp type and values not usable
-          const repeatableFieldProps = existingIndividualFieldProps.reduce((prev, [key, value]) => {
-            // check if the input field index exists as a key in the value object
-            if (Object.keys(value).includes(valueIndex.toString())) {
-              // if yes - add it to the object with the appropriate value
-              return {
-                ...prev,
-                [key]: value[valueIndex.toString()],
-              };
-            }
-            // else delete the fieldProp from the fieldProps object completely
-            delete singleFieldProps[key];
-            // and just return the unmodified object
-            return prev;
-          }, {});
-          // finally actually combine the original fieldProps object with the properties settable
-          // per repeated field
-          singleFieldProps = {
-            ...singleFieldProps,
-            ...repeatableFieldProps,
-
-          };
+        let repeatableFieldProps;
+        if (element['x-attrs']?.field_type === 'group') {
+          repeatableFieldProps = singleFieldProps[valueIndex];
+        } else {
+          // if yes get the field Props that are actually settable for each field individually
+          // and present in the fieldProps object
+          const existingIndividualFieldProps = Object.entries(singleFieldProps)
+            .filter(([key]) => INDIVIDUAL_REPEATABLE_FIELDPROPS.includes(key));
+          // now check if any individually settable field props were found for the field
+          if (existingIndividualFieldProps.length) {
+            // now get an object that only contains the fieldProps of repeatable fields where the
+            // index is present in the value object
+            // otherwise delete the value object from the fieldProps completely (since usually not
+            // compatible with actual fieldProp type and values not usable
+            repeatableFieldProps = existingIndividualFieldProps.reduce((prev, [key, value]) => {
+              // check if the input field index exists as a key in the value object
+              if (Object.keys(value).includes(valueIndex.toString())) {
+                // if yes - add it to the object with the appropriate value
+                return {
+                  ...prev,
+                  [key]: value[valueIndex.toString()],
+                };
+              }
+              // else delete the fieldProp from the fieldProps object completely
+              delete singleFieldProps[key];
+              // and just return the unmodified object
+              return prev;
+            }, {});
+          }
         }
+        // finally actually combine the original fieldProps object with the properties settable
+        // per repeated field
+        singleFieldProps = {
+          ...singleFieldProps,
+          ...repeatableFieldProps,
+
+        };
       }
       // create a unique string for identifier(key) purposes out of field index
       // and (if field is repeatable) value index
       const comboIndex = fieldRepeatable ? `${index}_${groupIndex}_${valueIndex}` : `${index}_${groupIndex}`;
+      // get the relevant error message(s) from `errorMessagesObject` already here since we need it
+      // several times
+      const errorMessagesObjectExtract = this.getErrorMessage(name, valueIndex);
 
       return {
         field: element,
@@ -694,7 +717,30 @@ export default {
         identifierPropertyName: this.identifierPropertyName,
         labelPropertyName: this.labelPropertyName,
         assistiveText: singleFieldProps.assistiveText || this.assistiveText,
+        // get string from `errorMessagesObject` and if not present use `fieldProps`
+        errorMessage: errorMessagesObjectExtract || singleFieldProps.errorMessage,
+        invalid: !!(errorMessagesObjectExtract && errorMessagesObjectExtract.length) || singleFieldProps.invalid,
       };
+    },
+    /**
+     * function to extract error messages string from errorMessageObject
+     * @param {string} name - the field name
+     * @param {number} valueIndex - the index of the field in case it is a repeatable field
+     * @returns {?string|Object} - single field returns the error message, for field groups an object
+     *  is returned (either array for repeatable groups or object for single group), if no error message
+     *  was found undefined is returned
+     */
+    getErrorMessage(name, valueIndex) {
+      // extract error messages for a field, depending on if repeatable or not
+      const errors = valueIndex >= 0 ? this.errorMessagesObject?.[name]?.[valueIndex] : this.errorMessagesObject?.[name];
+      // if messages were found and the retrieved array value is a string we are at the lowest level
+      if (errors && typeof errors === 'object' && typeof errors[0] === 'string') {
+        // return all array strings
+        return errors.join(' ');
+      }
+      // else either the field has no errors or it is an object meant for
+      // a field group - either way - return that
+      return errors;
     },
     /**
      * check if field can be multiplied

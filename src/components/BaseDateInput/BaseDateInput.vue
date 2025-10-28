@@ -146,34 +146,42 @@ export default {
     },
     /**
      * mark as required field (currently only used for aria-required)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     required: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
      * to display below the form field
      * for an example see [BaseInput](BaseInput)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     invalid: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * set `true` if input field should be disabled
      * for an example see [BaseInput](BaseInput)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     disabled: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * add an error message to be displayed below form field if field is invalid
      * for an example see [BaseInput](BaseInput)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     errorMessage: {
-      type: String,
+      type: [String, Object],
       default: '',
     },
     /**
@@ -950,6 +958,55 @@ export default {
       });
     }
 
+    /** INPUT FIELDS STATE HANDLING */
+    /** INVALID */
+    /** consider if `invalid` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const invalidFrom = computed(() => typeof props.invalid === 'boolean'
+      ? props.invalid : props.invalid.date_from || props.invalid.time_from || props.invalid.date || false);
+    /** consider if `invalid` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const invalidTo = computed(() => typeof props.invalid === 'boolean'
+      ? props.invalid : props.invalid.date_to || props.invalid.time_to || props.invalid.time || false);
+
+    /** ERROR MESSAGES */
+    /** consider if `errorMessage` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<string>}
+     */
+    const errorMessageFrom = computed(() => typeof props.errorMessage === 'string'
+      ? props.errorMessage : props.errorMessage.date_from || props.errorMessage.time_from || props.errorMessage.date || '');
+    /** consider if `errorMessage` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<string>}
+     */
+    const errorMessageTo = computed(() => typeof props.errorMessage === 'string'
+      ? props.errorMessage : props.errorMessage.date_to || props.errorMessage.time_to || props.errorMessage.time || '');
+
+    /** REQUIRED */
+    /** consider if `required` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const requiredFrom = computed(() => typeof props.required === 'boolean'
+      ? props.required : props.required.date_from || props.required.time_from || props.required.date || false);
+    /** consider if `required` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const requiredTo = computed(() => typeof props.props === 'boolean'
+      ? props.required : props.required.date_to || props.required.time_to || props.required.time || false);
+
+    /** DISABLED */
+    /** consider if `disabled` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const disabledFrom = computed(() => typeof props.disabled === 'boolean'
+      ? props.disabled : props.disabled.date_from || props.disabled.time_from || props.disabled.date || false);
+    /** consider if `disabled` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const disabledTo = computed(() => typeof props.props === 'boolean'
+      ? props.disabled : props.disabled.date_to || props.disabled.time_to || props.disabled.time || false);
+
     return {
       internalId,
       lang,
@@ -995,6 +1052,15 @@ export default {
       useFadeOutFrom: fadeOut.fadeOutFrom,
       useFadeOutTo: fadeOut.fadeOutTo,
       calcFadeOut,
+      // input field state
+      invalidFrom,
+      invalidTo,
+      errorMessageFrom,
+      errorMessageTo,
+      requiredFrom,
+      requiredTo,
+      disabledFrom,
+      disabledTo,
     };
   },
   data() {
@@ -1774,11 +1840,11 @@ export default {
                 : assistiveText.clearInput?.date_from ?? assistiveText.clearInput?.time_from
                   ?? assistiveText.clearInput?.date ?? 'clear input',
             }"
-            :required="required"
-            :invalid="invalid"
-            :disabled="disabled"
+            :required="requiredFrom"
+            :invalid="invalidFrom"
+            :disabled="disabledFrom"
             :show-error-icon="showErrorIcon"
-            :error-message="errorMessage"
+            :error-message="errorMessageFrom"
             :input-class="inputClass"
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutFrom"
@@ -1868,11 +1934,11 @@ export default {
                 : assistiveText.clearInput?.date_to ?? assistiveText.clearInput?.time_to
                   ?? assistiveText.clearInput?.time ?? 'clear input',
             }"
-            :required="required"
-            :invalid="invalid"
-            :disabled="disabled"
+            :required="requiredTo"
+            :invalid="invalidTo"
+            :disabled="disabledTo"
             :show-error-icon="showErrorIcon"
-            :error-message="errorMessage"
+            :error-message="errorMessageTo"
             :set-focus-on-active="setFocusOnActive"
             :use-fade-out="useFadeOutTo"
             class="base-date-input__input-wrapper"
@@ -2050,7 +2116,7 @@ export default {
         .base-date-input__input-line {
           display: flex;
           flex: 1 1 auto;
-          align-items: center;
+          align-items: baseline;
 
           .base-date-input__input-wrapper {
 

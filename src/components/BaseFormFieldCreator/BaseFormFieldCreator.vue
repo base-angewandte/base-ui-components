@@ -151,26 +151,39 @@ export default {
      * **Caveat**: currently the required prop is only used to trigger [BaseChipsBelow](BaseChipsBelow) validation -
      *             for all other form fields it is only used for the `aria-required` attributes
      * **Note**: if required is also set via OpenAPI definition x-attrs (provided by prop `field`) this will overwrite the prop!
+     * value can be an object if `field_type` date has several values
      */
     required: {
-      type: Boolean,
+      type: [Boolean, Object],
+      default: false,
+    },
+    /**
+     * set `true` if input field should be disabled
+     * for an example see [BaseInput](BaseInput)
+     * value can be an object if `field_type` date has several values
+     */
+    disabled: {
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
      * to display below the form field.
      * for an example see [BaseInput](BaseInput)
+     * value can be an object if `field_type` date has several values
      */
     invalid: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * add an error message to be displayed below form field if field is invalid.
      * for an example see [BaseInput](BaseInput)
+     * for `field_type` 'group' an Object with the fields can be passed on or
+     * value can be an object if `field_type` date has several values
      */
     errorMessage: {
-      type: String,
+      type: [String, Object],
       default: '',
     },
     /**
@@ -333,6 +346,8 @@ export default {
         formId: `${this.fieldKey}_${this.field.name}`,
         fieldProps: this.fieldProps,
         dropDownLists: this.fieldGroupDropDownLists,
+        // if type is 'group' error messages need to be passed on - otherwise leave empty object
+        errorMessagesObject: typeof this.errorMessage === 'string' ? {} : this.errorMessage,
       };
     },
     /**
@@ -399,6 +414,23 @@ export default {
         return 'timerange';
       }
       return 'single';
+    },
+    dateErrorMessage() {
+      if (this.fieldType !== 'date') return '';
+      if (typeof this.errorMessage === 'object') {
+        return Object.fromEntries(Object.entries(this.errorMessage).map(([key, value]) => {
+          return [key, typeof value === 'object' && value.length ? value.join(' ') : value];
+        }));
+      }
+      return this.errorMessage;
+    },
+    dateInvalid() {
+      if (this.fieldType !== 'date') return false;
+      if (this.invalid) return this.invalid;
+      if (typeof this.dateErrorMessage === 'object' && Object.keys(this.dateErrorMessage).length) {
+        return Object.fromEntries(Object.entries(this.dateErrorMessage).map(([key, value]) => [key, !!value]));
+      }
+      return this.fieldProps.invalid || false;
     },
     /**
      * get field properties from swagger info - necessary for subforms
@@ -901,9 +933,9 @@ export default {
             }"
           :format-tabs-legend="fieldProps.formatTabsLegend || getI18nTerm('form.dateTabsLegend')"
           :language="language"
-          :invalid="invalid || fieldProps.invalid"
+          :invalid="dateInvalid"
           :required="required || fieldProps.required"
-          :error-message="errorMessage || fieldProps.errorMessage"
+          :error-message="dateErrorMessage || fieldProps.errorMessage"
           :clearable="clearable"
           :assistive-text="assistiveTextInt"
           class="base-form-field-creator__date-field"
@@ -983,9 +1015,9 @@ export default {
           :show-label="!dateType.includes('date')"
           :placeholder="placeholderInt.time || placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
-          :invalid="invalid || fieldProps.invalid"
+          :invalid="dateInvalid"
           :required="required || fieldProps.required"
-          :error-message="errorMessage || fieldProps.errorMessage"
+          :error-message="dateErrorMessage || fieldProps.errorMessage"
           :clearable="clearable"
           :assistive-text="assistiveTextInt"
           date-type="timerange"
