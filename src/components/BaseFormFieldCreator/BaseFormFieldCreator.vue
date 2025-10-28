@@ -151,24 +151,36 @@ export default {
      * **Caveat**: currently the required prop is only used to trigger [BaseChipsBelow](BaseChipsBelow) validation -
      *             for all other form fields it is only used for the `aria-required` attributes
      * **Note**: if required is also set via OpenAPI definition x-attrs (provided by prop `field`) this will overwrite the prop!
+     * value can be an object if `field_type` date has several values
      */
     required: {
-      type: Boolean,
+      type: [Boolean, Object],
+      default: false,
+    },
+    /**
+     * set `true` if input field should be disabled
+     * for an example see [BaseInput](BaseInput)
+     * value can be an object if `field_type` date has several values
+     */
+    disabled: {
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
      * to display below the form field.
      * for an example see [BaseInput](BaseInput)
+     * value can be an object if `field_type` date has several values
      */
     invalid: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * add an error message to be displayed below form field if field is invalid.
      * for an example see [BaseInput](BaseInput)
-     * for `field_type` 'group' an Object with the fields can be passed on
+     * for `field_type` 'group' an Object with the fields can be passed on or
+     * value can be an object if `field_type` date has several values
      */
     errorMessage: {
       type: [String, Object],
