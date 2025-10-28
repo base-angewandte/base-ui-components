@@ -111,7 +111,7 @@ export default defineConfig({
         // landing page (index.md) and components.md page
         // components.md is created as hard link since softlink created weird redirects
         link: '/components',
-        activeMatch: '/Base*',
+        activeMatch: '(/components|/Base*)',
       },
       {
         text: 'Customization Options',
