@@ -648,38 +648,43 @@ export default {
       const fieldRepeatable = valueIndex >= 0;
       // check if field is repeatable
       if (fieldRepeatable) {
-        // if yes get the field Props that are actually settable for each field individually
-        // and present in the fieldProps object
-        const existingIndividualFieldProps = Object.entries(singleFieldProps)
-          .filter(([key]) => INDIVIDUAL_REPEATABLE_FIELDPROPS.includes(key));
-        // now check if any individually settable field props were found for the field
-        if (existingIndividualFieldProps.length) {
-          // now get an object that only contains the fieldProps of repeatable fields where the
-          // index is present in the value object
-          // otherwise delete the value object from the fieldProps completely (since usually not
-          // compatible with actual fieldProp type and values not usable
-          const repeatableFieldProps = existingIndividualFieldProps.reduce((prev, [key, value]) => {
-            // check if the input field index exists as a key in the value object
-            if (Object.keys(value).includes(valueIndex.toString())) {
-              // if yes - add it to the object with the appropriate value
-              return {
-                ...prev,
-                [key]: value[valueIndex.toString()],
-              };
-            }
-            // else delete the fieldProp from the fieldProps object completely
-            delete singleFieldProps[key];
-            // and just return the unmodified object
-            return prev;
-          }, {});
-          // finally actually combine the original fieldProps object with the properties settable
-          // per repeated field
-          singleFieldProps = {
-            ...singleFieldProps,
-            ...repeatableFieldProps,
-
-          };
+        let repeatableFieldProps;
+        if (element['x-attrs']?.field_type === 'group') {
+          repeatableFieldProps = singleFieldProps[valueIndex];
+        } else {
+          // if yes get the field Props that are actually settable for each field individually
+          // and present in the fieldProps object
+          const existingIndividualFieldProps = Object.entries(singleFieldProps)
+            .filter(([key]) => INDIVIDUAL_REPEATABLE_FIELDPROPS.includes(key));
+          // now check if any individually settable field props were found for the field
+          if (existingIndividualFieldProps.length) {
+            // now get an object that only contains the fieldProps of repeatable fields where the
+            // index is present in the value object
+            // otherwise delete the value object from the fieldProps completely (since usually not
+            // compatible with actual fieldProp type and values not usable
+            repeatableFieldProps = existingIndividualFieldProps.reduce((prev, [key, value]) => {
+              // check if the input field index exists as a key in the value object
+              if (Object.keys(value).includes(valueIndex.toString())) {
+                // if yes - add it to the object with the appropriate value
+                return {
+                  ...prev,
+                  [key]: value[valueIndex.toString()],
+                };
+              }
+              // else delete the fieldProp from the fieldProps object completely
+              delete singleFieldProps[key];
+              // and just return the unmodified object
+              return prev;
+            }, {});
+          }
         }
+        // finally actually combine the original fieldProps object with the properties settable
+        // per repeated field
+        singleFieldProps = {
+          ...singleFieldProps,
+          ...repeatableFieldProps,
+
+        };
       }
       // create a unique string for identifier(key) purposes out of field index
       // and (if field is repeatable) value index
