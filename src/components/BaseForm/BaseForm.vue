@@ -719,7 +719,7 @@ export default {
         assistiveText: singleFieldProps.assistiveText || this.assistiveText,
         // get string from `errorMessagesObject` and if not present use `fieldProps`
         errorMessage: errorMessagesObjectExtract || singleFieldProps.errorMessage,
-        invalid: !!errorMessagesObjectExtract || singleFieldProps.invalid,
+        invalid: !!(errorMessagesObjectExtract && errorMessagesObjectExtract.length) || singleFieldProps.invalid,
       };
     },
     /**
@@ -734,7 +734,7 @@ export default {
       // extract error messages for a field, depending on if repeatable or not
       const errors = valueIndex >= 0 ? this.errorMessagesObject?.[name]?.[valueIndex] : this.errorMessagesObject?.[name];
       // if messages were found and the retrieved array value is a string we are at the lowest level
-      if (errors && typeof errors[0] === 'string') {
+      if (errors && typeof errors === 'object' && typeof errors[0] === 'string') {
         // return all array strings
         return errors.join(' ');
       }

@@ -415,6 +415,23 @@ export default {
       }
       return 'single';
     },
+    dateErrorMessage() {
+      if (this.fieldType !== 'date') return '';
+      if (typeof this.errorMessage === 'object') {
+        return Object.fromEntries(Object.entries(this.errorMessage).map(([key, value]) => {
+          return [key, typeof value === 'object' && value.length ? value.join(' ') : value];
+        }));
+      }
+      return this.errorMessage;
+    },
+    dateInvalid() {
+      if (this.fieldType !== 'date') return false;
+      if (this.invalid) return this.invalid;
+      if (typeof this.dateErrorMessage === 'object' && Object.keys(this.dateErrorMessage).length) {
+        return Object.fromEntries(Object.entries(this.dateErrorMessage).map(([key, value]) => [key, !!value]));
+      }
+      return this.fieldProps.invalid || false;
+    },
     /**
      * get field properties from swagger info - necessary for subforms
      * @returns {Object}
@@ -916,9 +933,9 @@ export default {
             }"
           :format-tabs-legend="fieldProps.formatTabsLegend || getI18nTerm('form.dateTabsLegend')"
           :language="language"
-          :invalid="invalid || fieldProps.invalid"
+          :invalid="dateInvalid"
           :required="required || fieldProps.required"
-          :error-message="errorMessage || fieldProps.errorMessage"
+          :error-message="dateErrorMessage || fieldProps.errorMessage"
           :clearable="clearable"
           :assistive-text="assistiveTextInt"
           class="base-form-field-creator__date-field"
@@ -998,9 +1015,9 @@ export default {
           :show-label="!dateType.includes('date')"
           :placeholder="placeholderInt.time || placeholderInt"
           :range-separator="fieldProps.rangeSeparator || getI18nTerm('form.until')"
-          :invalid="invalid || fieldProps.invalid"
+          :invalid="dateInvalid"
           :required="required || fieldProps.required"
-          :error-message="errorMessage || fieldProps.errorMessage"
+          :error-message="dateErrorMessage || fieldProps.errorMessage"
           :clearable="clearable"
           :assistive-text="assistiveTextInt"
           date-type="timerange"
