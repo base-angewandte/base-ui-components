@@ -7,15 +7,15 @@ Radio Button
 <template>
   <div>
     <div>
-      <base-checkmark 
+      <BaseCheckmark
         v-model="checked"
         :show-label="true"
-        label="One"/>
-      <base-checkmark 
+        label="One" />
+      <BaseCheckmark
         v-model="checked"
         :show-label="true"
-        label="Two"/>
-    </div> 
+        label="Two" />
+    </div>
     <div>{{ 'Selected: ' + checked }}</div>
   </div>
 
@@ -37,11 +37,11 @@ Checkbox
 ```vue live
 <template>
   <div>
-    <base-checkmark 
+    <BaseCheckmark
       :show-label="true"
       v-model="checked"
       label="An Example Checkbox"
-      mark-style="checkbox"/>  
+      mark-style="checkbox" />
     <div>{{ 'is checked: ' + checked }}</div>
 </div>
 </template>

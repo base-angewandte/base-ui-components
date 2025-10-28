@@ -1,129 +1,23 @@
-<template>
-  <!-- v-clean-dom-nodes is here because space was added before and after the link which
-    was not the desired effect when link was followed by a comma in BaseTextList - also
-    see ticket #2283#note-11 -->
-  <component
-    :is="renderAs"
-    v-bind="linkAttributes"
-    v-clean-dom-nodes
-    :aria-controls="isTooltip ? `tooltipBox-${_uid}`: null"
-    :aria-expanded="isTooltip ? showTooltip.toString() : null"
-    :aria-label="isChip || isTooltip ? title : null"
-    :tabindex="isTooltip ? 0 : null"
-    :title="title"
-    :class="[
-      'base-link',
-      {
-        'base-link--chip': isChip,
-        'base-link--internal': isInternal,
-        'base-link--external': isExternal,
-        'base-link--tooltip': isTooltip,
-        'base-link--active': showTooltip,
-        'base-link--space-after': spaceAfter,
-      },
-    ]"
-    @keyup.enter="clickHandler"
-    @click="clickHandler">
-    <!-- chip, internal, external, text -->
-    <template
-      v-if="!isTooltip">
-      <slot
-        name="label"
-        :label="value">
-        <span
-          v-insert-text-as-html="{ value, interpretTextAsHtml }"
-          :class="{ 'no-clean': interpretTextAsHtml }" />
-      </slot>
-    </template>
-
-    <!-- (i) tooltip -->
-    <template
-      v-if="isTooltip">
-      <span
-        class="base-link__label">
-        <slot
-          name="label"
-          :label="value">
-          <span
-            v-insert-text-as-html="{ value, interpretTextAsHtml }"
-            :class="{ 'no-clean': interpretTextAsHtml }" />
-        </slot>
-      </span>
-
-      <span
-        ref="icon"
-        class="base-link__icon">
-        <BaseIcon
-          v-show="!isLoading"
-          name="information" />
-      </span>
-
-      <span
-        v-if="isLoading"
-        class="base-link__loader">
-        <BaseLoader
-          v-if="isLoading" />
-      </span>
-
-      <BaseTooltipBox
-        v-if="showTooltip"
-        :id="`tooltipBox-${_uid}`"
-        :attach-to="$refs.icon"
-        :modal-on-mobile="false"
-        :role="'tooltip'"
-        :styles="tooltipStyles"
-        :threshold-top="tooltipThresholdTop"
-        :type-on-mobile="tooltipTypeOnMobile"
-        @close="showTooltip = !showTooltip">
-        <!-- @slot slot to inject content
-          @binding {Object} item - a tooltip object -->
-        <slot
-          name="tooltip"
-          :item="tooltip">
-          <span
-            v-if="tooltip.label"
-            class="base-tooltip__label">
-            {{ tooltip.label }}
-          </span>
-
-          <div
-            v-for="(item, index) in tooltip"
-            :key="index"
-            class="base-tooltip__row">
-            {{ item.label }}:
-            <template v-if="item.url">
-              <a
-                v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }"
-                :href="item.url"
-                :title="item.altTitle || undefined"
-                class="base-link--external">
-                {{ item.value }}
-              </a>
-            </template>
-            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len -->
-            <template v-else><span v-insert-text-as-html="{ value: item.value, interpretTextAsHtml }" /></template>
-          </div>
-        </slot>
-      </BaseTooltipBox>
-    </template>
-  </component>
-</template>
-
 <script>
+import { defineAsyncComponent, ref, getCurrentInstance, computed, useSlots } from 'vue';
+import { useWindowResize } from '@/composables/useWindowResize.js';
+import { useEventListener } from '@/composables/useEventListener.js';
+import { useId } from '@/composables/useId.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+import cleanDomNodes from '@/directives/cleanDomNodes.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
+
 /**
  * component to display different types of links
  * e.g.: chip, internal, external, text, tooltip, tooltip (async content)
  */
 
-import cleanDomNodes from '@/directives/cleanDomNodes';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
-
 export default {
   name: 'BaseLink',
   components: {
-    BaseIcon: () => import('../BaseIcon/BaseIcon').then(m => m.default || m),
-    BaseTooltipBox: () => import('../BaseTooltipBox/BaseTooltipBox').then(m => m.default || m),
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseTooltipBox: defineAsyncComponent(() => import('@/components/BaseTooltipBox/BaseTooltipBox.vue')),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
   },
   directives: {
     cleanDomNodes,
@@ -169,10 +63,15 @@ export default {
     },
     /**
      * specify how a link element should be rendered
-     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and vue-router is necessary
+     * this needs to be a valid vue link component string (e.g. `RouterLink`) or a component directly
+     * and vue-router is necessary
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     renderLinkAs: {
-      type: String,
+      type: [String, Object],
       default: 'RouterLink',
     },
     /**
@@ -313,11 +212,76 @@ export default {
       default: false,
     },
   },
+  emits: ['tooltip-clicked', 'chip-clicked'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+
+    /** TOOLTIP VISIBILITY HANDLING */
+    /**
+     * variable to store if tooltip should be shown
+     * @type {Ref<UnwrapRef<boolean>>}
+     */
+    const showTooltip = ref(false);
+
+    /**
+     * close an open tooltip
+     */
+    function closeTooltip() {
+      if (!showTooltip.value) return;
+      showTooltip.value = false;
+    }
+    /**
+     * intercept scroll/resize event and close the tooltip
+     */
+    function scrollResizeHandler() {
+      if (showTooltip.value) {
+        closeTooltip();
+      }
+    }
+
+    // use the window resize event listener
+    useWindowResize({
+      callback: scrollResizeHandler,
+      setDebounce: 100,
+    });
+    // and additionally create a scroll event listener to also
+    // close the tooltip when scrolling is happening on the page
+    useEventListener({
+      // need to pass a string since window not defined in setup for SSR
+      target: 'window',
+      event: 'scroll',
+      callback: scrollResizeHandler,
+      setDebounce: 100,
+    });
+
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    // slot is not directly accessible anymore - use composable to determine
+    // if slot has content
+    const { slotHasContent } = useHasSlotContent(slots.tooltip);
+
+    /** DETERMINE ELEMENT TYPE */
+    // we need to access the current component instance
+    // to check for router
+    const { app } = getCurrentInstance().appContext;
+
+    /**
+     * check if vue router is available
+     * @type {ComputedRef<boolean>}
+     */
+    const isRouterAvailable = computed(() => !!app.config.globalProperties?.$router);
+
+    return {
+      internalId,
+      slotHasContent,
+      showTooltip,
+      isRouterAvailable,
+    };
+  },
   data() {
     return {
       isLoading: false,
-      scrollResizeTimeout: null,
-      showTooltip: false,
     };
   },
   computed: {
@@ -369,13 +333,6 @@ export default {
      */
     isInternal() {
       return !!(this.identifierPropertyValue && !this.type);
-    },
-    /**
-     * check if vue router is available
-     * @returns {boolean}
-     */
-    isRouterAvailable() {
-      return !!this.$router;
     },
     /**
      * check if the link is type `tooltip`
@@ -461,14 +418,6 @@ export default {
       }
     },
   },
-  mounted() {
-    window.addEventListener('scroll', this.scrollResizeHandler);
-    window.addEventListener('resize', this.scrollResizeHandler);
-  },
-  destroyed() {
-    window.removeEventListener('scroll', this.scrollResizeHandler);
-    window.removeEventListener('resize', this.scrollResizeHandler);
-  },
   methods: {
     /**
      * handle click events for different link types
@@ -479,20 +428,11 @@ export default {
       }
     },
     /**
-     * close an open tooltip
-     */
-    closeTooltip() {
-      if (!this.showTooltip) {
-        return;
-      }
-      this.showTooltip = false;
-    },
-    /**
      * handle tooltip click event
      */
     async tooltipClicked() {
       // check if there is content to display
-      if ((this.tooltip && this.$slots.tooltip) || this.tooltip.length) {
+      if ((this.tooltip && this.slotHasContent) || this.tooltip.length) {
         this.showTooltip = !this.showTooltip;
         return;
       }
@@ -507,27 +447,126 @@ export default {
         this.$emit('tooltip-clicked', this.tooltipAsync);
       }
     },
-    /**
-     * intercept scroll/resize event and close the tooltip
-     */
-    scrollResizeHandler() {
-      // check if there is a timeout already set and clear it if yes
-      if (this.scrollResizeTimeout) {
-        clearTimeout(this.scrollResizeTimeout);
-        this.scrollResizeTimeout = null;
-      }
-      this.scrollResizeTimeout = setTimeout(() => {
-        if (this.showTooltip) {
-          this.closeTooltip();
-        }
-      }, 100);
-    },
   },
 };
 </script>
 
+<template>
+  <!-- v-clean-dom-nodes is here because space was added before and after the link which
+    was not the desired effect when link was followed by a comma in BaseTextList - also
+    see ticket #2283#note-11 -->
+  <component
+    :is="renderAs"
+    v-bind="linkAttributes"
+    v-clean-dom-nodes
+    :aria-controls="isTooltip ? `tooltipBox-${internalId}`: undefined"
+    :aria-expanded="isTooltip ? showTooltip : undefined"
+    :aria-label="isChip || isTooltip ? title : undefined"
+    :tabindex="isTooltip ? 0 : undefined"
+    :title="title"
+    :class="[
+      'base-link',
+      {
+        'base-link--chip': isChip,
+        'base-link--internal': isInternal,
+        'base-link--external': isExternal,
+        'base-link--tooltip': isTooltip,
+        'base-link--active': showTooltip,
+        'base-link--space-after': spaceAfter,
+      },
+    ]"
+    @keyup.enter="clickHandler"
+    @click="clickHandler">
+    <!-- chip, internal, external, text -->
+    <template
+      v-if="!isTooltip">
+      <slot
+        name="label"
+        :label="value">
+        <span
+          v-insert-text-as-html="{ value, interpretTextAsHtml }"
+          :class="{ 'no-clean': interpretTextAsHtml }" />
+      </slot>
+    </template>
+
+    <!-- (i) tooltip -->
+    <template
+      v-if="isTooltip">
+      <span
+        class="base-link__label">
+        <slot
+          name="label"
+          :label="value">
+          <span
+            v-insert-text-as-html="{ value, interpretTextAsHtml }"
+            :class="{ 'no-clean': interpretTextAsHtml }" />
+        </slot>
+      </span>
+
+      <span
+        ref="icon"
+        class="base-link__icon">
+        <BaseIcon
+          v-show="!isLoading"
+          name="information" />
+      </span>
+
+      <span
+        v-if="isLoading"
+        class="base-link__loader">
+        <BaseLoader
+          v-if="isLoading" />
+      </span>
+
+      <BaseTooltipBox
+        v-if="showTooltip"
+        :id="`tooltipBox-${internalId}`"
+        :attach-to="$refs.icon"
+        :modal-on-mobile="false"
+        :role="'tooltip'"
+        :styles="tooltipStyles"
+        :threshold-top="tooltipThresholdTop"
+        :type-on-mobile="tooltipTypeOnMobile"
+        @close="showTooltip = !showTooltip">
+        <!-- @slot slot to inject content
+          @binding {Object} item - a tooltip object -->
+        <slot
+          name="tooltip"
+          :item="tooltip">
+          <span
+            v-if="tooltip.label"
+            class="base-tooltip__label">
+            {{ tooltip.label }}
+          </span>
+
+          <!-- TODO: somehow the directive `v-insert-text-as-html` is not working here.
+                     for now we remove it and use that hacky workaround -->
+          <div
+            v-for="(item, index) in tooltip"
+            :key="index"
+            class="base-tooltip__row">
+            {{ item.label }}:
+            <template v-if="item.url">
+              <!-- eslint-disable vue/no-v-html - just using next-line did not work -->
+              <a
+                :href="item.url"
+                :title="item.altTitle || undefined"
+                class="base-link--external"
+                v-text="!interpretTextAsHtml ? item.value : null"
+                v-html="interpretTextAsHtml ? item.value : null" />
+              <!-- eslint-enable vue/no-v-html -->
+            </template>
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len vue/no-v-html vue/max-attributes-per-line -->
+            <template v-else><span v-text="!interpretTextAsHtml ? item.value : null" v-html="interpretTextAsHtml ? item.value : null" /></template>
+          </div>
+        </slot>
+      </BaseTooltipBox>
+    </template>
+  </component>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-link {
     transition-property: color, text-decoration-color, background-color;
@@ -549,7 +588,7 @@ export default {
       width: $icon-small;
       margin-left: $spacing-small-half;
 
-      &::v-deep svg {
+      &:deep(svg){
         vertical-align: top;
         height: 100%;
         width: 100%;

@@ -4,21 +4,21 @@ The different link types are selected by the properties passed.
 
 | types         | properties                       |
 |---------------|----------------------------------|
-| chip          | identifierPropertyValue && type  | 
-| external      | url                              | 
-| internal      | identifierPropertyValue && !type | 
+| chip          | identifierPropertyValue && type  |
+| external      | url                              |
+| internal      | identifierPropertyValue && !type |
 | text          |                                  |
-| tooltip       | tooltip                          | 
-| tooltip async | tooltipAsync                     | 
+| tooltip       | tooltip                          |
+| tooltip async | tooltipAsync                     |
 
 ```vue live
 <template>
   <div>
     <h2>examples of different link types:</h2>
     <template
-      v-for="(link, index) in links">
+      v-for="(link, index) in links"
+      :key="index">
       <BaseLink
-        :key="index"
         :identifier-property-name="'id'"
         :identifier-property-value="link.id"
         :chip-query-name="'chip-link'"
@@ -96,7 +96,7 @@ export default {
     asyncTooltip(value, id) {
       // fetch data with the data from value
       setTimeout(() => {
-        this.$set(this.links[id], 'tooltip', [
+        this.links[id].tooltip = [
           {
             label: 'label',
             value: 'value',
@@ -106,7 +106,7 @@ export default {
             value: 'external link',
             url: 'https://base.uni-ak.ac.at',
           },
-        ]);
+        ];
       }, 500);
     },
   },
@@ -114,16 +114,9 @@ export default {
 </script>
 
 <style lang="scss">
-  /* reset chip hover style due the styleguide css would overwrite the component ones */
-  .base-link.base-link--chip:hover {
-    text-decoration: none !important;
-  }
-
-  /* set z-index equal or higher than styleguides sidebar */
-  @media screen and (min-width: $mobile) {
-    >>> .base-tooltip-box {
-      z-index: 1002 !important;
-    }
+  /* set z-index equal or lower than styleguides top navigation */
+  >>> .base-tooltip-box {
+    z-index: 10 !important;
   }
 </style>
 ```

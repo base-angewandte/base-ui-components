@@ -1,7 +1,97 @@
+<script setup>
+import { ref, useTemplateRef, watch } from 'vue';
+import { useAnnouncer } from '@/composables/useAnnouncer.js';
+
+/**
+ * Minimal loader component to be reused in other components
+ */
+
+defineOptions({
+  name: 'BaseLoader',
+});
+
+const props = defineProps({
+  /**
+   * define a color for the loader
+   */
+  loaderColor: {
+    type: String,
+    default: '',
+  },
+  /**
+   * add positional properties like for a style object
+   */
+  position: {
+    type: Object,
+    default: () => ({}),
+  },
+  /**
+   * set this to `true` if you want to keep element (with height and width) but dont
+   * want the loader to show
+   */
+  hide: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * define a text that should be read as soon as loader appears
+   */
+  textOnLoaderShow: {
+    type: String,
+    default: 'loading',
+  },
+});
+
+/**
+ * set up a reference to the element to be able to attach the announcements element
+ * @type {Readonly<ShallowRef<HTMLElement | null>>}
+ */
+const loader = useTemplateRef('loaderElement');
+/**
+ * timeout variable to only set announcement after a certain time passed
+ * @type {Ref<null|number>}
+ */
+const timeout = ref(null);
+/**
+ * insert an HTML element with aria-live assertive that will announce the
+ * loading process
+ */
+const { announcement } = useAnnouncer(loader);
+
+/**
+ * function called on changes to the loader element or prop `hide`
+ * announcing the text set in prop `textOnLoaderShow`
+ */
+function setLoaderAnnouncement() {
+  // first check if loader is now present and not hidden
+  if (loader.value && !props.hide) {
+    // if so need to be working with a timeout here so the announcement
+    // is not overwritten by later actions
+    if (timeout.value) {
+      clearTimeout(timeout.value);
+      timeout.value = null;
+    }
+    timeout.value = setTimeout(() => {
+      // now check again if element is still visible
+      if (loader.value && !props.hide) {
+        // if yes - make loading announcement
+        announcement.value = props.textOnLoaderShow;
+      }
+    }, 1000);
+  }
+}
+
+// watch the element to add the text as soon as it is rendered either from
+// component rendering or prop `hide` becoming `false`
+watch([loader, () => props.hide], () => {
+  setLoaderAnnouncement();
+});
+</script>
+
 <template>
   <div
-    ref="loader"
-    :style="{ ...position, ...{ '--loader-color': loaderColor } }"
+    ref="loaderElement"
+    :style="{ ...position, ...{ '--loader-color': loaderColor || 'unset' } }"
     class="base-loader">
     <svg
       v-if="!hide"
@@ -18,116 +108,8 @@
   </div>
 </template>
 
-<script>/**
- * Minimal loader component to be reused in other components
- */
-import { ref, watch } from 'vue';
-import { useAnnouncer } from '@/composables/useAnnouncer';
-
-export default {
-  name: 'BaseLoader',
-  props: {
-    /**
-     * define a color for the loader
-     */
-    loaderColor: {
-      type: String,
-      default: '',
-    },
-    /**
-     * add positional properties like for a style object
-     */
-    position: {
-      type: Object,
-      default: () => ({}),
-    },
-    /**
-     * set this to `true` if you want to keep element (with height and width) but dont
-     * want the loader to show
-     */
-    hide: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * define a text that should be read as soon as loader appears
-     */
-    textOnLoaderShow: {
-      type: String,
-      default: 'loading',
-    },
-  },
-  setup(props) {
-    /**
-     * set up a reference to the element to be able to attach the announcements element
-     * @type {Ref<UnwrapRef<null|HTMLElement>>}
-     */
-    const loader = ref(null);
-    /**
-     * timeout variable to only set announcement after a certain time passed
-     * @type {Ref<UnwrapRef<null|number>>}
-     */
-    const timeout = ref(null);
-    /**
-     * insert an HTML element with aria-live assertive that will announce the
-     * loading process
-     */
-    const { announcement } = useAnnouncer(loader);
-
-    /**
-     * function called on changes to the loader element or prop `hide`
-     * announcing the text set in prop `textOnLoaderShow`
-     */
-    function setLoaderAnnouncement() {
-      // first check if loader is now present and not hidden
-      if (loader.value && !props.hide) {
-        // if so need to be working with a timeout here so the announcement
-        // is not overwritten by later actions
-        if (timeout.value) {
-          clearTimeout(timeout.value);
-          timeout.value = null;
-        }
-        timeout.value = setTimeout(() => {
-          // now check again if element is still visible
-          if (loader.value && !props.hide) {
-            // if yes - make loading announcement
-            announcement.value = props.textOnLoaderShow;
-          }
-        }, 1000);
-      }
-    }
-
-    // watch the element to add the text as soon as it is rendered
-    // (other option: prop `hide` is set true - this needed to be handled
-    // in options API since watcher not triggering here)
-    watch(loader, () => {
-      setLoaderAnnouncement();
-    });
-    return {
-      loader,
-      announcement,
-      setLoaderAnnouncement,
-    };
-  },
-  data() {
-    return {
-      timeout: null,
-    };
-  },
-  watch: {
-    /**
-     * for some reason in frontend setup watcher did not trigger for prop `hide`
-     * so added it here
-     */
-    hide() {
-      this.setLoaderAnnouncement();
-    },
-  },
-};
-</script>
-
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 
   .base-loader{
     position: absolute;

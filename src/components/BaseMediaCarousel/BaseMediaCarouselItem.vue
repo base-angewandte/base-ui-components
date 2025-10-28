@@ -1,131 +1,9 @@
-<template>
-  <div
-    :style="{ '--footer-height': footerHeight + 'px' }"
-    class="base-media-preview-image-stage">
-    <!-- container 'base-media-preview-preloader' is removed by swiper after image is loaded -->
-    <!-- class is also defined in swiper setup -->
-    <div
-      v-if="displayImage && fileType === 'image'"
-      class="base-media-preview-preloader">
-      <base-loader
-        class="base-media-preview-preloader-loader" />
-    </div>
-    <img
-      v-if="displayImage && fileType === 'image'"
-      :src="sourceUrl"
-      :srcset="imageSourceSet"
-      :style="displaySize"
-      :alt="fileName"
-      :class="[
-        'base-media-preview-image',
-        'base-media-preview-rotation-' + orientation.toString(),
-      ]"
-      loading="lazy"
-      @error="displayImage = false">
-    <div
-      v-else-if="fileType === 'image' && !displayImage"
-      class="base-media-preview-not-supported base-media-preview-error">
-      <p class="base-media-preview-not-supported-file-name">
-        An error occurred displaying this image.
-      </p>
-    </div>
-    <base-hls-video
-      v-else-if="fileType === 'video'"
-      ref="baseMediaVideo"
-      :display-size="displaySize"
-      :media-url="mediaUrl"
-      :media-poster-url="mediaPosterUrl"
-      :autoplay="autoplay"
-      :hls-start-level="hlsStartLevel"
-      class="base-media-preview-image base-media-preview-video" />
-    <audio
-      v-else-if="fileType === 'audio'"
-      ref="baseMediaAudio"
-      controls
-      class="base-media-preview__audio">
-      Your browser does not support the audio tag.
-      <source
-        :src="mediaUrl"
-        type="audio/mpeg">
-    </audio>
-    <div
-      v-else
-      class="base-media-preview-not-supported base-media-preview-error">
-      <p class="base-media-preview-not-supported-file-name">
-        {{ fileName }}
-      </p>
-      <div class="base-media-preview-not-supported-buttons">
-        <BaseButton
-          v-if="allowDownload || (!allowDownload && fileType === '')"
-          :text="getI18nTerm(infoTexts.download)"
-          icon="download"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button base-media-preview-not-supported-button"
-          @clicked="download" />
-        <BaseButton
-          v-if="(!isMobile && fileEnding === 'pdf')
-            || (!allowDownload && fileEnding === 'pdf')"
-          :text="getI18nTerm(infoTexts.view)"
-          icon="eye"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button base-media-preview-not-supported-button"
-          @clicked="openPdf()" />
-      </div>
-      <p
-        v-for="textline in additionalInfo"
-        :key="textline"
-        class="base-media-preview__not-supported-additional">
-        {{ textline }}
-      </p>
-    </div>
-    <div
-      ref="footer"
-      class="base-media-preview-info">
-      <div
-        class="base-media-preview__info__col
-               base-media-preview__info__col1
-               base-media-preview__info-text-wrapper">
-        <p class="base-media-preview-info-text">
-          {{ displayName }}
-        </p>
-        <template v-if="additionalInfo.length">
-          <p
-            v-for="textline in additionalInfo"
-            :key="textline"
-            class="base-media-preview__info-text-additional">
-            {{ textline }}
-          </p>
-        </template>
-      </div>
-      <div
-        v-if="currentSlideInfo"
-        aria-hidden="true"
-        class="base-media-preview__info__col base-media-preview__info__col2">
-        <p>
-          {{ currentSlideInfo }}
-        </p>
-      </div>
-      <div
-        v-if="allowDownload"
-        class="base-media-preview__info__col base-media-preview__info__col3">
-        <BaseButton
-          :text="infoTexts.download"
-          icon="download"
-          icon-position="right"
-          icon-size="large"
-          class="base-media-preview__button"
-          @clicked="download" />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
-import BaseLoader from '@/components/BaseLoader/BaseLoader';
-import { debounce } from '@/utils/utils';
-import i18n from '../../mixins/i18n';
+import { defineAsyncComponent, ref } from 'vue';
+import { useI18n } from '@/composables/useI18n.js';
+import { useWindowResize } from '@/composables/useWindowResize.js';
+import { useId } from '@/composables/useId.js';
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 
 /**
  * Component allowing for the display of images or streaming of
@@ -133,13 +11,16 @@ import i18n from '../../mixins/i18n';
  */
 
 export default {
-  name: 'BaseMedia',
+  name: 'BaseMediaItem',
   components: {
     BaseLoader,
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    BaseHlsVideo: () => import('../BaseHlsVideo/BaseHlsVideo').then(m => m.default || m),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseImage: defineAsyncComponent(() => import('@/components/BaseImage/BaseImage.vue')),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseHlsVideo: defineAsyncComponent(() => import('@/components/BaseHlsVideo/BaseHlsVideo.vue')),
+    BasePdfViewer: defineAsyncComponent(() => import('@/components/BasePdfViewer/BasePdfViewer.vue')),
+    BaseRangeSlider: defineAsyncComponent(() => import('@/components/BaseRangeSlider/BaseRangeSlider.vue')),
   },
-  mixins: [i18n],
   props: {
     /**
      * url of the medium to be displayed
@@ -196,16 +77,20 @@ export default {
       default: true,
     },
     /**
-     * define information texts for download and view (for pdfs) buttons in an
-     * object with the respective properties
-     *   could be strings or path to i18n json as well
+     * define information texts
+     * e.g. for download and view (for pdfs) buttons or error messages
      */
     infoTexts: {
       type: Object,
       default: () => ({
         download: 'Download',
         view: 'View',
+        error: {
+          pdf: 'The PDF couldn’t be opened in the PDF-Viewer.',
+        }
       }),
+      validator: val => ['download', 'view', 'error'].every(prop => Object.keys(val).includes(prop))
+        && val?.error?.pdf,
     },
     /**
      * define how the image should be rotated (EXIF orientation values)
@@ -250,14 +135,128 @@ export default {
       type: Number,
       default: undefined,
     },
+    /**
+     * url of a preview image for the medium
+     * e.g. used for files for which no special viewer is available
+     */
+    thumbnail: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define current zoom object
+     * <b>id</b> {string} - the identifier of the current slide<br>
+     * <b>value</b> {number} - the zoom factor of the current slide in %
+     */
+    currentZoom: {
+      type: Object,
+      default: () => ({
+        id: null,
+        value: 100,
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['id', 'value'].every(prop => Object.keys(val).includes(prop)),
+    },
+    /**
+     * define the initial width (in pixels) for pdf pages
+     */
+    pdfInitialWidth: {
+      type: Number,
+      default: 1000,
+    },
+    /**
+     * defines the width (in pixels) of PDF pages in zoom mode
+     */
+    pdfZoomWidth: {
+      type: Number,
+      default: 2500,
+    },
+    /**
+     * define the max zoom factor in %
+     */
+    zoomMax: {
+      type: Number,
+      default: 250,
+    },
+  },
+  emits: ['download', 'update:swiper-zoom'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
+    /** RESIZE / FOOTER HEIGHT CALCULATIONS */
+    /**
+     * element reference
+     * @type {Ref<UnwrapRef<HTMLElement|null>>}
+     */
+    const footer = ref(null);
+    /**
+     * variable to store calculated footer height
+     * @type {Ref<UnwrapRef<number|null>>}
+     */
+    const footerHeight = ref(null);
+
+    /**
+     * function calculating the footer height
+     */
+    function setFooterHeight() {
+      if (!footer.value) return;
+      footerHeight.value = footer.value.offsetHeight;
+    }
+
+    /**
+     * set up a resize event listener calling the footer height function
+     */
+    const { isMobile } = useWindowResize({
+      callback: setFooterHeight,
+      setDebounce: 500,
+      callOnMounted: true,
+    });
+
+    return {
+      getI18nTerm,
+      isMobile,
+      footer,
+      footerHeight,
+      internalId,
+    };
   },
   data() {
     return {
-      // variable for display image error handling
+      /**
+       * variable for display image error handling
+       * @type {boolean}
+       */
       displayImage: true,
-      isMobile: false,
-      // variable to store calculated footer height
-      footerHeight: null,
+      /**
+       * variable to indicate the current zoom state
+       * @type {boolean}
+       */
+      isZoomActive: false,
+      /**
+       * variable to toggle zoom (BaseRangeSlider) for PDF viewer
+       * @type {boolean}
+       */
+      enableZoom: false,
+      /**
+       * define the max zoom factor in %
+       * @type {Number}
+       */
+      zoomMin: 100,
+      /**
+       * variable to store current zoom value
+       * @type {Number}
+       */
+      currentZoomInt: 100,
+      /**
+       * variable to display pdf using BasePdfViewer.
+       * if false, display the document fallback
+       * @type {boolean}
+       */
+      displayPdf: true,
     };
   },
   computed: {
@@ -278,7 +277,7 @@ export default {
       }
       // check if pdf
       if (['pdf'].includes(docType.toLowerCase())) {
-        return 'document';
+        return 'pdf';
       }
       return '';
     },
@@ -290,6 +289,7 @@ export default {
       const match = this.sourceUrl.match(/\w+\.(\w{2,4})$/);
       return match ? match[1] : '';
     },
+    // TODO: this property is not used?
     formatNotSupported() {
       return !this.fileType;
     },
@@ -303,21 +303,34 @@ export default {
         ? Object.values(this.previews[last])[0] : this.mediaUrl;
     },
   },
-  mounted() {
-    this.isMobile = window.innerWidth <= 640;
-    this.setFooterHeight();
-    this.resizeObserver().observe(document.body);
-  },
-  beforeDestroy() {
-    this.resizeObserver().unobserve(document.body);
+  watch: {
+    currentZoom: {
+      handler(obj) {
+        if (obj.id !== this.internalId) return;
+        this.currentZoomInt = obj.value;
+      },
+      immediate: true,
+      deep: true,
+    },
   },
   methods: {
+    /**
+     * function to toggle zoom mode for BasePdfViewer
+     * @param {number} value - current zoom value
+     */
+    zoomPdf(value) {
+      this.currentZoomInt = value;
+      this.isZoomActive = this.currentZoomInt !== this.zoomMin;
+      this.$emit('update:swiper-zoom', { id: this.internalId, value: value });
+    },
     /**
      * function to trigger download action
      */
     download() {
       // check again if user is allowed to download
-      if (this.allowDownload || (!this.allowDownload && this.fileType === '')) {
+      if (this.allowDownload
+        || (!this.allowDownload && this.fileType === '')
+        || (!this.allowDownload && this.fileType === 'pdf')) {
         /**
          * download button clicked
          *
@@ -329,33 +342,165 @@ export default {
         this.$emit('download', { url: this.downloadUrl || this.mediaUrl, name: this.fileName });
       }
     },
-    /**
-     * function to open pdf
-     */
-    openPdf() {
-      window.open(this.mediaUrl);
-    },
-    /**
-     * set footer height
-     */
-    setFooterHeight() {
-      if (!this.$refs.footer) {
-        return;
-      }
-      this.footerHeight = this.$refs.footer.offsetHeight;
-    },
-    /**
-     * check if document width changes and calc/set footer height
-     */
-    resizeObserver() {
-      return new ResizeObserver(debounce(500, () => this.setFooterHeight()));
-    },
   },
 };
 </script>
 
+<template>
+  <div
+    :style="{ '--footer-height': footerHeight + 'px' }"
+    class="base-media-preview-image-stage">
+    <!-- container 'base-media-preview-preloader' is removed by swiper after image is loaded -->
+    <!-- class is also defined in swiper setup -->
+    <div
+      v-if="displayImage && fileType === 'image'"
+      class="base-media-preview-preloader">
+      <BaseLoader
+        class="base-media-preview-preloader-loader" />
+    </div>
+    <img
+      v-if="displayImage && fileType === 'image'"
+      :src="sourceUrl"
+      :srcset="imageSourceSet"
+      :style="displaySize"
+      :alt="fileName"
+      :class="[
+        'base-media-preview-image',
+        'base-media-preview-rotation-' + orientation.toString(),
+      ]"
+      loading="lazy"
+      @error="displayImage = false">
+    <div
+      v-else-if="fileType === 'image' && !displayImage"
+      class="base-media-preview-not-supported base-media-preview-error">
+      <p class="base-media-preview-not-supported-file-name">
+        An error occurred displaying this image.
+      </p>
+    </div>
+    <BaseHlsVideo
+      v-else-if="fileType === 'video'"
+      ref="baseMediaVideo"
+      :display-size="displaySize"
+      :media-url="mediaUrl"
+      :media-poster-url="mediaPosterUrl"
+      :autoplay="autoplay"
+      :hls-start-level="hlsStartLevel"
+      class="base-media-preview-image base-media-preview-video" />
+    <audio
+      v-else-if="fileType === 'audio'"
+      ref="baseMediaAudio"
+      controls
+      class="base-media-preview__audio">
+      Your browser does not support the audio tag.
+      <source
+        :src="mediaUrl"
+        type="audio/mpeg">
+    </audio>
+    <template
+      v-else-if="fileType === 'pdf' && displayPdf">
+      <div class="base-media-preview__pdf__toolbar">
+        <transition
+          name="fade"
+          mode="out-in">
+          <div v-if="enableZoom">
+            <BaseRangeSlider
+              v-model="currentZoomInt"
+              :min="zoomMin"
+              :max="zoomMax"
+              class="base-media-preview__pdf__range-slider"
+              @update:model-value="zoomPdf" />
+          </div>
+        </transition>
+      </div>
+      <div class="swiper-zoom-container base-media-preview__pdf__container">
+        <BasePdfViewer
+          ref="pdfViewer"
+          :src="mediaUrl"
+          :initial-width="pdfInitialWidth"
+          :zoom-width="pdfZoomWidth"
+          :zoom="isZoomActive"
+          class="base-media-preview__pdf swiper-zoom-target"
+          @initialized="enableZoom = true"
+          @error="displayPdf = false" />
+      </div>
+    </template>
+    <div
+      v-else
+      class="base-media-preview-not-supported base-media-preview-error">
+      <div class="base-media-preview-not-supported__container">
+        <BaseImage
+          v-if="thumbnail"
+          :src="thumbnail"
+          :lazyload="true"
+          class="base-media-preview-not-supported__thumbnail" />
+        <div class="base-media-preview-not-supported__content">
+          <p class="base-media-preview-not-supported-file-name">
+            {{ fileName }}
+          </p>
+          <p
+            v-for="textline in additionalInfo"
+            :key="textline"
+            class="base-media-preview__not-supported-additional">
+            {{ textline }}
+          </p>
+        </div>
+      </div>
+      <div
+        v-if="!displayPdf && infoTexts?.error?.pdf"
+        class="base-media-preview-not-supported__error">
+        <BaseIcon
+          name="attention"
+          class="base-media-preview-not-supported__error__icon" />
+        <div class="base-media-preview-not-supported__error__text">
+          {{ infoTexts.error.pdf }}
+        </div>
+      </div>
+    </div>
+    <div
+      ref="footer"
+      class="base-media-preview-info">
+      <div
+        class="base-media-preview__info__col
+               base-media-preview__info__col1
+               base-media-preview__info-text-wrapper">
+        <p class="base-media-preview-info-text">
+          {{ displayName }}
+        </p>
+        <template v-if="additionalInfo.length">
+          <p
+            v-for="textline in additionalInfo"
+            :key="textline"
+            class="base-media-preview__info-text-additional">
+            {{ textline }}
+          </p>
+        </template>
+      </div>
+      <div
+        v-if="currentSlideInfo"
+        aria-hidden="true"
+        class="base-media-preview__info__col base-media-preview__info__col2">
+        <p>
+          {{ currentSlideInfo }}
+        </p>
+      </div>
+      <!-- enable the file download button for PDFs and unknown filetypes -->
+      <div
+        v-if="(allowDownload || fileType === 'pdf' || (!allowDownload && fileType === ''))"
+        class="base-media-preview__info__col base-media-preview__info__col3">
+        <BaseButton
+          :text="infoTexts.download"
+          icon="download"
+          icon-position="right"
+          icon-size="large"
+          class="base-media-preview__button"
+          @clicked="download" />
+      </div>
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import '../../styles/variables';
+@use "@/styles/variables" as *;
 
   .base-media-preview-image-stage {
     margin: auto;
@@ -412,22 +557,125 @@ export default {
       margin-top: auto;
     }
 
+    .base-media-preview__pdf {
+      width: 100%;
+      max-height: calc(100vh - var(--footer-height) - #{$spacing-large});
+      margin-top: auto;
+
+      @media screen and (max-width: $mobile) {
+        max-height: calc(100vh - var(--footer-height) - #{$spacing});
+
+        @supports (max-height: 100dvh) {
+          max-height: calc(100dvh - var(--footer-height) - #{$spacing});
+        }
+
+      }
+    }
+
+    .base-media-preview__pdf__container {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .base-media-preview__pdf__toolbar {
+      position: absolute;
+      top: $spacing;
+      left: $spacing;
+      z-index: 1000;
+      align-self: flex-start;
+      min-height: $row-height-large;
+
+      @media screen and (max-width: $mobile) {
+        top: $spacing-small;
+        left: $spacing-small;
+      }
+    }
+
+    .base-media-preview__pdf__range-slider {
+      box-shadow: $box-shadow-hov;
+
+      &:hover {
+        box-shadow: $box-shadow-edit;
+      }
+    }
+
     .base-media-preview-not-supported {
       text-align: center;
-      background-color: rgba(0, 0, 0, 0.3);
-      height: 20%;
       min-height: 200px;
-      min-width: 200px;
-      width: 50%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      min-width: 500px;
+      max-width: 600px;
+      width: 40%;
+
       color: whitesmoke;
       margin-top: auto;
-      padding: $spacing;
+
+      &__container {
+        display: flex;
+        flex-wrap: wrap;
+        padding: $spacing;
+        background-color: rgba(0, 0, 0, 0.3);
+      }
 
       @media screen and (max-width: $mobile) {
         width: 75%;
+      }
+
+      @media screen and (max-width: $tablet) {
+        width: 60%;
+        min-width: 200px;
+      }
+
+      .base-media-preview-not-supported__thumbnail {
+        display: block;
+        width: auto;
+        height: 200px;
+        margin-right: $spacing;
+
+        @media screen and (max-width: $mobile) {
+          display: none;
+        }
+      }
+
+      &__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+      }
+
+      &__error {
+        flex: 1 1 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: $spacing-small;
+        margin-top: $spacing-small;
+        background-color: rgba(0, 0, 0, 0.3);
+
+        @media screen and (max-width: $mobile) {
+          align-items: normal;
+        }
+
+        &__icon {
+          margin-right: $spacing-small;
+          width: $icon-small;
+          height: $icon-small;
+          min-width: $icon-small;
+          min-height: $icon-small;
+
+          @media screen and (max-width: $mobile) {
+            margin-top: $spacing-small;
+          }
+        }
+
+        &__text {
+          text-align: left;
+          font-size: $font-size-small;
+          word-break: normal;
+        }
       }
 
       .base-media-preview-not-supported-file-name {
@@ -481,6 +729,7 @@ export default {
       margin-top: auto;
       margin-left: -$spacing-small;
       margin-right: -$spacing-small;
+      line-height: normal;
 
       .base-media-preview__info__col1,
       .base-media-preview__info__col3 {
@@ -507,12 +756,12 @@ export default {
 
         .base-media-preview-info-text {
           padding-bottom: $spacing-small-half;
-          margin-bottom: 0;
+          margin: 0;
         }
 
         .base-media-preview__info-text-additional {
           font-size: $font-size-small;
-          margin-bottom: 0;
+          margin: 0;
         }
       }
     }
@@ -558,5 +807,15 @@ export default {
       top: 50%;
       transform: translate(-50%, -75%);
     }
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 500ms ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
   }
 </style>

@@ -10,8 +10,8 @@ The Toggle lets you choose if the options are provided as array of strings or ob
     <BaseToggle
       v-model="listIsObjects"
       label="Options is Array of Objects" />
-    <base-autocomplete-input
-      v-model="autocompleteInput"
+    <BaseAutocompleteInput
+      v-model:model-value="autocompleteInput"
       :list="autocompleteResults"
       :placeholder="'Select Your Favourite Subject'"
       :dynamic-fetch="true"
@@ -73,6 +73,12 @@ export default {
       return this.initialResults;
     }
   },
-}
+  watch: {
+    // reset the input when the list data structure changes
+    listIsObjects() {
+      this.autocompleteInput = '';
+    },
+  },
+};
 </script>
 ```

@@ -1,3 +1,137 @@
+<script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
+
+/**
+ * accessible tab switch buttons
+ */
+export default {
+  name: 'BaseSwitchButton',
+  components: { BaseIcon },
+  props: {
+    /**
+     * set true if the buttons should be visible but disabled, so they
+     * will appear greyed out and not be clickable
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * specify where the icon should be rendered
+     */
+    iconPosition: {
+      type: String,
+      default: 'right',
+      validator: val => ['right', 'left'].includes(val),
+    },
+    /**
+     * specify icon size
+     * this prop currently only applies to `type` 'prominent'
+     */
+    iconSize: {
+      type: String,
+      default: 'medium',
+      validator(val) {
+        return ['small', 'medium', 'large'].includes(val);
+      },
+    },
+    /**
+     * set a label for the switches, not visible per default (set `showLabel` to `true` if label should be shown) but required for accessibility
+     */
+    label: {
+      type: String,
+      required: true,
+    },
+    /**
+     * set the currently active tab (specify the value of the object not the label)
+     */
+    modelValue: {
+      type: String,
+      required: true,
+    },
+    /**
+     * specify the tabs as array of object with `value`, `label` and (optional) `icon` properties
+     */
+    options: {
+      type: Array,
+      default: () => [{ label: 'tab', value: 'tab', icon: '' }],
+      validator: arr => arr.every(val => ['label', 'value'].every(prop => Object.keys(val).includes(prop))),
+    },
+    /**
+     * define if the label of the single buttons should be shown (or just icons). This
+     * property is default undefined and is determined internally individually for each type:
+     *  **normal**: default is `true`
+     *  **prominent**: default is `false`
+     */
+    showButtonsLabel: {
+      type: Boolean,
+      default: undefined,
+    },
+    /**
+     * set if the switch label is shown
+     */
+    showLabel: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set a type for the button's active state rendering style
+     *  **normal**: gives the switch a more subtle, more condensed look with active item only indicated by grey border,
+     *    buttons have a label per default (`showButtonsLabel` is `true`).
+     *  **prominent**: larger buttons with more spacing and permanent border around each item, active item is
+     *    indicated by a 2px (app-)colored bottom border, button labels are not shown per default (`showButtonsLabel` is `false`)
+     *    so the property `icon` should be set for each switch item in `options`.
+     */
+    type: {
+      type: String,
+      default: 'normal',
+      validator: val => ['normal', 'prominent'].includes(val),
+    },
+  },
+  emits: ['update:model-value'],
+  setup() {
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
+  data() {
+    return {
+      selectedOption: this.modelValue,
+    };
+  },
+  computed: {
+    // to ensure a unique id (made problems on field duplication)
+    optionIds() {
+      return this.options.map(option => `${this.internalId}-${option.value}`);
+    },
+    defaultShowButtonsLabel() {
+      return this.type === 'normal';
+    },
+    showButtonsLabelInt() {
+      return this.showButtonsLabel ?? this.defaultShowButtonsLabel;
+    },
+  },
+  watch: {
+    selectedOption(val) {
+      /**
+       * Event emitted on options switch, value of options object is emitted
+       *
+       * @event update:model-value
+       * @param { string } - the `value` of the selected option object
+       */
+      this.$emit('update:model-value', val);
+    },
+    modelValue(val) {
+      if (val !== this.selectedOption) {
+        this.selectedOption = val;
+      }
+    },
+  },
+};
+</script>
+
 <template>
   <fieldset
     :class="['base-switch-buttons', { 'base-switch-buttons--gap': type === 'prominent' }]">
@@ -16,9 +150,9 @@
     </span>
 
     <template
-      v-for="(option, index) in options">
+      v-for="(option, index) in options"
+      :key="option.value">
       <label
-        :key="option.value + 'label'"
         :for="optionIds[index]"
         :title="!showButtonsLabelInt ? option.label : undefined"
         :class="['base-switch-buttons__button',
@@ -64,143 +198,8 @@
   </fieldset>
 </template>
 
-<script>
-import BaseIcon from '../BaseIcon/BaseIcon';
-/**
- * accessible tab switch buttons
- */
-export default {
-  name: 'BaseSwitchButton',
-  components: { BaseIcon },
-  model: {
-    prop: 'activeTab',
-    event: 'switch',
-  },
-  props: {
-    /**
-     * specify the tabs as array of object with `value`, `label` and (optional) `icon` properties
-     */
-    options: {
-      type: Array,
-      default: () => [{ label: 'tab', value: 'tab', icon: '' }],
-      validator: arr => arr.every(val => ['label', 'value'].every(prop => Object.keys(val).includes(prop))),
-    },
-    /**
-     * set the currently active tab (specify the value of the object not the label)
-     */
-    activeTab: {
-      type: String,
-      required: true,
-      default: () => (this.options[0] ? this.options[0].value : 'tab'),
-    },
-    /**
-     * set a label for the switches, not visible per default (set `showLabel` to `true` if label should be shown) but required for accessibility
-     */
-    label: {
-      type: String,
-      required: true,
-    },
-    /**
-     * set a type for the button's active state rendering style
-     *  **normal**: gives the switch a more subtle, more condensed look with active item only indicated by grey border,
-     *    buttons have a label per default (`showButtonsLabel` is `true`).
-     *  **prominent**: larger buttons with more spacing and permanent border around each item, active item is
-     *    indicated by a 2px (app-)colored bottom border, button labels are not shown per default (`showButtonsLabel` is `false`)
-     *    so the property `icon` should be set for each switch item in `options`.
-     */
-    type: {
-      type: String,
-      default: 'normal',
-      validator: val => ['normal', 'prominent'].includes(val),
-    },
-    /**
-     * set if the switch label is shown
-     */
-    showLabel: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * define if the label of the single buttons should be shown (or just icons). This
-     * property is default undefined and is determined internally individually for each type:
-     *  **normal**: default is `true`
-     *  **prominent**: default is `false`
-     */
-    showButtonsLabel: {
-      type: Boolean,
-      default: undefined,
-    },
-    /**
-     * specify where the icon should be rendered
-     */
-    iconPosition: {
-      type: String,
-      default: 'right',
-      validator: val => ['right', 'left'].includes(val),
-    },
-    /**
-     * specify icon size
-     * this prop currently only applies to `type` 'prominent'
-     */
-    iconSize: {
-      type: String,
-      default: 'medium',
-      validator(val) {
-        return ['small', 'medium', 'large'].includes(val);
-      },
-    },
-    /**
-     * set true if the buttons should be visible but disabled, so they
-     * will appear greyed out and not be clickable
-     */
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      selectedOption: this.activeTab,
-    };
-  },
-  computed: {
-    // to ensure a unique id (made problems on field duplication)
-    optionIds() {
-      return this.options.map(option => this.generateId(option.value));
-    },
-    defaultShowButtonsLabel() {
-      return this.type === 'normal';
-    },
-    showButtonsLabelInt() {
-      return this.showButtonsLabel ?? this.defaultShowButtonsLabel;
-    },
-  },
-  watch: {
-    selectedOption(val) {
-      /**
-       * Event emitted on options switch, value of options object is emitted
-       *
-       * @event switch
-       * @param { string } - the `value` of the selected option object
-       */
-      this.$emit('switch', val);
-    },
-    activeTab(val) {
-      if (val !== this.selectedOption) {
-        this.selectedOption = val;
-      }
-    },
-  },
-  methods: {
-    generateId(value) {
-      return `${value}${(Math.floor(Math.random() * 1000000)).toString()}`;
-    },
-  },
-};
-</script>
-
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-switch-buttons {
     clear: both;
@@ -208,6 +207,7 @@ export default {
     position: relative;
     align-items: center;
     background-color: inherit;
+    line-height: $line-height;
 
     &.base-switch-buttons--gap {
       gap: $spacing;

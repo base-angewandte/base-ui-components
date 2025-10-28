@@ -1,8 +1,10 @@
+# Development
+
 ## Build Setup
 
 ### System Requirements
 
-This project is currently compatible with node versions >= 18.0.0 <21.0.0.
+This project is currently compatible with node versions >= 20.0.0 <21.0.0.
 
 ### Available Npm Scripts
 
@@ -34,10 +36,10 @@ npm run lint:fix
 # publish a new version
 npm run version-publish
 
-# run the styleguide in dev mode
+# run the vitepress styleguide in dev mode
 npm run styleguide
 
-# build a new styleguide version
+# build a new vitepress styleguide version
 npm run styleguide:build
 
 # create svg spriteSheet
@@ -52,11 +54,12 @@ npm run changelog -- --styleguide-path=https://base-angewandte.github.io/base-ui
 
 ## Development
 
-The v3 of this component library is built with [Vite](https://vitejs.dev).
+The v5 of this component library is built with [Vite](https://vitejs.dev).
 
 This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
 available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
 
+Components can be tested with front-end projects leveraging [npm link](https://docs.npmjs.com/cli/v10/commands/npm-link):
 ```bash
 # to use locally for development
 # in this project
@@ -64,8 +67,6 @@ npm link
 
 # in target project
 npm link base-ui-components
-# Note: to date nuxt/bridge projects seem to have issues with importing linked and minified modules -
-#       therefore disable minifying in vite.config.js: build.minify: false
 ```
 
 ## Contributor Guidelines
@@ -78,7 +79,7 @@ npm link base-ui-components
     The base dev team uses [Browserstack](https://www.browserstack.com/) for testing, which provides free accounts for open source projects.
   * A frontend project using SSR (e.g. Nuxt).
   * The component styleguide.
-
+* Due to legacy code components are now partially using Options and partially Composition API, however *new* components should always be written using Composition API.
 
 ### (S)CSS
 
@@ -92,6 +93,7 @@ $font-size-regular: 1rem;
 $font-size-small: math.div(16rem, 19);
 $font-size-large: math.div(24rem, 19);
 $line-height: math.div(24rem, 19);
+$line-height-small: math.div(20rem, 19);
 
 /* height and spacing */
 $spacing: math.div(16rem, 19);
@@ -132,6 +134,8 @@ $map-cluster-bg-hover: var(--map-cluster-bg-hover, rgba(255, 217, 91, .4));
 $map-cluster-bg-inner-hover: var(--map-cluster-bg-inner-hover, rgba(255, 217, 91, .85));
 $pagination-bullet-color: var(--pagination-bullet-color, #444444);
 $warning-color: var(--warning-color, #ff4444);
+$overlay-background-light: rgba(0, 0, 0, 0.5);
+$overlay-background-dark: rgba(0, 0, 0, 0.8);
 
 /* shadows and borders */
 $border-width: 2px;
@@ -142,6 +146,7 @@ $box-shadow-edit: 0 0 15px 5px rgba(0, 0, 0, 0.15);
 $drop-shadow: 0px 10px 10px 0px rgba(0,0,0,0.25);
 $pop-up-shadow: 0px 0px 36px 0px rgba(0,0,0,0.5);
 $pop-up-drop-shadow: 0px 10px 46px 0px rgba(0,0,0,0.25);
+$tooltip-drop-shadow: 0 0px 6px rgba(0,0,0,0.25);
 $input-shadow: inset 0px 1px 4px 0px rgba(0,0,0,0.2);
 $preview-box-shadow: 0px 0px 16px 0px rgba(0,0,0,0.25);
 $box-transition: box-shadow 0.2s ease-in-out;
@@ -178,11 +183,14 @@ $tablet: 1024px;
 
 /* z-indeces */
 $zindex: (
+  slidein: 1,
   boxcontent: 100,
   fadeout: 100,
   uploadbar: 100,
   button-active: 100,
   entry-selector-head: 150,
+  // needs to be higher than regular fadeout because chips text has z-index of 100
+  chips-fadeout: 150,
   dropdown: 200,
   uploadbar-content: 200,
   hoverbox: 500,
@@ -197,15 +205,16 @@ $headline-margin-bottom: math.div($line-height, 2);
 /* transitions */
 $link-transition: color 0.2s ease-in-out;
 $base-expand-list-transition-duration: 250ms;
-
 ```
 
 * If a component needs to have a `z-index`, it should be set in reference to and added to `$zindex` in `variables.scss` (line 91).
 
 #### Helper Classes
 
-`no-clean`: can be used to not have the directive `v-clean-dom-nodes` applied to a child element
-
+* `hide`: move an element off-screen to hide it visually but still have it accessible
+* `no-clean`: can be used to not have the directive `v-clean-dom-nodes` applied to a child element
+* `grabbing`: set cursor to `'grabbing'`.
+* `scrolling`: set when scrolling horizontally, default class used in `useHorizontalDragScroll.js`.
 
 Additional helper classes are available in `src/styles/lib.scss` (e.g. a `.hide` class keep content available for screenreaders).
 
@@ -218,7 +227,7 @@ Additional helper classes are available in `src/styles/lib.scss` (e.g. a `.hide`
 
 ### Documentation Guidelines
 
-* We are using [Vuepress](ps://vuepress.vuejs.org) to automatically generate a [styleguide](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton.html#events) for all components. Therefore all component `props`, `events`, `slots` and public `methods` need to be documented in [JSDoc style](https://jsdoc.app/).
+* We are using [Vitepress](https://vitepress.dev/) to automatically generate a [styleguide](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton.html#events) for all components. Therefore, all component `props`, `events`, `slots` and public `methods` need to be documented in [JSDoc style](https://jsdoc.app/).
 
 
 Example for props:
@@ -248,9 +257,26 @@ Example for events:
 this.$emit('fetch-autocomplete', { searchString: input, filter, index });
 ```
 
+OR
+
+```vue=
+const emits = defineEmits([
+  /**
+  * inform parent to fetch autocomplete data for the provided filter
+  *
+  * @event fetch-autocomplete
+  * @type {Object} - object with the following properties:
+  * @property {string} searchString - the string to autocomplete
+  * @property {Filter} filter - the filter object
+  * @property {number} index - the filter index of all filters (main and applied)
+  */
+  'autocomplete',
+]);
+```
+
 Example for slots:
 
-```htmlbars=
+```html=
 <!-- @slot for adding elements at the end covering the whole height
 @binding {string} fieldName - the name of the displayed field
 @binding {number} index - the array index of field values -->
@@ -272,6 +298,21 @@ Example for public methods:
 selectEntry(obj) {
   // functional code
 },
+```
+
+OR
+
+```javascript=
+/**
+ * function to trigger from slot `entries` when an entry was selected
+ * @param {Object} obj - selected entry
+ * @property {boolean} obj.selected - variable indicating if entry was selected or deselected
+ * @property {string} obj.index - the index of the selected or deselected entry in 'entries'
+ * @public
+ */
+function selectEntry(obj) {
+  // functional code
+}
 ```
 
 * If a prop has limited valid values, they need to be explained in the description of the prop:
@@ -332,19 +373,36 @@ DO:
 validator: val => ['normal', 'prominent'].includes(val),
 ```
 
+AND/OR (additionally) use the @values tag:
+
+    /**
+     * set a type for the button's active state rendering style
+     *  **normal**: gives the switch a more subtle, more condensed look with active item only indicated by grey border,
+     *    buttons have a label per default (`showButtonsLabel` is `true`).
+     *  **prominent**: larger buttons with more spacing and permanent border around each item, active item is
+     *    indicated by a 2px (app-)colored bottom border, button labels are not shown per default (`showButtonsLabel` is `false`)
+     *    so the property `icon` should be set for each switch item in `options`.
+     * @values 'normal', 'prominent'
+     */
+    type: {
+      type: String,
+      default: 'normal',
+      validator: val => ['normal', 'prominent'].includes(val),
+    },
+
 * Each component should have a short meaningful description at the beginning of the script tag (but after imports). This is used in the styleguide as introduction to the component.
 
 ```javascript=
 <script>
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 /**
  * accessible tab switch buttons
  */
 ```
 
-* Also all other code should be documented and commented with the objective in mind to help other developers to understand the code.
+* Also, all other code should be documented and commented with the objective in mind to help other developers to understand the code.
 
-* An meaninfull example of the component demonstrating its features or its new or altered features must be provided in an `Readme.md` file located in the same folder as the component. Again, due to using Vuepress this should look as follows:
+* A meaningful example of the component demonstrating its features or its new or altered features must be provided in an `Readme.md` file located in the same folder as the component. Again, due to using Vitepress this should look as follows:
 
 
 ~~~markdown=
@@ -378,7 +436,7 @@ export default {};
 #### Custom HTML elements
 
 * For several reasons listed in the official [Vue documentation](https://vuejs.org/style-guide/rules-strongly-recommended.html#component-name-casing-in-templates), custom HTML elements should be written in PascalCase (instead of kebap-case):
-```htmlbars=
+```html=
 <template>
     <BaseIcon />
 </template>
@@ -397,7 +455,7 @@ this.$emit('fetch-dropdown-entries', { value: val });
 
 * We are loosely trying to follow the [BEM (Block Element Modifier)](https://getbem.com/naming/) CSS naming conventions. So CSS naming in each component should follow the structure:
 
-```htmlbars=
+```html=
 <template>
     <div class="my-component my-component--state">
         <div class="my-component__wrapper my-new-component__wrapper--state">

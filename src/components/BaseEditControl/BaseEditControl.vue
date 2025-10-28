@@ -1,73 +1,10 @@
-<template>
-  <div
-    class="base-edit-control">
-    <component
-      :is="renderTitleAs"
-      v-if="title"
-      class="base-edit-control__title  base-text-fade-out-background">
-      <!-- @slot title slot -->
-      <slot>
-        {{ title }}
-        <span
-          v-if="subtitle"
-          class="base-edit-control__title__additional">
-          {{ subtitle }}
-        </span>
-      </slot>
-    </component>
-
-    <div
-      v-if="controls"
-      class="base-edit-control__buttons">
-      <base-button
-        v-if="!edit"
-        :disabled="disabled"
-        :has-background-color="false"
-        :icon="!isLoading ? 'edit' : ''"
-        :text="getI18nTerm(editButtonText)"
-        class="base-edit-control__button"
-        @clicked="activate">
-        <template
-          v-if="isLoading"
-          slot="left-of-text">
-          <span class="base-edit-control__loader">
-            <BaseLoader />
-          </span>
-        </template>
-      </base-button>
-
-      <base-button
-        v-if="edit"
-        :disabled="disabled"
-        :has-background-color="false"
-        :icon="saveButtonIcon"
-        :text="getI18nTerm(saveButtonTextInt)"
-        class="base-edit-control__button"
-        @clicked="save">
-        <template
-          v-if="isLoading"
-          slot="left-of-text">
-          <span class="base-edit-control__loader">
-            <BaseLoader />
-          </span>
-        </template>
-      </base-button>
-
-      <base-button
-        v-if="editMode === 'save' && edit"
-        :has-background-color="false"
-        icon="remove"
-        :text="getI18nTerm(cancelButtonText)"
-        class="base-edit-control__button"
-        @clicked="cancel" />
-    </div>
-  </div>
-</template>
-
 <script>
-import BaseButton from '@/components/BaseButton/BaseButton';
-import BaseLoader from '@/components/BaseLoader/BaseLoader';
-import i18n from '../../mixins/i18n';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
+import { useI18n } from '@/composables/useI18n.js';
+import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
+import { useTemplateRef } from 'vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
 
 export default {
   name: 'BaseEditControl',
@@ -75,9 +12,6 @@ export default {
     BaseButton,
     BaseLoader,
   },
-  mixins: [
-    i18n,
-  ],
   props: {
     /**
      * toggle control buttons
@@ -164,6 +98,36 @@ export default {
       validator: val => ['save', 'done'].includes(val),
     },
   },
+  emits: ['saved', 'canceled', 'activated'],
+  setup() {
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
+    /** TITLE LINE FADE OUT */
+    const titleLine = useTemplateRef('titleLineElement');
+    const { boxFadeOut, calcFadeOut } = useElementFadeOut(titleLine, {
+      direction: 'horizontal',
+      // TODO: refactor to use build in classes and pseudo elements
+      className: '',
+    });
+
+    // also consider the title text (or subtext changing) in fade out calc
+    useElementObserver({
+      type: 'mutation',
+      target: titleLine,
+      callback: calcFadeOut,
+      options: {
+        characterData: true,
+        subtree: true,
+      },
+      callOnMount: true,
+    });
+
+    return {
+      getI18nTerm,
+      boxFadeOut,
+    };
+  },
   computed: {
     /**
      * set icon depending on editMode
@@ -232,8 +196,76 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    class="base-edit-control">
+    <component
+      :is="renderTitleAs"
+      v-if="title"
+      ref="titleLineElement"
+      :class="['base-edit-control__title',
+               { 'base-text-fade-out-background': boxFadeOut.right }]">
+      <!-- @slot title slot -->
+      <slot>
+        {{ title }}
+        <span
+          v-if="subtitle"
+          class="base-edit-control__title__additional">
+          {{ subtitle }}
+        </span>
+      </slot>
+    </component>
+
+    <div
+      v-if="controls"
+      class="base-edit-control__buttons">
+      <BaseButton
+        v-if="!edit"
+        :disabled="disabled"
+        :has-background-color="false"
+        :icon="!isLoading ? 'edit' : ''"
+        :text="getI18nTerm(editButtonText)"
+        class="base-edit-control__button"
+        @clicked="activate">
+        <template
+          v-if="isLoading"
+          #left-of-text>
+          <span class="base-edit-control__loader">
+            <BaseLoader />
+          </span>
+        </template>
+      </BaseButton>
+
+      <BaseButton
+        v-if="edit"
+        :disabled="disabled"
+        :has-background-color="false"
+        :icon="saveButtonIcon"
+        :text="getI18nTerm(saveButtonTextInt)"
+        class="base-edit-control__button"
+        @clicked="save">
+        <template
+          v-if="isLoading"
+          #left-of-text>
+          <span class="base-edit-control__loader">
+            <BaseLoader />
+          </span>
+        </template>
+      </BaseButton>
+
+      <BaseButton
+        v-if="editMode === 'save' && edit"
+        :has-background-color="false"
+        icon="remove"
+        :text="getI18nTerm(cancelButtonText)"
+        class="base-edit-control__button"
+        @clicked="cancel" />
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-edit-control {
     display: flex;

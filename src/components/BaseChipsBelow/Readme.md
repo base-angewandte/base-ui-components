@@ -1,5 +1,6 @@
 ## Demo
 
+### Example with draggable and editable chips
 A simple chips input form field with chips displayed below
 and default (base project specific) role selection
 
@@ -8,6 +9,7 @@ and default (base project specific) role selection
   <div class="container">
     <BaseChipsBelow
       v-model="selectedList"
+      :allow-unknown-entries="true"
       :chips-editable="true"
       :list="[
           {
@@ -29,12 +31,15 @@ and default (base project specific) role selection
         },
         {
           label: 'Magician',
+          id: 'Magician',
         },
         {
           label: 'Priest',
+          id: 'Priest',
         },
         {
           label: 'Farmer',
+          id: 'Farmer',
         }]"
       label="Select a Person">
       <template
@@ -57,7 +62,7 @@ export default {
 
 ```
 
-## Demo with optional validation
+### Demo with optional validation
 
 A chips input form field with chips displayed below and optional validation
 
@@ -81,7 +86,7 @@ A chips input form field with chips displayed below and optional validation
         v-model="defaultOption"
         label="set default additional options"
         class="control"
-        @clicked="setDefaultOption"/>
+        @update:model-value="setDefaultOption"/>
       <BaseToggle
         v-model="sortable"
         label="sort entries"
@@ -139,10 +144,12 @@ export default {
       additionalPropOptions: [
         {
           label: 'Read',
+          id: 'Read',
           default: true,
         },
         {
           label: 'Edit',
+          id: 'Edit',
         },
       ],
       additionalPropDefaultOption: null,
@@ -171,6 +178,17 @@ export default {
         // },
       ],
     };
+  },
+  watch: {
+    additionalPropAllowMultipleEntries(val) {
+      if (!val) {
+        this.selectedList.forEach((listItem) => {
+          if (listItem.roles?.length > 1) {
+            listItem.roles.splice(1, listItem.roles.length - 1);
+          }
+        });
+      }
+    },
   },
   mounted() {
     this.setDefaultOption(this.defaultOption);

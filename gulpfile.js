@@ -1,9 +1,11 @@
-const gulp = require('gulp');
-const fs = require('fs');
-const { argv } = require('yargs');
-const conventionalChangelog = require('gulp-conventional-changelog');
+import gulp from 'gulp';
+import fs from 'fs';
+import yargs from 'yargs';
+import conventionalChangelog from 'gulp-conventional-changelog';
 
-const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/components/';
+const argv = yargs(process.argv.slice(2)).parse();
+
+const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/';
 
 gulp.task('changelog', (cb) => {
   // check if the file exists and create it if necessary

@@ -67,7 +67,7 @@ An example filling the row with custom content through slots `text-content` and 
         Custom Entry Text
       </template>
       <template
-          v-slot:right-side-elements>
+          #right-side-elements>
           <div class="custom-right-side">
             <BaseButton
               button-style="row"

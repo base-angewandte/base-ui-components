@@ -1,10 +1,46 @@
-@import 'variables';
+@use "sass:map";
+@use "variables" as *;
+
 
 /* for accessibility */
 .hide {
   position: absolute !important;
   top: auto !important;
   left: -9999px !important;
+}
+
+.grabbing {
+  cursor: grabbing !important;
+}
+
+.scrolling {
+  cursor: grabbing !important;
+  user-select: none;
+  touch-action: none;
+}
+
+// Fade out classes used in useElementFadeOut.js
+.fade-out-left::before {
+  content: '';
+  width: $fade-out-width;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  z-index: map.get($zindex, chips-fadeout);
+  pointer-events: none;
+}
+.fade-out-right::after {
+  content: '';
+  width: $fade-out-width;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  // need to add 1px because fade out not positioned perfectly else
+  right: -1px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
+  z-index: map.get($zindex, chips-fadeout);
+  pointer-events: none;
 }
 
 *, *:before, *:after {
@@ -188,7 +224,7 @@ h1, h2, h3 {
     top: 0;
     right: 0;
     background: linear-gradient(to right, rgba(255, 255, 255, 0) , white);
-    z-index: map-get($zindex, fadeout);
+    z-index: map.get($zindex, fadeout);
   }
 }
 
@@ -203,7 +239,7 @@ h1, h2, h3 {
     top: 0;
     left: 0;
     background: linear-gradient(to left, rgba(255, 255, 255, 0) , white);
-    z-index: map-get($zindex, fadeout);
+    z-index: map.get($zindex, fadeout);
   }
 }
 
@@ -218,7 +254,7 @@ h1, h2, h3 {
     top: 0;
     right: 0;
     background: linear-gradient(to right, rgba(255, 255, 255, 0) , $background-color);
-    z-index: map-get($zindex, fadeout);
+    z-index: map.get($zindex, fadeout);
   }
 }
 
@@ -239,4 +275,8 @@ h1, h2, h3 {
   width: 1px;
   margin-left: -1000px;
   overflow: hidden;
+}
+
+.grabbing * {
+  cursor: grabbing;
 }

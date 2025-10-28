@@ -1,44 +1,7 @@
-<template>
-  <div
-    :class="['base-chip',
-             { 'base-chip__removable': isRemovable },
-             { 'base-chip__linked': isLinked },
-             { 'base-chip__active': chipActive }]">
-    <div
-      ref="chipText"
-      v-insert-text-as-html="{ value: entryInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
-      :style="textStyling"
-      :contenteditable="editable ? 'true' : false"
-      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : false"
-      enterkeyhint="search"
-      class="base-chip__text"
-      @blur="updateText"
-      @keydown.enter.prevent="updateText"
-      @click.stop="clickAction"
-      @mousedown="onMouseDown"
-      @mousemove="moveBox"
-      @mouseleave="hideBox" />
-    <span
-      v-if="assistiveText"
-      :id="`${internalId}_aria-label`"
-      class="hide">
-      {{ assistiveText }}
-    </span>
-    <BaseIcon
-      v-if="isRemovable"
-      name="remove"
-      class="base-chip__icon"
-      @click.native.stop="removeClicked" />
-    <base-hover-box
-      ref="hoverBox"
-      v-bind="hoverBoxContent"
-      :class="{ 'base-chip__hover-box__hidden': !hoverBoxEnabled || !showInfoBox }" />
-  </div>
-</template>
-
 <script>
-import { createId } from '@/utils/utils';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
+import { defineAsyncComponent } from 'vue';
+import { useId } from '@/composables/useId.js';
+import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
 /**
  * Basic Chip component
@@ -47,21 +10,16 @@ import InsertTextAsHtml from '@/directives/InsertTextAsHtml';
 export default {
   name: 'BaseChip',
   components: {
-    BaseHoverBox: () => import('../BaseHoverBox/BaseHoverBox'),
-    BaseIcon: () => import('../BaseIcon/BaseIcon'),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
   directives: {
     insertTextAsHtml: InsertTextAsHtml,
-  },
-  model: {
-    prop: 'entry',
-    event: 'value-changed',
   },
   props: {
     /**
      * pass the text for the chip
      */
-    entry: {
+    modelValue: {
       type: String,
       required: true,
     },
@@ -71,18 +29,6 @@ export default {
     isLinked: {
       type: Boolean,
       default: true,
-    },
-    /**
-     * if a hover box is associated with the chip add all relevant properties here
-     * (see [BaseHoverBox](BaseHoverBox) for details)
-     *
-     * **CAVEAT**: this prop is deprecated and will be removed in the next major version!
-     * Usage not recommended!
-     * Have a look into [BaseTooltipBox](BaseTooltipBox) for implementing a similar functionality
-     */
-    hoverBoxContent: {
-      type: Object,
-      default: () => ({}),
     },
     /**
      * set chip active (set color)
@@ -107,10 +53,6 @@ export default {
     },
     /**
      * define true if chip should be editable on click
-     *
-     * **Caveat**: chips can not show `hoverBoxContent` as soon as it is editable
-     * respectively - if both are set `true` edit functionality takes precedent - chip will
-     *  not be draggable, `hoverBoxContent` will not be shown!
      */
     editable: {
       type: Boolean,
@@ -136,33 +78,27 @@ export default {
       default: false,
     },
   },
+  emits: ['clicked', 'update:model-value', 'remove-entry'],
+  setup() {
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       /**
-       * internal represenation of string provided by parent
+       * internal representation of string provided by parent
        * @type {string}
        */
-      entryInt: '',
-      /**
-       * handle showing of HoverBox
-       * @type {boolean}
-       */
-      showInfoBox: false,
+      modelValueInt: '',
     };
   },
-  computed: {
-    hoverBoxEnabled() {
-      return this.isLinked && !!Object.keys(this.hoverBoxContent).length;
-    },
-    internalId() {
-      return createId();
-    },
-  },
   watch: {
-    entry: {
+    modelValue: {
       handler(val) {
-        if (val !== this.entryInt) {
-          this.entryInt = val;
+        if (val !== this.modelValueInt) {
+          this.modelValueInt = val;
         }
       },
       immediate: true,
@@ -176,15 +112,15 @@ export default {
      */
     updateText(event) {
       const textString = event.target.innerText;
-      if (this.editable && textString !== this.entryInt) {
-        this.entryInt = textString;
+      if (this.editable && textString !== this.modelValueInt) {
+        this.modelValueInt = textString;
         /**
          * if chip is editable value is updated with this event
          *
-         * @event value-changed
+         * @event update:model-value
          * @param {string} - the displayed text string after edit
          */
-        this.$emit('value-changed', this.entryInt);
+        this.$emit('update:model-value', this.modelValueInt);
       }
     },
     clickAction(e) {
@@ -197,40 +133,7 @@ export default {
          *
          */
         this.$emit('clicked');
-        if (this.isLinked) {
-          this.$emit('hoverbox-active', true);
-          this.$refs.hoverBox.setPosition(e);
-          this.showInfoBox = !this.showInfoBox;
-        }
       }
-    },
-    moveBox(e) {
-      if (this.hoverBoxEnabled && this.showInfoBox) {
-        this.$refs.hoverBox.setPosition(e);
-      }
-    },
-    hideBox() {
-      if (this.hoverBoxEnabled) {
-        /**
-         * event indicating if hover box was set to show / hide
-         *
-         * @event hoverbox-active
-         * @param {boolean} - is hoverbox active
-         *
-         */
-        this.$emit('hoverbox-active', false);
-        this.showInfoBox = false;
-      }
-    },
-    onMouseDown(event) {
-      /**
-       * event on mouse down, needed by base chips input to determine active chip
-       *
-       * @event mouse-down
-       * @param {Event} - the native MouseEvent
-       *
-       */
-      this.$emit('mouse-down', event);
     },
     removeClicked() {
       /**
@@ -240,14 +143,47 @@ export default {
        * @param {string} - the displayed chip string
        *
        */
-      this.$emit('remove-entry', this.entryInt);
+      this.$emit('remove-entry', this.modelValueInt);
     },
   },
 };
 </script>
 
+<template>
+  <div
+    :class="['base-chip',
+             { 'base-chip__removable': isRemovable },
+             { 'base-chip__linked': isLinked },
+             { 'base-chip__active': chipActive }]">
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div
+      ref="chipText"
+      v-insert-text-as-html="{ value: modelValueInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
+      :style="textStyling"
+      :contenteditable="editable ? 'true' : undefined"
+      :aria-labelledby="assistiveText ? `${internalId}_aria-label` : undefined"
+      enterkeyhint="search"
+      class="base-chip__text"
+      @blur="updateText"
+      @keydown.enter.prevent="updateText"
+      @click.stop="clickAction" />
+    <span
+      v-if="assistiveText"
+      :id="`${internalId}_aria-label`"
+      class="hide">
+      {{ assistiveText }}
+    </span>
+    <BaseIcon
+      v-if="isRemovable"
+      name="remove"
+      class="base-chip__icon"
+      @click.stop="removeClicked" />
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-chip {
     margin: $chips-spacing*4 $spacing-small $chips-spacing*4 0;
@@ -290,7 +226,7 @@ export default {
       background-color: rgba(255, 255, 255, 0);
       color: $font-color;
       word-break: break-word;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
 
       &:active, &:focus {
         outline: none;
@@ -308,9 +244,5 @@ export default {
       justify-content: center;
       align-items: center;
     }
-  }
-
-  .base-chip__hover-box__hidden {
-    display: none;
   }
 </style>

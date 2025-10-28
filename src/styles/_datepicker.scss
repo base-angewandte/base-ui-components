@@ -1,5 +1,5 @@
-@import "./variables";
-@import 'vue2-datepicker/scss/index.scss';
+@use "variables" as *;
+@forward 'vue-datepicker-next/scss/index.scss';
 
 /* datepicker css */
 .mx-datepicker {

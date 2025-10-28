@@ -5,11 +5,11 @@ Example of `BaseMenuEntry` with various entry thumbnails supplied via `thumbnail
 <template>
   <div class="listcontainer">
     <BaseMenuList
-        :list="list"
+        v-model:list="list"
         :selected-list="selectedArray"
         :select-active="selectActive"
         :active-entry="activeEntry"
-        @selected="$event.selected ? selectedArray.push(list[$event.index].id) : selectedArray.splice(selectedArray.indexOf($event.index), 1)"
+        @selected="addSelected"
         @clicked="activeEntry = $event">
         <template
           #thumbnails="{ item }">
@@ -42,7 +42,7 @@ export default {
     return {
       list: [
         {
-          id: '1',
+          id: 'id1',
           title: 'Active Entry',
           type: 'Bild',
           error: false,
@@ -51,7 +51,7 @@ export default {
           published: true,
         },
         {
-          id: '2',
+          id: 'id2',
           title: 'Title',
           description: 'Description',
           type: 'Type',
@@ -60,7 +60,7 @@ export default {
           published: false,
         },
         {
-          id: '3',
+          id: 'id3',
           title: 'Entry with "error", "shared", and "published" properties set to true',
           type: 'Konzert',
           error: true,
@@ -68,7 +68,7 @@ export default {
           published: true,
         },
         {
-          id: '4',
+          id: 'id4',
           title: 'Entry with "published" property set to true',
           type: 'Publikation',
           error: false,
@@ -80,7 +80,17 @@ export default {
       selectedArray: [],
     };
   },
-
+  methods: {
+    addSelected({ selected, index }) {
+      // if `selected` is true add the item id to the selected list
+      if (selected) {
+        this.selectedArray.push(this.list[index].id);
+      } else {
+        // else remove the id from the list
+        this.selectedArray.splice(this.selectedArray.indexOf(this.list[index].id), 1);
+      }
+    },
+  },
 };
 </script>
 <style>

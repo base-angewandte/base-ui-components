@@ -1,197 +1,7 @@
-<template>
-  <div
-    :style="calcStyle"
-    class="base-entry-selector">
-    <!-- HEAD -->
-    <div
-      ref="head"
-      :class="['base-entry-selector__head',
-               { 'base-entry-selector__head--shadow': headHasShadow },
-               { 'base-entry-selector__head--padding': useSearch }]">
-      <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
-      <slot name="head">
-        <!-- default -->
-        <BaseSearch
-          v-if="useSearch"
-          v-model="filterString"
-          :show-image="true"
-          :placeholder="getI18nTerm(entrySelectorText.search)"
-          :assistive-text="{
-            loaderActive: assistiveText.loaderActive,
-            results: resultsAnnouncement,
-          }"
-          :class="['base-entry-selector__head__search-bar',
-                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
-          @input="filterEntries($event, 'title')" />
-      </slot>
-
-      <!-- BASE OPTIONS ROW -->
-      <div
-        v-if="showOptionsRow"
-        class="base-entry-selector__options">
-        <BaseOptions
-          ref="baseOptions"
-          :show-options.sync="showOptions"
-          :options-hidden="optionsHidden"
-          :use-options-button-on="'always'"
-          :show-after-options-below="true"
-          :options-button-icon="{
-            show: 'options-menu',
-            hide: 'options-menu',
-          }"
-          :options-button-text="entrySelectorText.options"
-          align-options="left">
-          <template
-            #afterOptions>
-            <div
-              class="base-entry-selector__dropdowns">
-              <!-- @slot to add custom elements at the end of the options row, e.g. custom drop downs -->
-              <slot name="after-options">
-                <!-- default -->
-                <BaseDropDown
-                  v-if="sortOptions.length"
-                  :id="`${sortConfig.label}-sort-drop-down`"
-                  ref="baseDropDown"
-                  v-model="sortParam"
-                  :label="sortConfig.label"
-                  :options="sortOptions"
-                  :with-spacing="false"
-                  :align-drop-down="entryTypes.length ? 'left' : 'right'"
-                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
-                  :value-prop="sortConfig.valuePropertyName"
-                  class="base-entry-selector__dropdowns__dropdown"
-                  @value-selected="fetchEntries" />
-                <BaseDropDown
-                  v-if="entryTypes.length"
-                  :id="`${entryTypesConfig.label}-types-drop-down`"
-                  ref="baseDropDown"
-                  v-model="filterType"
-                  :label="entryTypesConfig.label"
-                  :options="entryTypes"
-                  :language="language"
-                  :with-spacing="false"
-                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
-                  :value-prop="entryTypesConfig.valuePropertyName"
-                  align-drop-down="right"
-                  class="base-entry-selector__dropdowns__dropdown"
-                  @value-selected="filterEntries($event, 'type')" />
-              </slot>
-            </div>
-          </template>
-          <template
-            #options>
-            <!-- @slot add custom action (buttons) -->
-            <slot name="option-actions" />
-          </template>
-        </BaseOptions>
-      </div>
-      <!-- SELECTOR OPTIONS -->
-      <BaseSelectOptions
-        v-if="showOptions"
-        ref="selectOptions"
-        :select-text="getI18nTerm(entrySelectorText.selectAll)"
-        :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
-        :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
-        :list="selectableEntries"
-        :selected-list="selectedEntries"
-        :select-all-disabled="!!maxSelectedEntries
-          && (!(selectableEntries.length < (maxSelectedEntries - selectedListIds.length)
-            || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
-        @selected="changeAllSelectState">
-        <template #selectedText>
-          {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
-          ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
-          <span
-            v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
-            {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
-          </span>
-        </template>
-      </BaseSelectOptions>
-    </div>
-
-    <!-- BODY -->
-    <div
-      ref="body"
-      class="base-entry-selector__body">
-      <div
-        v-if="isLoading"
-        class="loading-area">
-        <BaseLoader
-          :text-on-loader-show="assistiveText.loaderActive"
-          :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
-      </div>
-
-      <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
-          @binding {Object[]} entries - list of entries to display
-          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
-          -->
-      <slot
-        name="entries"
-        :entries="entries"
-        :select-entry="selectEntry">
-        <!-- default -->
-        <BaseMenuList
-          v-if="entries.length"
-          key="menu-list"
-          ref="menuList"
-          :select-active="showOptions"
-          :list="entries"
-          :active-entry="activeEntry"
-          :selected-list="selectedListIds"
-          class="base-entry-selector__body__entries"
-          @clicked="entryClicked"
-          @selected="selectEntry">
-          <template #entry-text-content="{ item }">
-            <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
-            @binding {Object} item - the data of one single selector entry provided with `entries` -->
-            <slot
-              name="entry-text-content"
-              :item="item" />
-          </template>
-          <template #entry-right-side-elements="{ isSelected, item }">
-            <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
-               @binding { Object } item - the complete entry provided by list
-               @binding { boolean } is-selected - was item selected
-               @binding { boolean } select-active - is select mode of entry selector active -->
-            <slot
-              name="entry-right-side-elements"
-              :is-selected="isSelected"
-              :select-active="showOptions"
-              :item="item" />
-          </template>
-          <template
-            #thumbnails="{ item }">
-            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
-              @binding { Object } item - the data of one entry provided by `entries` prop -->
-            <slot
-              :item="item"
-              name="thumbnails" />
-          </template>
-        </BaseMenuList>
-        <div
-          v-else-if="!isLoading"
-          class="base-entry-selector__no-entries">
-          <p class="base-entry-selector__no-entries__title">
-            {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
-          </p>
-          <p class="base-entry-selector__no-entries__subtext">
-            {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
-          </p>
-        </div>
-      </slot>
-    </div>
-
-    <BasePagination
-      v-if="pageTotal > 1"
-      ref="pagination"
-      :total="pageTotal"
-      :current="pageNumber"
-      @set-page="setPage" />
-  </div>
-</template>
-
 <script>
-import i18n from '../../mixins/i18n';
+import { defineAsyncComponent, ref, toRef } from 'vue';
+import { useI18n } from '@/composables/useI18n.js';
+import { useEventListener } from '@/composables/useEventListener.js';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -200,15 +10,14 @@ import i18n from '../../mixins/i18n';
 export default {
   name: 'BaseEntrySelector',
   components: {
-    BaseDropDown: () => import('../BaseDropDown/BaseDropDown').then(m => m.default || m),
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
-    BaseMenuList: () => import('../BaseMenuList/BaseMenuList').then(m => m.default || m),
-    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
-    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
-    BaseSearch: () => import('../BaseSearch/BaseSearch').then(m => m.default || m),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
+    BaseDropDown: defineAsyncComponent(() => import('@/components/BaseDropDown/BaseDropDown.vue')),
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
+    BaseMenuList: defineAsyncComponent(() => import('@/components/BaseMenuList/BaseMenuList.vue')),
+    BaseOptions: defineAsyncComponent(() => import('@/components/BaseOptions/BaseOptions.vue')),
+    BasePagination: defineAsyncComponent(() => import('@/components/BasePagination/BasePagination.vue')),
+    BaseSearch: defineAsyncComponent(() => import('@/components/BaseSearch/BaseSearch.vue')),
+    BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
   },
-  mixins: [i18n],
   props: {
     /**
      * list of entries to display. Unless the slot `entries` is used this should be an object with
@@ -380,17 +189,17 @@ export default {
       }),
       // checking if all necessary properties are part of the provided object
       validator: val => [
-        'noEntriesTitle',
-        'noEntriesSubtext',
-        'options',
-        'search',
-        'selectAll',
-        'selectNone',
-        'entriesSelected',
-        'maxEntriesReached',
-      ]
-        .every(prop => Object.keys(val).includes(prop))
-          && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
+          'noEntriesTitle',
+          'noEntriesSubtext',
+          'options',
+          'search',
+          'selectAll',
+          'selectNone',
+          'entriesSelected',
+          'maxEntriesReached',
+        ]
+          .every(prop => Object.keys(val).includes(prop))
+        && ['show', 'hide'].every(requiredProp => Object.keys(val.options).includes(requiredProp)),
     },
     /**
      * define if search field should be shown.
@@ -410,10 +219,18 @@ export default {
       default: true,
     },
     /**
+     * make the single menu list items draggable
+     */
+    useDraggable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
      * this prop gives the option to add assistive text for screen readers.
      * properties:
      * **loaderActive**: text that is announced when results are being fetched (prop
      *  `isLoading` is set `true`)
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
      * **resultsFound**: provide text that should be announced when the search has
      *  yielded results. Adding the string '{number}' will announce the total number
      *  of results found
@@ -426,8 +243,61 @@ export default {
         resultsFound: '{number} Results found.',
         noResultsFound: 'No results found.',
         loaderActive: 'Loading.',
+        clearInput: 'Clear input',
       }),
     },
+    /**
+     * this prop gives the option to add assistive text for the pagination:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    paginationAssistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['currentPage', 'nextPage', 'pagination', 'previousPage', 'toPage']
+        .every(prop => Object.keys(val).includes(prop)),
+    }
+  },
+  emits: ['entry-clicked', 'fetch-entries', 'selected-changed', 'update:entries-selectable'],
+  setup(props) {
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n(toRef(props, 'language'));
+
+    /** LIST FADE OUT */
+    const body = ref(null);
+    const headHasShadow = ref(false);
+    function scroll() {
+      if (body.value.scrollTop) {
+        headHasShadow.value = true;
+        return;
+      }
+      headHasShadow.value = false;
+    }
+
+    useEventListener({
+      target: body,
+      event: 'scroll',
+      callback: scroll,
+    });
+
+    return {
+      getI18nTerm,
+      body,
+      headHasShadow,
+    };
   },
   data() {
     return {
@@ -446,7 +316,6 @@ export default {
        * @type {Object}
        */
       sortParam: {},
-      headHasShadow: false,
       pageNumber: 1,
       showOptions: false,
       // TODO: eventually it would make sense to have selected entries settable from outside
@@ -519,34 +388,41 @@ export default {
      * watch if entries are updated to set the focus on the first list
      * element
      */
-    entries() {
-      // check if the menu list exist already (which it should on page
-      // change) and if change was triggered by changing the page
-      if (this.$refs.menuList && this.pageChanged) {
-        // wait until the elements are rendered
-        this.$nextTick(() => {
-          // then depending on if select input is shown or not
-          const firstFocusableListElement = this.showOptions
-            // get the first select input element
-            ? this.$refs.menuList.$el.querySelector('input:enabled')
-            // or the first menu entry element (that has tabindex 0 set)
-            : this.$refs.menuList.$el.querySelector('*[tabindex]:not([tabindex="-1"])');
-          // check if an element was found
-          if (firstFocusableListElement) {
-            // if yes - focus
-            firstFocusableListElement.focus();
-          }
-        });
-      }
-      // reset pageChanged flag
-      this.pageChanged = false;
-      // announce that entries have changed
-      this.resultsAnnouncement = this.assistiveText[this.entriesTotal ? 'resultsFound' : 'noResultsFound']
-        .replace('{number}', this.entriesTotal);
-      // and reset afterward so the same text would trigger the watcher again
-      setTimeout(() => {
-        this.resultsAnnouncement = '';
-      }, 300);
+    entries: {
+      handler() {
+        // check if the menu list exist already (which it should on page
+        // change) and if change was triggered by changing the page
+        if (this.$refs.menuList && this.pageChanged) {
+          // wait until the elements are rendered
+          this.$nextTick(() => {
+            // then depending on if select input is shown or not
+            const firstFocusableListElement = this.showOptions
+              // get the first select input element
+              ? this.$refs.menuList.$el.querySelector('input:enabled')
+              // or the first menu entry element (that has tabindex 0 set)
+              : this.$refs.menuList.$el.querySelector('*[tabindex]:not([tabindex="-1"])');
+            // check if an element was found
+            if (firstFocusableListElement) {
+              // if yes - focus
+              firstFocusableListElement.focus();
+            }
+          });
+        }
+        // reset pageChanged flag
+        this.pageChanged = false;
+        // announce that entries have changed
+        const announcementTextKey = this.entriesTotal ? 'resultsFound' : 'noResultsFound';
+        // safeguard against text not existing
+        if (this.assistiveText[announcementTextKey]) {
+          this.resultsAnnouncement = this.assistiveText[announcementTextKey]
+            .replace('{number}', this.entriesTotal);
+        }
+        // and reset afterward so the same text would trigger the watcher again
+        setTimeout(() => {
+          this.resultsAnnouncement = '';
+        }, 300);
+      },
+      deep: true,
     },
     /**
      * watch outside variable to have it in sync with internal 'showOptions'
@@ -577,13 +453,16 @@ export default {
     /**
      * watch selectedEntries to inform parent of changes in selection
      */
-    selectedEntries() {
-      /**
-       * event emitted every time the selected entries change
-       * @event selected-changed
-       * @param {Object[]} - array of updated selected entries
-       */
-      this.$emit('selected-changed', this.selectedEntries);
+    selectedEntries: {
+      handler() {
+        /**
+         * event emitted every time the selected entries change
+         * @event selected-changed
+         * @param {Object[]} - array of updated selected entries
+         */
+        this.$emit('selected-changed', this.selectedEntries);
+      },
+      deep: true,
     },
   },
   created() {
@@ -596,13 +475,6 @@ export default {
   mounted() {
     // fetch initial entries
     this.fetchEntries();
-    // add scroll listener to determine if head shadow should be displayed
-    this.$refs.body
-      .addEventListener('scroll', this.scroll);
-  },
-  beforeDestroy() {
-    this.$refs.body
-      .removeEventListener('scroll', this.scroll);
   },
   methods: {
     /**
@@ -661,13 +533,6 @@ export default {
       }
       this.pageNumber = 1;
     },
-    scroll() {
-      if (this.$refs.body.scrollTop) {
-        this.headHasShadow = true;
-        return;
-      }
-      this.headHasShadow = false;
-    },
     /**
      * function to trigger from slot `entries` when an entry was selected
      * @param {Object} obj - selected entry
@@ -701,8 +566,204 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    :style="calcStyle"
+    class="base-entry-selector">
+    <!-- HEAD -->
+    <div
+      ref="head"
+      :class="['base-entry-selector__head',
+               { 'base-entry-selector__head--shadow': headHasShadow },
+               { 'base-entry-selector__head--padding': useSearch }]">
+      <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
+      <slot name="head">
+        <!-- default -->
+        <BaseSearch
+          v-if="useSearch"
+          v-model="filterString"
+          :show-image="true"
+          :placeholder="getI18nTerm(entrySelectorText.search)"
+          :assistive-text="{
+            loaderActive: assistiveText.loaderActive,
+            clearInput: assistiveText.clearInput,
+            results: resultsAnnouncement,
+          }"
+          :class="['base-entry-selector__head__search-bar',
+                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
+          @update:model-value="filterEntries($event, 'title')" />
+      </slot>
+
+      <!-- BASE OPTIONS ROW -->
+      <div
+        v-if="showOptionsRow"
+        class="base-entry-selector__options">
+        <BaseOptions
+          ref="baseOptions"
+          v-model:show-options="showOptions"
+          :options-hidden="optionsHidden"
+          :use-options-button-on="'always'"
+          :show-after-options-below="true"
+          :options-button-icon="{
+            show: 'options-menu',
+            hide: 'options-menu',
+          }"
+          :options-button-text="entrySelectorText.options"
+          align-options="left">
+          <template
+            #afterOptions>
+            <div
+              class="base-entry-selector__dropdowns">
+              <!-- @slot to add custom elements at the end of the options row, e.g. custom drop downs -->
+              <slot name="after-options">
+                <!-- default -->
+                <BaseDropDown
+                  v-if="sortOptions.length"
+                  :id="`${sortConfig.label}-sort-drop-down`"
+                  ref="baseDropDown"
+                  v-model="sortParam"
+                  :label="sortConfig.label"
+                  :options="sortOptions"
+                  :with-spacing="false"
+                  :align-drop-down="entryTypes.length ? 'left' : 'right'"
+                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
+                  :value-prop="sortConfig.valuePropertyName"
+                  class="base-entry-selector__dropdowns__dropdown"
+                  @update:model-value="fetchEntries" />
+                <BaseDropDown
+                  v-if="entryTypes.length"
+                  :id="`${entryTypesConfig.label}-types-drop-down`"
+                  ref="baseDropDown"
+                  v-model="filterType"
+                  :label="entryTypesConfig.label"
+                  :options="entryTypes"
+                  :language="language"
+                  :with-spacing="false"
+                  :style="{ maxWidth: `${100 / dropDownElementsCount}%` }"
+                  :value-prop="entryTypesConfig.valuePropertyName"
+                  align-drop-down="right"
+                  class="base-entry-selector__dropdowns__dropdown"
+                  @update:model-value="filterEntries($event, 'type')" />
+              </slot>
+            </div>
+          </template>
+          <template
+            #options>
+            <!-- @slot add custom action (buttons) -->
+            <slot name="option-actions" />
+          </template>
+        </BaseOptions>
+      </div>
+      <!-- SELECTOR OPTIONS -->
+      <BaseSelectOptions
+        v-if="showOptions"
+        ref="selectOptions"
+        :select-text="getI18nTerm(entrySelectorText.selectAll)"
+        :selected-number-text="getI18nTerm(entrySelectorText.entriesSelected)"
+        :deselect-text="getI18nTerm(entrySelectorText.selectNone)"
+        :list="selectableEntries"
+        :selected-list="selectedEntries"
+        :select-all-disabled="!!maxSelectedEntries
+          && (!(selectableEntries.length < (maxSelectedEntries - selectedListIds.length)
+            || !selectableEntries.some((entry) => !selectedListIds.includes(entry.id))))"
+        @selected="changeAllSelectState">
+        <template #selectedText>
+          {{ `${selectedListIds.length}${(maxSelectedEntries ? `/${maxSelectedEntries}` : '')}
+          ${getI18nTerm(entrySelectorText.entriesSelected)}` }}
+          <span
+            v-if="!!maxSelectedEntries && selectedListIds.length >= maxSelectedEntries">
+            {{ `(${getI18nTerm(entrySelectorText.maxEntriesReached)})` }}
+          </span>
+        </template>
+      </BaseSelectOptions>
+    </div>
+
+    <!-- BODY -->
+    <div
+      ref="body"
+      class="base-entry-selector__body">
+      <div
+        v-if="isLoading"
+        class="loading-area">
+        <BaseLoader
+          :text-on-loader-show="assistiveText.loaderActive"
+          :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
+      </div>
+
+      <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
+          @binding {Object[]} entries - list of entries to display
+          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
+          -->
+      <slot
+        name="entries"
+        :entries="entries"
+        :select-entry="selectEntry">
+        <!-- default -->
+        <BaseMenuList
+          v-if="entries.length"
+          key="menu-list"
+          ref="menuList"
+          :select-active="showOptions"
+          :list="entries"
+          :active-entry="activeEntry"
+          :selected-list="selectedListIds"
+          :use-draggable="useDraggable"
+          class="base-entry-selector__body__entries"
+          @clicked="entryClicked"
+          @selected="selectEntry">
+          <template #entry-text-content="{ item }">
+            <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
+            @binding {Object} item - the data of one single selector entry provided with `entries` -->
+            <slot
+              name="entry-text-content"
+              :item="item" />
+          </template>
+          <template #entry-right-side-elements="{ isSelected, item }">
+            <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
+               @binding { Object } item - the complete entry provided by list
+               @binding { boolean } is-selected - was item selected
+               @binding { boolean } select-active - is select mode of entry selector active -->
+            <slot
+              name="entry-right-side-elements"
+              :is-selected="isSelected"
+              :select-active="showOptions"
+              :item="item" />
+          </template>
+          <template
+            #thumbnails="{ item }">
+            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
+              @binding { Object } item - the data of one entry provided by `entries` prop -->
+            <slot
+              :item="item"
+              name="thumbnails" />
+          </template>
+        </BaseMenuList>
+        <div
+          v-else-if="!isLoading"
+          class="base-entry-selector__no-entries">
+          <p class="base-entry-selector__no-entries__title">
+            {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
+          </p>
+          <p class="base-entry-selector__no-entries__subtext">
+            {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
+          </p>
+        </div>
+      </slot>
+    </div>
+
+    <BasePagination
+      v-if="pageTotal > 1"
+      ref="pagination"
+      :total="pageTotal"
+      :model-value="pageNumber"
+      :assistive-text="paginationAssistiveText"
+      @update:model-value="setPage" />
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables.scss";
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-entry-selector {
     display: flex;
@@ -711,7 +772,7 @@ export default {
 
     &__head {
       position: sticky;
-      z-index: map-get($zindex, entry-selector-head);
+      z-index: map.get($zindex, entry-selector-head);
       background-color: $background-color;
       flex: 0 0 auto;
 
@@ -751,7 +812,7 @@ export default {
         position: absolute;
         height: 100%;
         width: 100%;
-        z-index: map-get($zindex, loader);
+        z-index: map.get($zindex, loader);
         background-color: $loading-background;
         overflow: hidden;
 

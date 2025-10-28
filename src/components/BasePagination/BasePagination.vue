@@ -1,116 +1,9 @@
-<template>
-  <nav
-    ref="pagination"
-    class="base-pagination">
-    <component
-      :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : false"
-      :aria-disabled="active <= 1"
-      :tabindex="active <= 1 ? -1 : 0"
-      :class="[
-        'base-pagination__arrow',
-        { 'base-pagination__arrow-icon-inactive': active <= 1 },
-      ]"
-      aria-label="Go to previous page"
-      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
-      @click.native.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false"
-      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : false">
-      <base-icon
-        class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
-        name="arrow-left" />
-    </component>
-    <div class="base-pagination__row">
-      <!-- ELEMENT TO DISPLAY WHEN TOTAL NUMBER OF ELEMENTS FITS INTO PARENT -->
-      <template v-if="total <= maxNumbers">
-        <component
-          :is="numberElement"
-          v-for="n in total"
-          :key="n"
-          :to="useLinkElement ? getLinkPath(n) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === n ? 'true' : false"
-          :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
-          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
-          @keydown.enter="setActivePage(n)"
-          @click.native.prevent="setActivePage(n)"
-          @click.prevent="setActivePage(n)">
-          {{ n }}
-        </component>
-      </template>
-      <template v-else>
-        <component
-          :is="numberElement"
-          v-if="start !== 1"
-          :to="useLinkElement ? getLinkPath(1) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === 1 ? 'true' : false"
-          :aria-label="`${active === 1 ? 'Current Page, Page' : 'Go to page'} ${1}`"
-          :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
-          @keydown.enter="setActivePage(1)"
-          @click.native.prevent="setActivePage(1)"
-          @click.prevent="setActivePage(1)">
-          {{ 1 }}
-        </component>
-        <span
-          v-if="start > 2"
-          class="base-pagination__more">&#8943;</span>
-        <component
-          :is="numberElement"
-          v-for="n in subset"
-          :key="n"
-          :to="useLinkElement ? getLinkPath(n) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === n ? 'true' : false"
-          :aria-label="`${active === n ? 'Current Page, Page' : 'Go to page'} ${n}`"
-          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
-          @keydown.enter="setActivePage(n)"
-          @click.native.prevent="setActivePage(n)"
-          @click.prevent="setActivePage(n)">
-          {{ n }}
-        </component>
-        <span
-          v-if="(end) < (total - 1) && (end) !== (total - 1)"
-          class="base-pagination__more">&#8943;</span>
-        <component
-          :is="numberElement"
-          v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
-          :to="useLinkElement ? getLinkPath(total) : false"
-          :tabindex="!useLinkElement ? 0 : false"
-          :aria-current="active === total ? 'true' : false"
-          :aria-label="`${active === total ? 'Current Page, Page' : 'Go to page'} ${total}`"
-          :class="['base-pagination__number',
-                   { 'base-pagination__number-active': active === total }]"
-          @keydown.enter="setActivePage(total)"
-          @click.native.prevent="setActivePage(total)"
-          @click.prevent="setActivePage(total)">
-          {{ total }}
-        </component>
-      </template>
-    </div>
-    <component
-      :is="numberElement"
-      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : false"
-      :aria-disabled="active >= total"
-      :tabindex="active >= total ? -1 : 0"
-      :class="[
-        'base-pagination__arrow',
-        { 'base-pagination__arrow-icon-inactive': active >= total },
-      ]"
-      aria-label="Go to next Page"
-      @click.prevent="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false"
-      @click.native.prevent.prevent="active + 1 <= total && !useLinkElement
-        ? setActivePage(active + 1) : false"
-      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : false">
-      <base-icon
-        class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
-        name="arrow-left" />
-    </component>
-  </nav>
-</template>
-
 <script>
-import { debounce } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { onMounted, ref, useTemplateRef } from 'vue';
+import { useElementObserver } from '@/composables/useElementObserver.js';
+import { useI18n } from '@/composables/useI18n.js';
+import { useDebounce } from '@/composables/useDebounce.js';
 
 /**
  * Pagination component
@@ -121,13 +14,9 @@ export default {
   components: {
     BaseIcon,
   },
-  model: {
-    prop: 'current',
-    event: 'set-page',
-  },
   props: {
     /**
-     * specify total number of pages
+     * specify the total number of pages
      */
     total: {
       type: Number,
@@ -136,58 +25,151 @@ export default {
     /**
      * currently active page number
      */
-    current: {
+    modelValue: {
       type: Number,
       default: 1,
     },
     /**
-     * specify if pagination elements should be links - specify a vue link element or
-     * set the variable false if element should not be a link
-     * (this needs vue-router)
+     * specify if pagination elements should be links - specify a vue link element (as
+     * string e.g. `'RouterLink` or pass the component directly) or set the variable `false`
+     * if element should not be a link (this needs vue-router)
      * currently only vue components (like 'RouterLink' or 'NuxtLink') are supported!
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     useLinkElement: {
-      type: [String, Boolean],
+      type: [String, Boolean, Object],
       default: false,
-      validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
+      validator: val => (typeof val === 'boolean' && !val)
+        || (typeof val === 'string' && val)
+        || (typeof val === 'object' && val.name && ['NuxtLink', 'RouterLink'].includes(val.name)),
+    },
+    /**
+     * this prop gives the option to add assistive text for screen readers
+     * properties:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+      // checking if all necessary properties are part of the provided object
+      validator: val => ['currentPage', 'nextPage', 'pagination', 'previousPage', 'toPage']
+        .every(prop => Object.keys(val).includes(prop)),
     },
   },
-  data() {
+  emits: ['update:model-value'],
+  setup(props) {
+    /** ACTIVE PAGE NUMBER */
+    /**
+     * currently active page number
+     * @type {Ref<UnwrapRef<number>>}
+     */
+    const active = ref(props.modelValue);
+
+    /** PAGE NUMBER DISPLAY CALCULATIONS */
+    const pagination = useTemplateRef('paginationEl');
+    /**
+     * total numbers to be displayed before the '...' depending on the width of the
+     * pagination element (only relevant if not all numbers can be displayed)
+     * @type {Ref<UnwrapRef<number>>}
+     */
+    const subsetNumber = ref(7);
+    /**
+     * max numbers to be displayed
+     * @type {Ref<UnwrapRef<number>>}
+     */
+    const maxNumbers = ref(10);
+    /**
+     * number the displayed pages between '...' should start with
+     * (only relevant if not all numbers can be displayed)
+     * @type {Ref<UnwrapRef<?number>>}
+     */
+    const start = ref(null);
+    /**
+     * number the displayed pages between the '...' should end with
+     * (only relevant if not all numbers can be displayed)
+     * @type {Ref<UnwrapRef<?number>>}
+     */
+    const end = ref(null);
+
+    /**
+     * depending on with of the parent element of the pagination calculate
+     * how many page numbers can be displayed
+     */
+    function setStartEnd() {
+      // get parent width
+      const elementWidth = pagination.value.clientWidth;
+      // set the subset and the max number accordingly
+      if (elementWidth < 400) {
+        subsetNumber.value = 1;
+        maxNumbers.value = 5;
+      } else if (elementWidth < 550) {
+        subsetNumber.value = 3;
+        maxNumbers.value = 8;
+      } else if (elementWidth < 700) {
+        subsetNumber.value = 5;
+        maxNumbers.value = 8;
+      } else {
+        subsetNumber.value = 7;
+        maxNumbers.value = 10;
+      }
+      // calc start and end number from the subset number
+      start.value = active.value - subsetNumber.value / 2 > 0
+        ? active.value - Math.floor(subsetNumber.value / 2) : 1;
+      end.value = active.value + subsetNumber.value / 2 < props.total
+        ? active.value + Math.floor(subsetNumber.value / 2) : props.total;
+    }
+
+    // add a delay to start / end calculations
+    const { debounce } = useDebounce();
+    function debounceCalculations() {
+      debounce(setStartEnd, 50);
+    }
+
+    /**
+     * add an observer to adjust displayed numbers according to component
+     * width
+     */
+    useElementObserver({
+      type: 'resize',
+      target: pagination,
+      callback: debounceCalculations,
+    });
+
+    onMounted(() => {
+      // calc the correct numbers for the first time as soon as component
+      // is mounted
+      setStartEnd();
+    });
+
+    /** LOCALIZATION */
+    const { getLangLabel, getI18nTerm } = useI18n();
+
     return {
-      /**
-       * currently active page number
-       * @type {number}
-       */
-      active: this.current,
-      /**
-       * number the displayed pages between '...' should start with
-       * (only relevant if not all numbers can be displayed)
-       * @type {?number}
-       */
-      start: null,
-      /**
-       * number the displayed pages between the '...' should end with
-       * (only relevant if not all numbers can be displayed)
-       * @type {?number}
-       */
-      end: null,
-      /**
-       * total numbers to be displayed before the '...' depending on the width of the
-       * pagination element (only relevant if not all numbers can be displayed)
-       * @type {number}
-       */
-      subsetNumber: 7,
-      /**
-       * max numbers to be displayed
-       * @type {number}
-       */
-      maxNumbers: 10,
-      /**
-       * an observer to adjust displayed numbers according to component
-       * width
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
+      pagination,
+      subsetNumber,
+      maxNumbers,
+      start,
+      end,
+      active,
+      setStartEnd,
+      getLangLabel,
+      getI18nTerm,
     };
   },
   computed: {
@@ -215,12 +197,16 @@ export default {
   },
   watch: {
     /**
-     * in case
+     * in case pagination is set via route - add a watcher here (however this only works
+     * with a query param 'page'!
      */
-    $route(to) {
-      if (this.useLinkElement && to && to.query && to.query.page && to.query.page !== this.active) {
-        this.active = Number(to.query.page);
-      }
+    $route: {
+      handler(to) {
+        if (!!this.useLinkElement && to?.query?.page && Number(to.query.page) !== Number(this.active)) {
+          this.active = Number(to.query.page);
+        }
+      },
+      immediate: true,
     },
     /**
      * if active number changes inform parent
@@ -228,14 +214,14 @@ export default {
      */
     active(val) {
       // check if new number is different from prop value
-      if (this.current !== val) {
+      if (this.modelValue !== val) {
         /**
          * triggered on page select
          *
-         * @event set-page
+         * @event update:model-value
          * @param {number} - the new page number
          */
-        this.$emit('set-page', val);
+        this.$emit('update:model-value', val);
       }
       // adjust the start and end value accordingly (if not all numbers can be displayed)
       this.setStartEnd();
@@ -244,66 +230,11 @@ export default {
      * check if parent prop changes
      * @param {number} val - the page number provided by the parent component
      */
-    current(val) {
+    modelValue(val) {
       this.active = val;
     },
   },
-  mounted() {
-    // initialize the start and end variable in case not all numbers can be displayed
-    this.setStartEnd();
-    // add an resize observer to adapt visible page numbers to component width
-    this.initObserver();
-  },
-  beforeDestroy() {
-    // remove observer again
-    if (this.resizeObserver) this.resizeObserver.disconnect();
-  },
   methods: {
-    /**
-     * function to initialize the resize observer necessary to adapt
-     * pagination to component width at all times
-     */
-    initObserver() {
-      // create an observer with the set overflow calc function
-      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
-        this.setStartEnd();
-      }));
-      // put it on the relevant element
-      tempResizeObserver.observe(this.$refs.pagination);
-      // store it
-      this.resizeObserver = tempResizeObserver;
-    },
-    /**
-     * depending on with of the parent element of the pagination calculate
-     * how many page numbers can be displayed
-     */
-    setStartEnd() {
-      // since observer is carried out one last time before component is destroyed
-      // we need to check if element still exists or was unmounted already
-      if (this.$refs.pagination) {
-        // get parent width
-        const elementWidth = this.$refs.pagination.clientWidth;
-        // set the subset and the max number accordingly
-        if (elementWidth < 400) {
-          this.subsetNumber = 1;
-          this.maxNumbers = 5;
-        } else if (elementWidth < 550) {
-          this.subsetNumber = 3;
-          this.maxNumbers = 8;
-        } else if (elementWidth < 700) {
-          this.subsetNumber = 5;
-          this.maxNumbers = 8;
-        } else {
-          this.subsetNumber = 7;
-          this.maxNumbers = 10;
-        }
-        // calc start and end number from the subset number
-        this.start = this.active - this.subsetNumber / 2 > 0
-          ? this.active - Math.floor(this.subsetNumber / 2) : 1;
-        this.end = this.active + this.subsetNumber / 2 < this.total
-          ? this.active + Math.floor(this.subsetNumber / 2) : this.total;
-      }
-    },
     /**
      * function to set a new page number active
      * @param {number} page - the new page number
@@ -323,7 +254,10 @@ export default {
     getLinkPath(page) {
       // check if router in project and link element is used and set link path accordingly if yes
       if (!!this.useLinkElement && this.$route) {
-        return ({ path: this.$route.fullPath, query: { page } });
+        return ({ path: this.$route.fullPath, query: {
+          ...this.$route.query,
+          page,
+        }});
       }
       return '';
     },
@@ -331,8 +265,113 @@ export default {
 };
 </script>
 
+<template>
+  <nav
+    ref="paginationEl"
+    :aria-label="getI18nTerm(assistiveText.pagination)"
+    class="base-pagination">
+    <component
+      :is="numberElement"
+      :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : undefined"
+      :aria-disabled="active <= 1"
+      :tabindex="active <= 1 ? -1 : 0"
+      :class="[
+        'base-pagination__arrow',
+        { 'base-pagination__arrow-icon-inactive': active <= 1 },
+      ]"
+      :aria-label="getI18nTerm(assistiveText.previousPage)"
+      @click.prevent="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null"
+      @keydown.enter="active - 1 > 0 && !useLinkElement ? setActivePage(active - 1) : null">
+      <BaseIcon
+        class="base-pagination__arrow-icon base-pagination__arrow-icon-left"
+        name="arrow-left" />
+    </component>
+    <div class="base-pagination__row">
+      <!-- ELEMENT TO DISPLAY WHEN TOTAL NUMBER OF ELEMENTS FITS INTO PARENT -->
+      <template v-if="total <= maxNumbers">
+        <component
+          :is="numberElement"
+          v-for="n in total"
+          :key="n"
+          :to="useLinkElement ? getLinkPath(n) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === n ? 'true' : undefined"
+          :aria-label="`${active === n ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${n}`"
+          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
+          @keydown.enter="setActivePage(n)"
+          @click.prevent="setActivePage(n)">
+          {{ n }}
+        </component>
+      </template>
+      <template v-else>
+        <component
+          :is="numberElement"
+          v-if="start !== 1"
+          :to="useLinkElement ? getLinkPath(1) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === 1 ? 'true' : undefined"
+          :aria-label="`${active === 1 ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${1}`"
+          :class="['base-pagination__number', { 'base-pagination__number-active': active === 1 }]"
+          @keydown.enter="setActivePage(1)"
+          @click.prevent="setActivePage(1)">
+          {{ 1 }}
+        </component>
+        <span
+          v-if="start > 2"
+          class="base-pagination__more">&#8943;</span>
+        <component
+          :is="numberElement"
+          v-for="n in subset"
+          :key="n"
+          :to="useLinkElement ? getLinkPath(n) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === n ? 'true' : undefined"
+          :aria-label="`${active === n ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${n}`"
+          :class="['base-pagination__number', { 'base-pagination__number-active': active === n }]"
+          @keydown.enter="setActivePage(n)"
+          @click.prevent="setActivePage(n)">
+          {{ n }}
+        </component>
+        <span
+          v-if="(end) < (total - 1) && (end) !== (total - 1)"
+          class="base-pagination__more">&#8943;</span>
+        <component
+          :is="numberElement"
+          v-if="(end - 1) < (total - 1) && (end - 1) !== (total - 1)"
+          :to="useLinkElement ? getLinkPath(total) : undefined"
+          :tabindex="!useLinkElement ? 0 : undefined"
+          :aria-current="active === total ? 'true' : undefined"
+          :aria-label="`${active === total ? getI18nTerm(assistiveText.currentPage) : getI18nTerm(assistiveText.toPage)} ${total}`"
+          :class="['base-pagination__number',
+                   { 'base-pagination__number-active': active === total }]"
+          @keydown.enter="setActivePage(total)"
+          @click.prevent="setActivePage(total)">
+          {{ total }}
+        </component>
+      </template>
+    </div>
+    <component
+      :is="numberElement"
+      :to="!!useLinkElement ? getLinkPath(active + 1 <= total ? active + 1 : total) : undefined"
+      :aria-disabled="active >= total"
+      :tabindex="active >= total ? -1 : 0"
+      :class="[
+        'base-pagination__arrow',
+        { 'base-pagination__arrow-icon-inactive': active >= total },
+      ]"
+      :aria-label="getI18nTerm(assistiveText.nextPage)"
+      @click.prevent="active + 1 <= total && !useLinkElement
+        ? setActivePage(active + 1) : false"
+      @keydown.enter="active + 1 <= total && !useLinkElement ? setActivePage(active + 1) : null">
+      <BaseIcon
+        class="base-pagination__arrow-icon base-pagination__arrow-icon-right"
+        name="arrow-left" />
+    </component>
+  </nav>
+</template>
+
 <style lang="scss">
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-pagination {
     text-align: center;

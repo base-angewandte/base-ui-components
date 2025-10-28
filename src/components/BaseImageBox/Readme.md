@@ -8,7 +8,7 @@ A variety of possibilities with image box
     <div
       ref="boxesContainer"
       class="boxes-background">
-        <base-image-box
+        <BaseImageBox
           :selectable="selectActive"
           :image-url="imgUrl"
           :box-size="boxSize"
@@ -17,7 +17,7 @@ A variety of possibilities with image box
           description="and description"
           class="box"
           @select-triggered="handleBoxArray($event, '1')" />
-        <base-image-box
+        <BaseImageBox
           :selectable="selectActive"
           :show-title="false"
           :image-url="imgUrl"
@@ -26,7 +26,7 @@ A variety of possibilities with image box
           description="show-title false"
           class="box"
           @select-triggered="handleBoxArray($event, '2')" />
-        <base-image-box
+        <BaseImageBox
           :selectable="selectActive"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
           :box-size="boxSize"
@@ -34,7 +34,7 @@ A variety of possibilities with image box
           subtext="no description"
           class="box"
           @select-triggered="handleBoxArray($event, '3')" />
-        <base-image-box
+        <BaseImageBox
           :selectable="selectActive"
           :box-size="boxSize"
           :box-text="['This box has only text to show', 'And then some more text that will exceed the size of the box for sure']"
@@ -43,7 +43,7 @@ A variety of possibilities with image box
           class="box"
           description="no overlap with text" />
 
-      <base-image-box
+      <BaseImageBox
         :selectable="selectActive"
         :image-url="imgUrl"
         :box-size="boxSize"
@@ -64,9 +64,9 @@ A variety of possibilities with image box
             title="icon in slot: footer-right"
             class="base-image-box__footer-icon" />
         </template>
-      </base-image-box>
+      </BaseImageBox>
 
-      <base-image-box
+      <BaseImageBox
         :selectable="selectActive"
         :show-title="false"
         :image-url="imgUrl"
@@ -77,7 +77,7 @@ A variety of possibilities with image box
         class="box"
         @select-triggered="handleBoxArray($event, '6')" />
 
-      <base-image-box
+      <BaseImageBox
         :selectable="selectActive"
         :show-title="false"
         :box-size="boxSize"
@@ -88,7 +88,7 @@ A variety of possibilities with image box
         class="box"
         @select-triggered="handleBoxArray($event, '7')" />
 
-      <base-image-box
+      <BaseImageBox
         :selectable="selectActive"
         :show-title="false"
         :box-size="boxSize"
@@ -102,7 +102,7 @@ A variety of possibilities with image box
         <template #footer-right>
           <span>00:04:22</span>
         </template>
-      </base-image-box>
+      </BaseImageBox>
 
       <BaseImageBox
         :selectable="selectActive"
@@ -168,11 +168,11 @@ A variety of possibilities with image box
         class="box"
         @select-triggered="handleBoxArray($event, '12')" />
 
-      <base-image-box
+      <BaseImageBox
         :selectable="selectActive"
         :image-first="true"
         :image-shadow="false"
-        :iconSize="iconSize"
+        :icon-size="iconSize"
         :box-size="boxSize"
         :center-header="true"
         title="Box with centered header"
@@ -185,7 +185,7 @@ A variety of possibilities with image box
             alt=""
             style="width: 100%;" />
         </template>
-      </base-image-box>
+      </BaseImageBox>
     </div>
     <div class="button-area">
       <BaseButton

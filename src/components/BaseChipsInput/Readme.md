@@ -5,7 +5,7 @@ Simple Single Choice Example with fixed dropdown, no unknown, not draggable
 Additionally, to the custom events listed above also all native input events are available.
 ```vue live
 <template>
-  <base-chips-input
+  <BaseChipsInput
     :list="list"
     :allow-multiple-entries="false"
     :always-linked="true"
@@ -19,7 +19,7 @@ Additionally, to the custom events listed above also all native input events are
     <template #no-options>
       A customized message that no options are available
     </template>
-  </base-chips-input>
+  </BaseChipsInput>
 </template>
 
 <script>
@@ -55,7 +55,7 @@ Multiple Entries Example with fixed dropdown, no unknown and draggable
 
 ```vue live
 <template>
-  <base-chips-input
+  <BaseChipsInput
     :list="list"
     :always-linked="true"
     :draggable="true"

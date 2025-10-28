@@ -29,7 +29,7 @@
         v-model="useCustomText"
         label="Use Custom Texts"
         class="control"
-        @clicked="selectMode = true; noResults = true" />
+        @update:model-value="selectMode = true; noResults = true" />
       <BaseToggle
         v-model="noResults"
         label="No search Results"
@@ -59,7 +59,7 @@
         :disabled="!showOptionsRow"
         label="Use 'option-actions' Slot"
         class="control"
-        @clicked="selectMode = true" />
+        @update:model-value="selectMode = true" />
       <BaseToggle
         v-model="useAfterOptionsSlot"
         :disabled="!showOptionsRow"
@@ -69,7 +69,7 @@
         v-model="useEntriesSlot"
         label="Use 'entries' Slot"
         class="control"
-        @clicked="useThumbnailsSlot = false; useEntryTextContentSlot = false; useEntryRightSideSlot = false" />
+        @update:model-value="useThumbnailsSlot = false; useEntryTextContentSlot = false; useEntryRightSideSlot = false" />
       <BaseToggle
         v-model="useEntryTextContentSlot"
         :disabled="useEntriesSlot"
@@ -80,7 +80,7 @@
         :disabled="useEntriesSlot"
         label="Use 'entry-right-side-elements' Slot"
         class="control"
-        @clicked="useThumbnailsSlot = false" />
+        @update:model-value="useThumbnailsSlot = false" />
       <BaseToggle
         v-model="useThumbnailsSlot"
         :disabled="useEntriesSlot || useEntryRightSideSlot"
@@ -88,11 +88,11 @@
         class="control" />
     </div>
     <BaseEntrySelector
+      v-model:entries-selectable="selectMode"
       :entries="baseEntrySelectorEntries"
       :entries-total="entries.length"
       :entries-per-page="entriesPerPage"
       :active-entry="baseEntrySelectorEntries.map(entry => entry.id).indexOf(activeEntry)"
-      :entries-selectable.sync="selectMode"
       :options-hidden="!showOptions"
       :sort-options="showSort ? sortOptions : []"
       :use-search="useSearch"
@@ -310,6 +310,7 @@ export default {
             selectAll: 'Custom Select All',
             selectNone: 'Custom Select None',
             entriesSelected: 'Custom Items Selected',
+            maxEntriesReached: 'Custom Max Number of items selected',
           },
         };
       }

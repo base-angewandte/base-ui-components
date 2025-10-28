@@ -11,7 +11,7 @@ Note: The column elements are defined via the data structure wrapped by an array
       :cols="2"
       :data="data"
       :identifier-property-name="'source'"
-      :render-label-as="'h2'" />
+      :render-label-as="'strong'" />
   </div>
 </template>
 
@@ -128,10 +128,10 @@ export default {
 }
 </script>
 
-<style>
-  /* reset chip hover style due the styleguide css would overwrite the component ones */
-  >>> .base-link.base-link--chip:hover {
-    text-decoration: none !important;
+<style lang="scss">
+  /* set z-index equal or lower than styleguides top navigation */
+  >>> .base-tooltip-box {
+    z-index: 10 !important;
   }
 </style>
 ```
@@ -146,7 +146,7 @@ Note: The number of columns can be defined with the `colsSingleTextContent` prop
     <BaseTextList
       :data="data"
       :cols-single-text-object="2"
-      :render-label-as="'h2'" />
+      :render-label-as="'strong'" />
   </div>
 </template>
 
@@ -179,7 +179,7 @@ and processed internally to prepare the structure for a single chip from [BaseLi
     <BaseTextList
       :data="data"
       :identifier-property-name="'id'"
-      :render-label-as="'h2'" />
+      :render-label-as="'strong'" />
   </div>
 </template>
 
@@ -201,6 +201,9 @@ export default {
               value: 'aliquyam erat',
               id: 'keyword-2',
             },
+            {
+              value: 'Eos et accusam aliquyam erat.',
+            },
           ],
         },
       ],
@@ -210,16 +213,9 @@ export default {
 </script>
 
 <style lang="scss">
-  /* reset chip hover style due the styleguide css would overwrite the component ones */
-  >>> .base-link.base-link--chip:hover {
-    text-decoration: none !important;
-  }
-
-  /* set z-index equal or higher than styleguides sidebar */
-  @media screen and (min-width: $mobile) {
-    >>> .base-tooltip-box {
-      z-index: 1002 !important;
-    }
+  /* set z-index equal or lower than styleguides top navigation */
+  >>> .base-tooltip-box {
+    z-index: 10 !important;
   }
 </style>
 ```

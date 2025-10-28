@@ -1,36 +1,16 @@
-<template>
-  <base-box
-    :box-size="{ width: '100%' }"
-    :box-hover="false"
-    box-ratio="0"
-    class="base-detail-box">
-    <dl class="base-detail-box-dl">
-      <template
-        v-for="(item, index) in data">
-        <dt :key="'dt' + index">
-          {{ getLangLabel(item[labelPropertyName], true) }}
-        </dt>
-        <dd :key="'dd' + index">
-          <!-- TODO: if necessary also add language specific function here! -->
-          {{ item[valuePropertyName] }}
-        </dd>
-      </template>
-    </dl>
-  </base-box>
-</template>
-
 <script>
-import BaseBox from '../BaseBox/BaseBox';
-import setLanguage from '../../mixins/i18n';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import { useI18n } from '@/composables/useI18n.js';
+import { toRef } from 'vue';
 
+/**
+ * conveniently display key value pairs in a list
+ */
 export default {
   name: 'BaseDetailBox',
   components: {
     BaseBox,
   },
-  mixins: [
-    setLanguage,
-  ],
   props: {
     /**
      * an array with objects to pass the data to be displayed, expecting an object with
@@ -64,11 +44,40 @@ export default {
       default: 'en',
     },
   },
+  setup(props) {
+    /** INTERNATIONALIZATION */
+    const { getLangLabel } = useI18n(toRef(props, 'language'));
+    return {
+      getLangLabel,
+    };
+  },
 };
 </script>
 
+<template>
+  <BaseBox
+    :box-size="{ width: '100%' }"
+    :box-hover="false"
+    box-ratio="0"
+    class="base-detail-box">
+    <dl class="base-detail-box-dl">
+      <template
+        v-for="(item, index) in data"
+        :key="'dt' + index">
+        <dt>
+          {{ getLangLabel(item[labelPropertyName], true) }}
+        </dt>
+        <dd>
+          <!-- TODO: if necessary also add language specific function here! -->
+          {{ item[valuePropertyName] }}
+        </dd>
+      </template>
+    </dl>
+  </BaseBox>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   $width-dl: 20%;
   $width-dd: 80%;
