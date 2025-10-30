@@ -505,7 +505,7 @@ export default {
       const xAttrsFieldType = xAttrs?.field_type;
       // valid types in OpenAPI definition are 'number' and 'integer'
       if (['number', 'integer'].includes(type)) {
-        return value || null;
+        return value >=0 ? value : null;
       }
       // check special case single-choice chips (is chips but is saved as
       // (multilang) object on backend)
