@@ -789,30 +789,37 @@ export default {
      * @returns {boolean}
      */
     checkFieldContent(fieldName, index = -1) {
-      return this.hasValues(index < 0
-        ? this.valueListInt[fieldName][index] : this.valueListInt[fieldName]);
+      return this.hasValues(
+        index < 0 ? this.valueListInt[fieldName][index] : this.valueListInt[fieldName],
+        index < 0 ? this.formFieldJson[fieldName] : this.formFieldJson[fieldName].items);
     },
     /**
      * loop through all field values depending on the type of value
      * @param {*} fieldValues - the values assigned to a form field
+     * @param {Object} [schema={}] - the openAPI field definition
      * @returns {boolean}
      */
-    hasValues(fieldValues) {
+    hasValues(fieldValues, schema = {}) {
       let hasContent = false;
       if (fieldValues && typeof fieldValues === 'object') {
         if (fieldValues.length >= 0) {
+          // since evaluation is not based on form field json but on the values data type
+          // we don't know if items or properties need to be passed (because e.g. of
+          // single chips - is object in json schema but values are array)
+          const subSchema = schema.items || schema.properties || {};
           fieldValues.forEach((values) => {
-            hasContent = this.hasValues(values) || hasContent;
+            hasContent = this.hasValues(values, subSchema) || hasContent;
           });
         } else {
           const objectKeys = Object.keys(fieldValues);
           objectKeys
             .forEach((key) => {
-              hasContent = this.hasValues(fieldValues[key]) || hasContent;
+              hasContent = this.hasValues(fieldValues[key], schema[key]) || hasContent;
             });
         }
       } else {
-        hasContent = fieldValues === 0 || !!fieldValues || hasContent;
+        // do not consider hidden fields in the evaluation
+        hasContent = !schema?.['x-attrs']?.hidden && (fieldValues === 0 || !!fieldValues || hasContent);
       }
       return hasContent;
     },
