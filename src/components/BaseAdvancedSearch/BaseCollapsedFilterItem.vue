@@ -1,47 +1,7 @@
-<template>
-  <div
-    ref="filterChip"
-    role="listitem"
-    tabindex="0"
-    class="base-collapsed-filter-item"
-    @keydown="removeChip">
-    <!-- if value is single value of date or time range add an 'from' or 'until' character -->
-    <span
-      v-if="isDateOrTimeRange"
-      class="base-collapsed-filter-item__until">
-      {{ rangeIndicator }}
-    </span>
-    <!-- per default use BaseChip component except for type `boolean`
-      enable interpret-text-as-html for chips input fields and chips WITH ids -->
-    <BaseChip
-      v-if="!isBoolean && hasValue"
-      :entry="value.labelInternal"
-      :is-linked="true"
-      :text-styling="chipStyling"
-      :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
-      :assistive-text="filterItemLabel"
-      class="base-collapsed-filter-item__chip"
-      @remove-entry="removeChip" />
-    <!-- for boolean we use a checkmark icon instead of text -->
-    <div
-      v-else-if="isBoolean && hasValue"
-      class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
-      <BaseIcon
-        :title="filterItemLabel"
-        name="check-mark"
-        class="base-collapsed-filter-item__icon" />
-      <BaseIcon
-        name="remove"
-        class="base-collapsed-filter-item__icon-remove"
-        @click.native.stop="removeChip" />
-    </div>
-  </div>
-</template>
-
 <script>
 
-import BaseChip from '@/components/BaseChip/BaseChip';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseChip from '@/components/BaseChip/BaseChip.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
 
 export default {
   name: 'BaseCollapsedFilterItem',
@@ -75,20 +35,6 @@ export default {
       default: 'from',
     },
     /**
-     * needed for cursor styling if over chips if list is scrollable
-     */
-    isScrolling: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * needed for cursor styling if over chips
-     */
-    scrollable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
      * if necessary selected chip text can be rendered as v-html directive
      * will only be applied to values with `idInternal`
      */
@@ -114,6 +60,7 @@ export default {
       }),
     },
   },
+  emits: ['remove-chip'],
   computed: {
     /**
      * is the type of the value to be displayed boolean
@@ -131,17 +78,6 @@ export default {
      */
     hasValue() {
       return !!this.value && !!this.value.labelInternal;
-    },
-    /**
-     * need to overwrite chips styling cursor and user-select in case
-     *  row is scrollable - if not return empty object
-     * @returns {{cursor: (string), userSelect: (string)}|{}}
-     */
-    chipStyling() {
-      return this.scrollable ? ({
-        cursor: this.isScrolling ? 'grabbing' : 'grab',
-        userSelect: this.isScrolling ? 'none' : 'unset',
-      }) : {};
     },
     filterItemLabel() {
       if (this.isBoolean && this.assistiveText.booleanFilterLabel
@@ -177,13 +113,62 @@ export default {
 };
 </script>
 
+<template>
+  <!-- this element NEEDS to be a listitem element because parent is <ul> and moving the keydown
+    event elsewhere had undesired side effects so disabling eslint rule -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+  <li
+    ref="filterChip"
+    tabindex="0"
+    class="base-collapsed-filter-item"
+    @keydown="removeChip">
+    <!-- if value is single value of date or time range add an 'from' or 'until' character -->
+    <span
+      v-if="isDateOrTimeRange"
+      class="base-collapsed-filter-item__until">
+      {{ rangeIndicator }}
+    </span>
+    <!-- per default use BaseChip component except for type `boolean`
+      enable interpret-text-as-html for chips input fields and chips WITH ids -->
+    <BaseChip
+      v-if="!isBoolean && hasValue"
+      :model-value="value.labelInternal"
+      :is-linked="true"
+      :interpret-text-as-html="interpretLabelAsHtml && !!value.idInternal"
+      :assistive-text="filterItemLabel"
+      class="base-collapsed-filter-item__chip"
+      @remove-entry="removeChip" />
+    <!-- for boolean we use a checkmark icon instead of text -->
+    <div
+      v-else-if="isBoolean && hasValue"
+      class="base-collapsed-filter-item__chip base-collapsed-filter-item__boolean-value">
+      <BaseIcon
+        :title="filterItemLabel"
+        name="check-mark"
+        class="base-collapsed-filter-item__icon" />
+      <BaseIcon
+        name="remove"
+        class="base-collapsed-filter-item__icon-remove"
+        @click.stop="removeChip" />
+    </div>
+  </li>
+</template>
+
 <style scoped lang="scss">
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-collapsed-filter-item {
   flex-shrink: 0;
 
-  &:focus {
+  &:focus-visible {
+    /* Draw the focus when :focus-visible is supported */
+    .base-collapsed-filter-item__chip {
+      background-color: $app-color-secondary;
+    }
+  }
+
+  @supports not selector(:focus-visible) {
+    /* Fallback for browsers without :focus-visible support */
     .base-collapsed-filter-item__chip {
       background-color: $app-color-secondary;
     }

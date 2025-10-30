@@ -1,37 +1,6 @@
-<template>
-  <div
-    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]"
-    @keydown.enter.stop="clicked"
-    @click.stop="clicked">
-    <input
-      :id="internalId"
-      v-model="checkedInt"
-      :name="label"
-      :value="radioValueInt"
-      :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
-      :class="['base-checkbox-input', { 'base-checkbox-checked': checkedInt }]"
-      @keydown.enter.prevent="">
-    <div
-      :class="[
-        'base-checkmark-container',
-        'base-checkmark-container-' + checkBoxSize,
-        { 'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
-      <base-icon
-        v-if="markStyle === 'checkbox' && checkedInt"
-        :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
-        name="check-mark" />
-    </div>
-    <!-- need to disable because label is there - it is just in BaseInput component -->
-    <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
-    <label
-      :for="internalId"
-      :class="['base-checkbox-labeltext', { hide: !showLabel }]">{{ label }}</label>
-  </div>
-</template>
-
 <script>
-import { createId } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
+import { useId } from '@/composables/useId.js';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * Checkbox and Radio Button Component
@@ -40,11 +9,7 @@ import BaseIcon from '../BaseIcon/BaseIcon';
 export default {
   name: 'BaseCheckmark',
   components: {
-    BaseIcon,
-  },
-  model: {
-    prop: 'checked',
-    event: 'clicked',
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
   },
   props: {
     /**
@@ -87,7 +52,7 @@ export default {
      * checkbox checked or radio button checked can be set from outside, default
      * value depending on type of selector
      */
-    checked: {
+    modelValue: {
       type: [Boolean, String],
       default: false,
     },
@@ -103,21 +68,26 @@ export default {
       },
     },
   },
+  emits: ['update:model-value'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       checkedInt: false,
     };
   },
   computed: {
-    internalId() {
-      return createId();
-    },
     radioValueInt() {
       return this.radioValue || this.label;
     },
   },
   watch: {
-    checked: {
+    modelValue: {
       handler(val) {
         this.checkedInt = val;
       },
@@ -133,17 +103,48 @@ export default {
        * event emitted on radio button / checkmark click,
        * emitting input label
        *
-       * @event clicked
+       * @event update:model-value
        * @param {string, boolean} - emitting boolean value for checkmark or radio value
        */
-      this.$emit('clicked', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
+      this.$emit('update:model-value', this.markStyle === 'checkbox' ? this.checkedInt : this.radioValueInt);
     },
   },
 };
 </script>
 
+<template>
+  <div
+    :class="['base-checkbox-container', 'base-checkbox-container-' + checkBoxSize]">
+    <input
+      :id="internalId"
+      v-model="checkedInt"
+      :name="label"
+      :value="radioValueInt"
+      :type="markStyle === 'checkbox' ? 'checkbox' : 'radio'"
+      :class="['base-checkbox-input', { 'base-checkbox-checked': !!checkedInt }]"
+      @keydown.enter.prevent.stop="clicked"
+      @click.stop="clicked">
+    <div
+      :class="[
+        'base-checkmark-container',
+        'base-checkmark-container-' + checkBoxSize,
+        { 'base-radiomark': markStyle === 'radio' && checkedInt === radioValueInt }]">
+      <BaseIcon
+        v-if="markStyle === 'checkbox' && checkedInt"
+        :class="['base-checkmark', 'base-checkmark-' + checkBoxSize]"
+        name="check-mark" />
+    </div>
+    <!-- need to disable because label is there - it is just in BaseInput component -->
+    <!-- eslint-disable-next-line  vuejs-accessibility/label-has-for -->
+    <label
+      :for="internalId"
+      :class="['base-checkbox-labeltext', { hide: !showLabel }]">{{ label }}</label>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+@use "sass:map";
+  @use "@/styles/variables" as *;
 
   .base-checkbox-container {
     position: relative;
@@ -185,7 +186,7 @@ export default {
       cursor: pointer;
       width: 100%;
       height: 100%;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
 
       &:focus ~ .base-checkmark-container {
         border-color: $app-color;

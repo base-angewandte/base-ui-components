@@ -1,49 +1,6 @@
-<template>
-  <BaseBoxButton
-    v-bind="$props"
-    :box-ratio="boxRatio"
-    :render-element-as="renderElementAs"
-    :disabled="disabled"
-    :class="[
-      'base-drop-box',
-      { 'base-box-button-disabled': disabled },
-      { 'is-drag-over': isDragOver }]"
-    @clicked="onClicked"
-    @onTooltip="onTooltip">
-    <div
-      class="base-drop-box-inner">
-      <draggable
-        v-if="dropType === 'elements'"
-        v-model="dragList"
-        :sort="false"
-        :group="dropElementName"
-        :on-change="onDragChange"
-        ghost-class="base-drop-box-ghost"
-        class="base-drop-box-drag-area"
-        @add="addEntry">
-        <div
-          class="base-drop-box-drag-area"
-          @dragleave="dragLeave"
-          @pointerenter="dragEnter"
-          @pointerleave="dragLeave">
-          <div
-            v-for="item in dragList"
-            :key="item.id"
-            class="base-drop-box-cloned-items">
-            {{ item }}
-          </div>
-        </div>
-      </draggable>
-      <form
-        v-else
-        ref="fileform" />
-    </div>
-  </BaseBoxButton>
-</template>
-
 <script>
-import Draggable from 'vuedraggable';
-import BaseBoxButton from '../BaseBoxButton/BaseBoxButton';
+import BaseBoxButton from '@/components/BaseBoxButton/BaseBoxButton.vue';
+import { defineAsyncComponent } from 'vue';
 
 /**
  * An Element to drop files or other UI Elements into
@@ -53,7 +10,7 @@ export default {
   name: 'BaseDropBox',
   components: {
     BaseBoxButton,
-    Draggable,
+    VueDraggable: defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable)),
   },
   props: {
     /**
@@ -148,6 +105,7 @@ export default {
       default: false,
     },
   },
+  emits: ['clicked', 'dropped-element', 'dropped-file'],
   data() {
     return {
       dragAndDropCapable: false,
@@ -157,33 +115,38 @@ export default {
   },
   mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
-    if (this.dragAndDropCapable && this.dropType === 'files' && !this.disabled) {
+    if (this.dragAndDropCapable) {
       ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(((evt) => {
-        this.$refs.fileform.addEventListener(evt, ((e) => {
+        this.$refs.baseDropBoxElement.$el.addEventListener(evt, ((e) => {
           e.preventDefault();
-          e.stopPropagation();
-        }), false);
+        }), true);
       }));
-      this.$refs.fileform.addEventListener('drop', (e) => {
-        this.isDragOver = false;
-        /**
-         * event emitted when a file or an element is dropped on the box, emitting the type of event
-         *
-         * @event dropped-file
-         * @param { DragEvent } - propagating the triggered event
-         */
-        this.$emit('dropped-file', e);
-      });
-      ['dragenter', 'dragleave'].forEach(((evt) => {
-        this.$refs.fileform.addEventListener(evt, ((originalEvent) => {
-          // kind of hacky solution to prevent target element to change color
-          // only works when draggable prop is set on every draggable element on site
-          // otherwise it will light up on file drop boxes!
-          if (!originalEvent.dataTransfer.types.includes('draggable')) {
-            this.isDragOver = !this.isDragOver;
-          }
+      if (this.dropType === 'files') {
+        this.$refs.fileform.addEventListener('drop', (e) => {
+          this.isDragOver = false;
+          // if the element is disabled or drop event does not contain any files - do not emit
+          // the event and return
+          if (this.disabled || !e.dataTransfer?.files?.length) return;
+          /**
+           * event emitted when a file or an element is dropped on the box, emitting the type of event
+           *
+           * @event dropped-file
+           * @param { DragEvent } - propagating the triggered event
+           */
+          this.$emit('dropped-file', e);
+        });
+        ['dragenter', 'dragleave'].forEach(((evt) => {
+          this.$refs.fileform.addEventListener(evt, ((originalEvent) => {
+            if (this.disabled) return;
+            // kind of hacky solution to prevent target element to change color
+            // only works when draggable prop is set on every draggable element on site
+            // otherwise it will light up on file drop boxes!
+            if (!originalEvent.dataTransfer.types.includes('draggable')) {
+              this.isDragOver = !this.isDragOver;
+            }
+          }));
         }));
-      }));
+      }
     }
   },
   methods: {
@@ -203,7 +166,7 @@ export default {
     determineDragAndDropCapable() {
       const div = document.createElement('div');
       return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div))
-      && 'FormData' in window && 'FileReader' in window;
+        && 'FormData' in window && 'FileReader' in window;
     },
     /**
      * method to get the dropped element id and emit it to parent
@@ -272,8 +235,55 @@ export default {
 
 </script>
 
+<template>
+  <BaseBoxButton
+    ref="baseDropBoxElement"
+    v-bind="$props"
+    :box-ratio="boxRatio"
+    :render-element-as="renderElementAs"
+    :disabled="disabled"
+    :class="[
+      'base-drop-box',
+      { 'base-box-button--disabled': disabled },
+      { 'is-drag-over': isDragOver }]"
+    @clicked="onClicked"
+    @on-tooltip="onTooltip">
+    <div
+      class="base-drop-box-inner">
+      <VueDraggable
+        v-if="dropType === 'elements'"
+        v-model="dragList"
+        :sort="false"
+        :group="dropElementName"
+        :on-change="onDragChange"
+        :disabled="disabled"
+        ghost-class="base-drop-box-ghost"
+        class="base-drop-box-drag-area"
+        @add="addEntry">
+        <!-- these events are not relevant for accessibility -->
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+        <div
+          class="base-drop-box-drag-area"
+          @dragleave="dragLeave"
+          @pointerenter="dragEnter"
+          @pointerleave="dragLeave">
+          <div
+            v-for="item in dragList"
+            :key="item.id"
+            class="base-drop-box-cloned-items">
+            {{ item }}
+          </div>
+        </div>
+      </VueDraggable>
+      <form
+        v-else
+        ref="fileform" />
+    </div>
+  </BaseBoxButton>
+</template>
+
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-drop-box {
     background-color: $background-color !important;
@@ -307,7 +317,7 @@ export default {
       }
     }
 
-    &.base-box-button-disabled {
+    &.base-box-button--disabled {
 
       .base-drop-box-inner {
         border-color: $graytext-color;
@@ -334,7 +344,7 @@ export default {
     }
   }
 
-  .base-drop-box-drag-area ::v-deep .base-drop-box-ghost {
+  .base-drop-box-drag-area :deep(.base-drop-box-ghost) {
     visibility: hidden !important;
     position: absolute;
     top: auto;

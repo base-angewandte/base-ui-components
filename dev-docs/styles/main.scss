@@ -1,5 +1,5 @@
-@import 'dev-docs/styles/fonts';
-@import "src/styles/variables";
+@use 'fonts';
+@use "@/styles/variables" as *;
 
 $font: "Source Sans Pro", serif;
 
@@ -16,6 +16,10 @@ html {
 
   &:root {
     font-size: 19px;
+  }
+
+  body {
+    height: 1200px;
   }
 
   button {

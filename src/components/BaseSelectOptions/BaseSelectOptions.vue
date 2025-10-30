@@ -1,24 +1,5 @@
-<template>
-  <div
-    class="base-select-options"
-    :style="{ '--direction': flexDirection }">
-    <div class="base-select-options__number-selected">
-      <!-- @slot here number of selected entries is indicated - replace with this slot for customization. -->
-      <slot name="selectedText">
-        {{ `${numberSelected} ${selectedNumberText}` }}
-      </slot>
-    </div>
-    <BaseButton
-      :text="allSelected ? deselectText : selectText"
-      :disabled="selectAllDisabled"
-      button-style="secondary"
-      class="base-select-options__select-button"
-      @clicked="select" />
-  </div>
-</template>
-
 <script>
-import BaseButton from '../BaseButton/BaseButton';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
 
 /**
  * component to enable display of selected items and a select all
@@ -81,6 +62,7 @@ export default {
       default: false,
     },
   },
+  emits: ['selected'],
   data() {
     return {
       selectedInt: false,
@@ -131,8 +113,28 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    class="base-select-options"
+    :style="{ '--direction': flexDirection }">
+    <div class="base-select-options__number-selected">
+      <!-- @slot here number of selected entries is indicated - replace with this slot for customization. -->
+      <slot name="selectedText">
+        {{ `${numberSelected} ${selectedNumberText}` }}
+      </slot>
+    </div>
+    <BaseButton
+      :text="allSelected ? deselectText : selectText"
+      :disabled="selectAllDisabled"
+      button-style="secondary"
+      :class="['base-select-options__select-button',
+               `base-select-options__select-button--margin-${reverse ? 'right' : 'left'}`]"
+      @clicked="select" />
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-select-options {
     display: flex;
@@ -150,8 +152,14 @@ export default {
     }
 
     .base-select-options__select-button {
-      // to keep button aligned right when parent wraps
-      margin-left: auto;
+      &.base-select-options__select-button--left {
+        // to keep button aligned right when parent wraps
+        margin-left: auto;
+      }
+      &.base-select-options__select-button--margin-right {
+        // to keep button aligned left when parent wraps
+        margin-right: auto;
+      }
 
       &:hover,
       &:focus {

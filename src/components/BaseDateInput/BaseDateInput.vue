@@ -1,250 +1,19 @@
-<template>
-  <div
-    ref="baseDateInput"
-    class="base-date-input">
-    <div
-      v-if="showLabelRow"
-      :class="['base-date-input__label-row',
-               { 'base-date-input__label-row--visible': showLabel }]">
-      <legend
-        v-if="showLabel"
-        ref="label"
-        class="base-date-input__label"
-        @click.prevent="">
-        {{ label }}
-      </legend>
-      <div
-        :class="['base-date-input__label-additions',
-                 {'base-date-input__label-additions--switch-height': isSwitchableFormat },
-                 {'base-date-input__label-additions--wrap': wrapLabelRow }]">
-        <div
-          ref="labelAdditions"
-          :class="['base-date-input__label-additions-inner',
-                   {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
-                   {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
-                     && !showLabel }]">
-          <!-- @slot to add additional elements to the label row -->
-          <slot name="label-addition" />
-          <BaseSwitchButton
-            v-if="isSwitchableFormat"
-            v-model="dateFormatInt"
-            :options="tabSwitchOptions"
-            :label="formatTabsLegend"
-            :active-tab="dateFormatInt"
-            class="base-date-input__switch-buttons" />
-        </div>
-      </div>
-    </div>
-
-    <!-- FORM FIELDS -->
-    <!-- keydown event is counter productive to workflow here -->
-    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
-    <div
-      v-click-outside="clickedOutside"
-      class="base-date-input__field-wrapper"
-      @click="clickedInside">
-      <!-- @slot to add elements within form field but before the input element line for an example see [BaseInput](BaseInput)-->
-      <slot name="pre-input-field" />
-      <div class="base-date-input__input-fields">
-        <!-- @slot add elements within input form field but before all other elements - this field wraps if necessary for an example see [BaseInput](BaseInput) -->
-        <slot name="input-field-addition-before" />
-        <div class="base-date-input__input-line">
-          <!-- @slot add elements directly in the input line (no wrapping) for an example see [BaseInput](BaseInput)-->
-          <slot name="input-field-inline-before" />
-          <!-- INPUT FROM -->
-          <BaseInput
-            :id="`input-${internalId}-from`"
-            v-model="inputFrom"
-            :label="label"
-            :show-label="false"
-            :is-active="fromOpen"
-            :use-form-field-styling="useFormFieldStyling"
-            :show-input-border="showInputBorder"
-            :clearable="clearable"
-            :required="required"
-            :invalid="invalid"
-            :disabled="disabled"
-            :show-error-icon="showErrorIcon"
-            :error-message="errorMessage"
-            :input-class="inputClass"
-            :set-focus-on-active="setFocusOnActive"
-            :use-fade-out="useFadeOutFrom"
-            class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('from', $event)"
-            v-on="inputListeners">
-            <template #input>
-              <div
-                class="base-date-input__datepicker">
-                <DatePicker
-                  v-model="inputFrom"
-                  :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
-                  :clearable="false"
-                  :append-to-body="false"
-                  :lang="lang[language]"
-                  :open="fromOpen"
-                  :type="isFromTimeField ? 'time' : minDateView"
-                  :format="isFromTimeField ? 'HH:mm' : datePickerValueFormat"
-                  :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
-                  input-class="base-date-input__datepicker-input"
-                  @pick="datePicked('from')"
-                  @click.native.prevent="onInputClick"
-                  @change="isFromTimeField ? closeTimePicker('from', ...arguments, $event) : ''">
-                  <template #input>
-                    <!-- need to disable because label is there - it is just in BaseInput
-                    component -->
-                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-                    <input
-                      :id="`input-${internalId}-from`"
-                      ref="inputFrom"
-                      :value="inputFrom"
-                      :placeholder="isFromTimeField ? placeholder.time ?? placeholder
-                        : placeholder.date ?? placeholder"
-                      :type="'text'"
-                      :aria-describedby="label + '-' + internalId"
-                      :aria-required="required.toString()"
-                      :aria-invalid="invalid.toString()"
-                      :required="required"
-                      :disabled="disabled"
-                      :aria-disabled="disabled"
-                      :class="['base-date-input__input', inputClass]"
-                      enterkeyhint="done"
-                      autocomplete="off"
-                      @input="checkDate($event, 'From')"
-                      @keydown="handleInputKeydown($event, 'From')"
-                      @blur="onInputBlur($event, 'from')"
-                      v-on="dateInputListeners">
-                  </template>
-                  <!-- this empty element is here so that the default icon of datepicker
-                  is not used -->
-                  <template #icon-calendar>
-                    <div class="base-date-input__icon-wrapper" />
-                  </template>
-                </DatePicker>
-              </div>
-            </template>
-            <template #post-input-field>
-              <BaseIcon
-                v-if="showIcons"
-                ref="baseIcon"
-                :name="isFromTimeField ? 'clock' : 'calendar-many'"
-                class="base-date-input__date-icon"
-                @click.stop="fromOpen = !fromOpen" />
-            </template>
-          </BaseInput>
-
-          <span
-            v-if="type === 'daterange' || type === 'timerange'"
-            class="base-date-input__separator">{{ rangeSeparator }}</span>
-
-          <!-- INPUT TO -->
-          <BaseInput
-            v-if="type !== 'single'"
-            :id="`input-${internalId}-to`"
-            v-model="inputTo"
-            :label="label"
-            :show-label="false"
-            :is-active="toOpen"
-            :use-form-field-styling="useFormFieldStyling"
-            :show-input-border="showInputBorder"
-            :clearable="clearable"
-            :required="required"
-            :invalid="invalid"
-            :disabled="disabled"
-            :show-error-icon="showErrorIcon"
-            :error-message="errorMessage"
-            :set-focus-on-active="setFocusOnActive"
-            :use-fade-out="useFadeOutTo"
-            class="base-date-input__input-wrapper"
-            @update:is-active="isActiveHandler('to', $event)"
-            v-on="inputListeners">
-            <template #input>
-              <div
-                class="base-date-input__datepicker">
-                <DatePicker
-                  v-model="inputTo"
-                  :placeholder="isToTimeField ? placeholder.time : placeholder.date"
-                  :clearable="false"
-                  :append-to-body="false"
-                  :lang="lang[language]"
-                  :open="toOpen"
-                  :type="isToTimeField ? 'time' : minDateView"
-                  :format="isToTimeField ? 'HH:mm' : datePickerValueFormat"
-                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
-                  input-class="base-date-input__datepicker-input"
-                  @pick="datePicked('to')"
-                  @click.native.prevent="onInputClick"
-                  @change="isToTimeField ? closeTimePicker('to', ...arguments, $event) : ''">
-                  <template #input>
-                    <!-- need to disable because label is there - it is just in BaseInput
-                      component -->
-                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-                    <input
-                      :id="`input-${internalId}-to`"
-                      ref="inputTo"
-                      :value="inputTo"
-                      :placeholder="isToTimeField ? placeholder.time ?? placeholder
-                        : placeholder.date ?? placeholder"
-                      :type="'text'"
-                      :aria-describedby="label + '-to-' + internalId"
-                      :aria-required="required.toString()"
-                      :aria-invalid="invalid.toString()"
-                      :required="required"
-                      :disabled="disabled"
-                      :aria-disabled="disabled"
-                      enterkeyhint="done"
-                      autocomplete="off"
-                      :class="['base-date-input__input', inputClass]"
-                      @input="checkDate($event, 'To')"
-                      @keydown="handleInputKeydown($event, 'To')"
-                      @blur="onInputBlur($event, 'to')"
-                      v-on="dateInputListeners">
-                  </template>
-                  <!-- this empty element is here so that the default icon of
-                  datepicker is not used -->
-                  <template #icon-calendar>
-                    <div class="base-date-input__icon-wrapper" />
-                  </template>
-                </DatePicker>
-              </div>
-            </template>
-            <template #post-input-field>
-              <BaseIcon
-                v-if="showIcons"
-                :name="isToTimeField ? 'clock' : 'calendar-many'"
-                class="base-date-input__date-icon"
-                @click.stop="toOpen = !toOpen" />
-            </template>
-          </BaseInput>
-        </div>
-      </div>
-      <!-- @slot for adding elements after input -->
-      <slot name="post-input-field" />
-    </div>
-
-    <div class="base-date-input__below">
-      <!-- @slot to add elements below input fields e.g. add drop down -->
-      <slot name="below-input" />
-    </div>
-  </div>
-</template>
-
 <script>
-import ClickOutside from 'vue-click-outside';
-import DatePicker from 'vue2-datepicker';
-import { capitalizeString, createId, debounce } from '@/utils/utils';
+import { computed, defineAsyncComponent, nextTick, ref, useTemplateRef, watch } from 'vue';
+import { vOnClickOutside } from '@vueuse/components';
+import { capitalizeString, debounce } from '@/utils/utils.js';
 
-import en from 'vue2-datepicker/locale/en';
-import de from 'vue2-datepicker/locale/de';
-import fr from 'vue2-datepicker/locale/fr';
-
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+import { useElementObserver } from '@/composables/useElementObserver.js';
 
 /**
  * Form Input Field Component for Date, Date - Date, Date - Time, or Time - Time
  *
  * for date also a format switch between date | year is available
- *
  */
 
 export default {
@@ -252,21 +21,19 @@ export default {
   components: {
     BaseInput,
     BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton').then(m => m.default || m),
-    DatePicker,
+    BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
+    // we need to import date picker async to avoid SSR problems
+    DatePicker: defineAsyncComponent(() => import('vue-datepicker-next')),
   },
   directives: {
-    ClickOutside,
+    ClickOutside: vOnClickOutside,
   },
-  model: {
-    prop: 'input',
-    event: 'selected',
-  },
+  inheritAttrs: false,
   props: {
-  /**
-   * select date or datetime or a range
-   */
-    type: {
+    /**
+     * select date or datetime or a range
+     */
+    dateType: {
       type: String,
       default: 'single',
       validator(val) {
@@ -279,7 +46,7 @@ export default {
      *   properties (e.g. date_from, time_to) already otherwise only
      *   a string will be returned
      */
-    input: {
+    modelValue: {
       type: [Object, String, Date],
       required: true,
     },
@@ -358,7 +125,7 @@ export default {
     /**
      * set id
      */
-    id: {
+    inputId: {
       type: [Number, String],
       default: '',
     },
@@ -379,34 +146,42 @@ export default {
     },
     /**
      * mark as required field (currently only used for aria-required)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     required: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * mark the form field as invalid and ideally also provide an error message
      * to display below the form field
      * for an example see [BaseInput](BaseInput)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     invalid: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * set `true` if input field should be disabled
      * for an example see [BaseInput](BaseInput)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     disabled: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: false,
     },
     /**
      * add an error message to be displayed below form field if field is invalid
      * for an example see [BaseInput](BaseInput)
+     * this can be a string displayed in all fields or specific for one field
+     * (key same as for modelValue object)
      */
     errorMessage: {
-      type: String,
+      type: [String, Object],
       default: '',
     },
     /**
@@ -455,33 +230,841 @@ export default {
       type: Number,
       default: 0,
     },
+    /**
+     * specify input field type for the native HTML <input> element
+     * @values text, search
+     */
+    inputType: {
+      type: String,
+      default: 'text',
+      validator: val => ['text', 'search'].includes(val),
+    },
+    /**
+     * provide assistive text for screen readers
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     *  this could either be just one string that is used for all fields or an object with
+     *  field specific text
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        clearInput: {
+          date_from: 'Clear input from',
+          date_to: 'Clear input to',
+          time_from: 'Clear input from',
+          time_to: 'Clear input to',
+          date: 'clear date',
+          time: 'clear time',
+        },
+      }),
+    },
+  },
+  emits: ['click-input-field', 'update:model-value', 'clicked-outside', 'value-validated', 'input', 'update:is-active'],
+  setup(props, { emit, slots }) {
+    /** INTERNAL ID */
+    const generatedId = useId();
+    const internalId = computed(() => props.inputId || generatedId);
+
+    /** LOCALIZATION */
+    /**
+     * determine lang object needed for datepicker dynamically, will be filled in mounted
+     * (computed prop does not work reliably)
+     * @type {[null] extends [Ref] ? IfAny<null, Ref<null>, null> : Ref<UnwrapRef<null>, UnwrapRef<null> | null>}
+     */
+    const lang = ref(null);
+    /**
+     * watch the language prop for changes so vue-datepicker can be updated with the relevant
+     * language package
+     */
+    watch(() => props.language, async (newLang) => {
+      // first import the relevant language package
+      await import(`./../../../node_modules/vue-datepicker-next/locale/${newLang}.es.js`);
+      // then update the vue-datepicker lang variable
+      lang.value = newLang;
+    });
+
+    /** ATTRS HANDLING */
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** INPUT ELEMENT HANDLING */
+    /**
+     * get a reference to the BaseInput component
+     * @type {{ from: Readonly<ShallowRef<null|HTMLElement>>, to: Readonly<ShallowRef<null|HTMLElement>> }}
+     */
+    const baseInput = {
+      from: useTemplateRef('baseInputFromEl'),
+      to: useTemplateRef('baseInputToEl'),
+    }
+    /**
+     * return the native input element found via BaseInput, in case there are two input fields
+     * this variable will always return the first one ('from' field)
+     * @type {ComputedRef<HTMLElement|null>}
+     */
+    const inputElement = computed(() => baseInput.from.value?.inputElement || null);
+
+    /**
+     * return the native input elements found via BaseInput, this variable returns both `from` and
+     * `to` input field in an array
+     * @type {ComputedRef<HTMLElement[]|null[]>}
+     */
+    const inputElements = computed(() => [baseInput.from.value?.inputElement || null, baseInput.to.value?.inputElement || null]);
+
+
+    /** DATE FORMAT */
+    /**
+     * variable for toggling format between date and year for date_year format
+     * @type {string}
+     */
+    const dateFormatInt = ref('');
+
+    /** INPUT HANDLING */
+    /**
+     * internal input representation with all possible values for
+     * date and time
+     * date format YYYY(-MM(-DD)) (storage format)
+     * @typedef {Object} inputInt
+     * @property {string} inputInt.date - attribute a single date or datetime date is stored in
+     * @property {string} inputInt.date_from - storing daterange from
+     * @property {string} inputInt.date_to - storing daterange to
+     * @property {string} inputInt.time - storing the time for datetime type
+     * @property {string} inputInt.time_from - storing timerange from
+     * @property {string} inputInt.time_to - storing timerange to
+     */
+    const inputInt = ref({
+      date: '',
+      date_from: '',
+      date_to: '',
+      time: '',
+      time_from: '',
+      time_to: '',
+    });
+
+    /**
+     * determine if the from field is a time field
+     * @returns {boolean}
+     */
+    const isFromTimeField = computed(() => {
+      return props.dateType === 'timerange';
+    });
+    /**
+     * determine if the to field is a time field
+     * @returns {boolean}
+     */
+    const isToTimeField = computed(() => {
+      return props.dateType === 'datetime' || props.dateType === 'timerange';
+    });
+    /**
+     * check if input is just a single date or an object
+     * @returns {boolean}
+     */
+    const isInputTypeString = computed(() => {
+      return typeof props.modelValue === 'string' || !inputProperties.value.length;
+    });
+    /**
+     * compute the properties of the object provided in input prop
+     * @returns {string[]}
+     */
+    const inputProperties = computed(() => {
+      // if input is object return those keys // else for a single date it
+      // could also be a string - then just return an empty array
+      return typeof props.modelValue === 'object' ? Object.keys(props.modelValue) : [];
+    });
+
+
+    /**
+     * handle input for the 'from' input field
+     */
+    const inputFrom = computed({
+      /**
+       * get back the appropriate inputInt attribute value
+       * @returns {string} - a date in the format DD.MM.YYYY
+       */
+      get() {
+        // if it is a time field just return the time_from value
+        if (isFromTimeField.value) {
+          return inputInt.value.time_from || '';
+        }
+        // else it is a date (either single or date_from) --> convert it into the
+        // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
+        return parseToDateDisplay(inputInt.value.date || inputInt.value.date_from);
+      },
+      /**
+       * also assign them again accordingly
+       * @param {string} val - the value provided by the input element
+       * @param {string} oldValue - the previous value of inputFrom
+       */
+      set(val, oldValue) {
+        let newDate = val;
+        if (isFromTimeField.value) {
+          inputInt.value.time_from = newDate;
+        } else {
+          newDate = parseToDateStorage(val);
+          if (inputProperties.value.includes('date_from')) {
+            inputInt.value.date_from = newDate;
+          } else {
+            inputInt.value.date = newDate;
+          }
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (newDate !== oldValue) {
+          emitData();
+        }
+      },
+    });
+
+    /**
+     * as above - if there is only a single time field get value from 'time' variable
+     * if it is a range use 'time_to''
+     */
+    const inputTo = computed({
+      /**
+       * get back the appropriate inputInt attribute value
+       * @returns {string}
+       */
+      get() {
+        // check if a to time field exists
+        if (isToTimeField.value) {
+          // return the appropriate attribute value
+          return inputInt.value.time || inputInt.value.time_to || '';
+        }
+        // else return the date_to attribute value
+        return parseToDateDisplay(inputInt.value.date_to);
+      },
+      /**
+       * also assign them again accordingly
+       * @param {string} val - the value provided by the input element
+       * @param {string} oldValue - the previous value of inputTo
+       */
+      set(val, oldValue) {
+        let newValue = val;
+        // check if field is date field
+        if (!isToTimeField.value) {
+          newValue = parseToDateStorage(newValue);
+          // if so, set date_to attribute value and transform value appropriately
+          // TODO: this could be insufficient since currently no validity checks on input string
+          inputInt.value.date_to = newValue;
+          // else check if type is timerange
+        } else if (inputProperties.value.includes('time_from')) {
+          inputInt.value.time_to = newValue;
+          // else assume the type is datetime
+        } else {
+          inputInt.value.time = newValue;
+        }
+        // watching of computed values does not work so emit event for altered inputInt right here
+        // the actual value is not needed here since data were transformed and
+        // original object structure with correct data is retrieved with function getInputData
+        if (newValue !== oldValue) {
+          emitData();
+        }
+      },
+    });
+    /**
+     * data emit function, transforming data before emit event
+     */
+    function emitData() {
+      // get a data object that only contains fields that were also present
+      // in external input
+      const data = getInputData();
+      /**
+       * emit an event when focus leaves the input
+       *
+       * @event selected
+       * @param {string, Object} - the input string or object
+       */
+      emit('update:model-value', data);
+    }
+    /**
+     * if input was just a single string return that otherwise
+     * only return the properties provided by external input
+     * if input is empty set value to empty string instead of null (default vue2-datepicker)
+     * @returns {string | Object}
+     */
+    function getInputData() {
+      if (isInputTypeString.value) {
+        return inputInt.value.date !== null ? inputInt.value.date : '';
+      }
+      const data = {};
+      inputProperties.value.forEach((key) => {
+        data[key] = inputInt.value[key] !== null ? inputInt.value[key] : '';
+      });
+      return data;
+    }
+    // HELPER METHODS
+    /**
+     * transform the date to the correct display format
+     * @param {string} dateString - the date string in YYYY-MM-DD format
+     */
+    function parseToDateDisplay(dateString) {
+      // if no date string was provided just return an empty string
+      if (!dateString) return '';
+      // now check if year is negative
+      const isNegativeYear = isNegativeStorageDate(dateString);
+      // if so, create a positive date string
+      const positiveDateString = isNegativeYear
+        ? removeYearMinusFromStorageDate(dateString) : dateString;
+      // now do the transformation and add the minus to the year again if necessary
+      return addYearMinusToDateDisplay(
+        positiveDateString.split('-').reverse().join('.'),
+        isNegativeYear,
+      );
+    }
+    /**
+     * transform the date to the correct storage format
+     * @param {string} dateString - the date string in DD.MM.YYYY format
+     */
+    function parseToDateStorage(dateString) {
+      return dateString ? dateString.split('.').reverse().join('-') : '';
+    }
+    /**
+     * check for a negative year in the date that is displayed
+     * @param {string} date - date string in the format DD.MM.YYYY
+     * @returns {boolean}
+     */
+    function isNegativeDisplayDate(date) {
+      if (!date) return false;
+      if (dateFormatInt.value === 'MM.YYYY') {
+        return /^\d{0,2}\.-\d{0,4}$/.test(date);
+      }
+      if (dateFormatInt.value === 'YYYY') {
+        return /^-\d{0,4}$/.test(date);
+      }
+      return /^\d{0,2}\.\d{0,2}\.-\d{0,4}$/.test(date);
+    }
+    /**
+     * check if year is negative in the stored date
+     * @param {string} date - a date string in the format YYYY-MM-DD
+     * @param {string} [format=undefined] - in case not the current format (this.dateFormatInt) should
+     *  be used for evaluation provide it with this param
+     * @returns {boolean}
+     */
+    function isNegativeStorageDate(date, format = undefined) {
+      // if there is no date to evaluate just return false
+      if (!date) return false;
+      // either use the format provided as param or the currently set format in dateFormatInt
+      const formatToCheck = format || dateFormatInt.value;
+      if (formatToCheck === 'MM.YYYY') {
+        return /^-\d{0,4}-\d{0,2}$/.test(date);
+      }
+      if (formatToCheck === 'YYYY') {
+        return /^-\d{0,4}$/.test(date);
+      }
+      return /^-\d{0,4}-\d{0,2}-\d{0,2}$/.test(date);
+    }
+    /**
+     * since minus has to be temporarily removed for some actions add it again
+     *  after with this function (for displayed date)
+     * @param {string} date - date in the format DD.MM.YYYY
+     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
+     *  function
+     * @returns {string}
+     */
+    function addYearMinusToDateDisplay(date, isNegative = true) {
+      if (isNegative) {
+        const [year, month, day] = date.split('.').reverse();
+        return `${day !== undefined ? `${day}.` : ''}${month !== undefined ? `${month}.` : ''}-${year}`;
+      }
+      return date;
+    }
+    /**
+     * since minus has to be temporarily removed for some actions add it again
+     *  after with this function (for stored date)
+     * @param {string} date - date in the format YYYY-MM-DD
+     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
+     *  function
+     * @returns {string}
+     */
+    function addYearMinusToDateStorage(date, isNegative = true) {
+      if (isNegative) {
+        return `-${date}`;
+      }
+      return date;
+    }
+    /**
+     * remove the minus from the date since some functions (especially Date() ) can
+     *  not cope with negative dates (for displayed date)
+     * @param {string} date - the date string in format DD.MM.YYYY
+     * @returns {string}
+     */
+    function removeYearMinusFromDisplayDate(date) {
+      return isNegativeDisplayDate(date)
+        ? date.replace('-', '') : date;
+    }
+    /**
+     * remove the minus from the date since some functions (especially Date()) can
+     *  not cope with negative dates (for stored date)
+     * @param {string} date - the date string in format YYYY-MM-DD
+     * @param {string} [format=undefined] - in case not the currently selected format should be used
+     *  for date evaluation provide the format with this param
+     * @returns {string}
+     */
+    function removeYearMinusFromStorageDate(date, format = undefined) {
+      return isNegativeStorageDate(date, format)
+        ? date.replace('-', '') : date;
+    }
+
+    /** DATE FORMAT SWITCH */
+    /**
+     * check if format switch tabs should be shown
+     * @returns {boolean}
+     */
+    const isSwitchableFormat = computed(() => {
+      return props.format === 'date_month_year' || props.format === 'date_year';
+    });
+
+    /** LABEL ROW DISPLAY */
+    /**
+     * check if label-addition slot exists is filled
+     */
+    const { slotHasContent: labelRowSlotsHaveData } = useHasSlotContent(slots['label-addition']);
+    /**
+     * determines if label row should be shown
+     * @returns {Boolean|boolean}
+     */
+    const showLabelRow = computed(() => {
+      // show label when prop is set true or a label addition was added via slot
+      return props.showLabel || isSwitchableFormat.value || labelRowSlotsHaveData.value;
+    });
+
+    /** INPUT ACTIVE / PICKER OPEN / CLICK OUTSIDE HANDLING */
+    /**
+     * to steer closing of date/timepicker from and to input field once date/time is selected
+     * (packed into an object to still be able to address it dynamically like so: pickerState[`${origin}Open`]
+     * @type {{fromOpen: Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>, toOpen: Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}}
+     */
+    const pickerState = {
+      fromOpen: ref(false),
+      toOpen: ref(false),
+    }
+    /**
+     * variable to steer if input fade out of from field should be shown
+     * @type {boolean}
+     */
+    /**
+     * variable to keep active state in sync with potential parent prop
+     * (this is needed as independent variable from toOpen and fromOpen for example in
+     * BaseAdvancedSearchRow to keep dropdown open even if datepicker is closed)
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const isActiveInt = ref(false);
+
+    /**
+     * watch for changes in input field active variable to keep in sync with parent
+     * @param {boolean} val - the changed internal is active variable
+     */
+    watch(isActiveInt, (val) => {
+      /**
+       * replace BaseInput state with BaseDateInput field active state and
+       * propagate this one
+       *
+       * @event update:is-active
+       * @param {boolean} - is input field active
+       */
+      emit('update:is-active', val);
+    });
+
+    /**
+     * also adjust internal variable when active state changes from outside
+     * @param {boolean} val - the changed isActive prop
+     */
+    watch(() => props.isActive, (val) => {
+      if (val !== isActiveInt.value) {
+        isActiveInt.value = val;
+        // if is active is set from outside also open the first date field
+        pickerState.fromOpen.value = val;
+      }
+      // if isActive is set false from outside also close date picker
+      if (!val) {
+        pickerState.fromOpen.value = false;
+        pickerState.toOpen.value = false;
+      }
+    }, {
+      immediate: true,
+    });
+
+    const onClickOutsideHandler = [
+      /**
+       * handle click outside event and adjust input active variable accordingly
+       * @param {MouseEvent} event - the event provided by the click outside directive
+       */
+        (event) => {
+        isActiveInt.value = false;
+        /**
+         * emit a custom clicked-outside event instead of BaseInput event (propagation stopped)
+         *
+         * @event clicked-outside
+         * @param {MouseEvent} - the native Event
+         */
+        emit('clicked-outside', event);
+      },
+    ]
+
+    /**
+     * handle click inside the component and adjust input active variable accordingly
+     * @param {MouseEvent} event - event triggered by mouse click
+     */
+    function clickedInside(event) {
+      isActiveInt.value = true;
+      /**
+       * event additionally triggered to BaseInput default click-input-field to also
+       * set field active if component sourroundings are clicked
+       *
+       * @event click-input-field
+       * @param {MouseEvent} - the native Event
+       */
+      emit('click-input-field', event);
+    }
+
+    /**
+     * in general input field active styling is handled via focusin and
+     * clicked-outside, however for special case iOS touch  devices have
+     * up and down arrows that do not trigger any event other than blur and will
+     * cause the dropdowns of input fields to remain open
+     * @param {FocusEvent} event - the native blur event
+     * @param {string} origin - did event emit from 'from' or 'to' date field
+     */
+    function onInputBlur(event, origin) {
+      const relatedTargetInput = event.relatedTarget?.parentElement ? event.relatedTarget.parentElement
+        .getElementsByTagName('input') : null;
+      // so since these arrows only navigate between input fields we check if there is a
+      // related target and if this related target is an input field and if yes we make sure
+      // the id is different from the input id of this component (the one the event originated from)
+      if (event.relatedTarget
+        && ((event.relatedTarget.tagName === 'INPUT'
+            && (!event.relatedTarget?.id || event.relatedTarget.id !== event.target.id))
+          // additionally also set input active false when the BaseInput 'remove' button
+          // (displayed if `clearable` is true) is triggered in the other date field of the range
+          || (event.relatedTarget?.className === 'base-input__remove-icon-wrapper'
+            && relatedTargetInput && relatedTargetInput[0]?.id !== event.target.id))) {
+        // set input active state false
+        pickerState[`${origin}Open`].value = false;
+      }
+    }
+
+    /** STYLE AND FADE OUT CALC ON RESIZE */
+    /**
+     * reference to the root element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const baseDateInput = useTemplateRef('baseDateInputEl');
+    /**
+     * reference to the label element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const labelElement = useTemplateRef('labelEl');
+    /**
+     * reference to the possible additions to the label row - switch buttons and `label-addition` slot
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const labelAdditions = useTemplateRef('labelAdditionsEl');
+    /**
+     * reference to the native input elements
+     * @type {{ inputElementFrom: Readonly<ShallowRef<null|HTMLElement>>, inputElementTo: Readonly<ShallowRef<null|HTMLElement>> }}
+     */
+    const nativeInputElements = {
+      inputFromElement: useTemplateRef('inputFromEl'),
+      inputToElement: useTemplateRef('inputToEl'),
+    };
+    /**
+     * reference to the BaseIcon component
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const baseIcon = useTemplateRef('baseIconEl');
+    /**
+     * store icon width in a variable
+     * @type {ComputedRef<number>}
+     */
+    const iconWidth = ref(0);
+    /**
+     * variable to set css class according to label elements wrapping or not
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const wrapLabelRow = ref(false);
+    /**
+     * variable to steer if icons should be shown (becoming false if not enough
+     * space)
+     * @type {Ref<UnwrapRef<boolean>, UnwrapRef<boolean> | boolean>}
+     */
+    const showIcons = ref(false);
+    /**
+     * variable to steer if input fade out of to field should be shown
+     * @type {boolean}
+     */
+    const fadeOut = {
+      fadeOutFrom: ref(false),
+      fadeOutTo: ref(false),
+    };
+
+    // create an observer with the fade out calc function
+    useElementObserver({
+      type: 'resize',
+      target: baseDateInput,
+      callback: debounce(50, onElementResize),
+    });
+
+    if (props.showLabel && (isSwitchableFormat.value || labelRowSlotsHaveData.value)) {
+      // second observer to trigger label additions width calc as soon as element is rendered
+      useElementObserver({
+        type: 'resize',
+        target: labelAdditions,
+        callback: debounce(50, onLabelAdditionsResize),
+      });
+    }
+    /**
+     * callback function for the resize observer calculating fade out and label
+     * additions width
+     */
+    function onElementResize() {
+      if (props.showLabel && (isSwitchableFormat.value || labelRowSlotsHaveData.value)) {
+        calcLabelAdditionsWidth();
+      }
+      calcFadeOut(['From', 'To']);
+    }
+    /**
+     * callback function for the resize observer calculating label
+     * additions width on label additions render
+     */
+    function onLabelAdditionsResize(entries, observer) {
+      // only do calc when element is filled
+      if (entries[0].contentRect.width > 0) {
+        calcLabelAdditionsWidth();
+        // only do this once as soon as elements are rendered - then disconnect!
+        observer.disconnect();
+      }
+    }
+
+    /**
+     * function to correctly style the date format switch buttons and prevent
+     * overlay with label
+     */
+    function calcLabelAdditionsWidth() {
+      if (baseDateInput.value) {
+        // get the complete element width
+        const observableWidth = baseDateInput.value.clientWidth;
+        // get the label margin
+        const labelMargin = props.showLabel
+          ? Number(getComputedStyle(labelElement.value)['margin-right'].replace('px', '')) : 0;
+        const labelWidth = props.showLabel ? labelElement.value.clientWidth : 0;
+        // calculate the remaining container space after label, label margin and date switch width
+        const spacingLeft = observableWidth
+          - labelWidth
+          - labelMargin
+          - labelAdditions.value.clientWidth;
+        // if no space is left set a class that sets label additions width to 100% so element has to wrap
+        wrapLabelRow.value = spacingLeft < 0;
+      }
+    }
+
+    /**
+     * function to calculate if fade out in the input fields should be shown, needs to be
+     * recalculated after resize or if input changes
+     */
+    async function calcFadeOut(inputFields) {
+      // first we need to determine the iconWidth IF it is shown
+      // only get once since the icon width should not change later on, but wait
+      // until icon is rendered (has a clientWidth)
+      if (!iconWidth.value && baseIcon.value?.$el?.clientWidth) {// get the icon HTML element
+        const iconElement = baseIcon.value.$el;
+        // get the margin that is also part of the icon width in the input field
+        const iconMargin = Number(getComputedStyle(iconElement)['margin-left'].replace('px', ''));
+        // set the icon width as width + margin
+        iconWidth.value = iconElement.clientWidth + iconMargin;
+      }
+      // ICONS
+      // since we want a uniform appearance
+      // across all fields we only do this once with the longest text
+      // for input width etc. we use the 'from' field since it should always be
+      // present
+      // get the 'from' input element
+      const inputElement = nativeInputElements.inputFromElement.value;
+      // make sure the element was found and since icon removal is only considered if there
+      // is input - check if there is actually input (or if this is the initial
+      // state were icons are still hidden per default to avoid a short flash if they dont fit)
+      if (inputElement && (!showIcons.value || inputFrom.value || inputTo.value)) {
+        // but relevant for icon calc is the longest text
+        let maxTextWidth = 0;
+        // check which element has the longer text
+        // create a span
+        const span = document.createElement('span');
+        // hide the span
+        span.setAttribute('class', 'hide');
+        // add the from value to the span
+        span.innerHTML = inputFrom.value;
+        // add the element to the document body
+        baseDateInput.value.appendChild(span);
+        maxTextWidth = span.offsetWidth;
+        // add the to value to the span
+        span.innerHTML = inputTo.value;
+        const toWidth = span.offsetWidth;
+        // update the value if 'to' field text is longer than first determined
+        // 'from'
+        if (toWidth > maxTextWidth) {
+          maxTextWidth = toWidth;
+        }
+        // remove the element again
+        baseDateInput.value.removeChild(span);
+
+        // get inputWidth
+        const inputWidth = inputElement.offsetWidth;
+        // now make the actual comparisons to set the correct showIcons value
+        // if icons are present just check the text against the remaining input width
+        if (showIcons.value && maxTextWidth > inputWidth) {
+          // if not - remove the icons
+          showIcons.value = false;
+          // wait for the DOM to update so the input width is correct in fade out calculations
+          await nextTick();
+          // if icons are not present we need to consider if text would still fit if icons
+          // WERE present - only if yes show icons again
+        } else if (!showIcons.value && maxTextWidth + iconWidth.value <= inputWidth) {
+          showIcons.value = true;
+          // wait for the DOM to update so the input width is correct in fade out calculations
+          await nextTick();
+        }
+      }
+
+
+      // FADE OUT
+      // since fade out is determined for each field individually iterate through the relevant fields
+      inputFields.forEach((field) => {
+        const inputElement = nativeInputElements[`input${field}Element`].value;
+        // check if element exists
+        if (inputElement) {
+          // now get the input field value or the placeholder text
+          // we need to take inputFrom/inputTo here because DOM value is not updated yet
+          // sometimes after validity check
+          const text = (field === 'From' ? inputFrom.value : inputTo.value)
+            || inputElement.getAttribute('placeholder');
+          // now check if any of the two exists
+          if (text) {
+            // create a span
+            const span = document.createElement('span');
+            // hide the span
+            span.setAttribute('class', 'hide');
+            // add the input extracted text to this span
+            span.innerHTML = text;
+            // add the element to the document body
+            baseDateInput.value.appendChild(span);
+            // get the width of that element
+            const textWidth = span.offsetWidth;
+            // remove the element again
+            baseDateInput.value.removeChild(span);
+            // now also get the input width
+            const inputWidth = inputElement.offsetWidth;
+            // and check if the text width fits the input width
+            fadeOut[`fadeOut${field}`].value = textWidth > inputWidth;
+          }
+        }
+      });
+    }
+
+    /** INPUT FIELDS STATE HANDLING */
+    /** INVALID */
+    /** consider if `invalid` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const invalidFrom = computed(() => typeof props.invalid === 'boolean'
+      ? props.invalid : props.invalid.date_from || props.invalid.time_from || props.invalid.date || false);
+    /** consider if `invalid` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const invalidTo = computed(() => typeof props.invalid === 'boolean'
+      ? props.invalid : props.invalid.date_to || props.invalid.time_to || props.invalid.time || false);
+
+    /** ERROR MESSAGES */
+    /** consider if `errorMessage` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<string>}
+     */
+    const errorMessageFrom = computed(() => typeof props.errorMessage === 'string'
+      ? props.errorMessage : props.errorMessage.date_from || props.errorMessage.time_from || props.errorMessage.date || '');
+    /** consider if `errorMessage` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<string>}
+     */
+    const errorMessageTo = computed(() => typeof props.errorMessage === 'string'
+      ? props.errorMessage : props.errorMessage.date_to || props.errorMessage.time_to || props.errorMessage.time || '');
+
+    /** REQUIRED */
+    /** consider if `required` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const requiredFrom = computed(() => typeof props.required === 'boolean'
+      ? props.required : props.required.date_from || props.required.time_from || props.required.date || false);
+    /** consider if `required` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const requiredTo = computed(() => typeof props.props === 'boolean'
+      ? props.required : props.required.date_to || props.required.time_to || props.required.time || false);
+
+    /** DISABLED */
+    /** consider if `disabled` prop is string or object and set the value for the 'from' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const disabledFrom = computed(() => typeof props.disabled === 'boolean'
+      ? props.disabled : props.disabled.date_from || props.disabled.time_from || props.disabled.date || false);
+    /** consider if `disabled` prop is string or object and set the value for the 'to' field accordingly
+     * @type {ComputedRef<boolean>}
+     */
+    const disabledTo = computed(() => typeof props.props === 'boolean'
+      ? props.disabled : props.disabled.date_to || props.disabled.time_to || props.disabled.time || false);
+
+    return {
+      internalId,
+      lang,
+      rootAttrs,
+      forwardAttrs,
+      inputElement,
+      inputElements,
+      dateFormatInt,
+      inputInt,
+      isFromTimeField,
+      isToTimeField,
+      isInputTypeString,
+      inputProperties,
+      inputFrom,
+      inputTo,
+      emitData,
+      getInputData,
+      parseToDateStorage,
+      parseToDateDisplay,
+      isNegativeDisplayDate,
+      isNegativeStorageDate,
+      addYearMinusToDateDisplay,
+      addYearMinusToDateStorage,
+      removeYearMinusFromDisplayDate,
+      removeYearMinusFromStorageDate,
+      labelRowSlotsHaveData,
+      isSwitchableFormat,
+      showLabelRow,
+      isActiveInt,
+      onClickOutsideHandler,
+      clickedInside,
+      onInputBlur,
+      fromOpen: pickerState.fromOpen,
+      toOpen: pickerState.toOpen,
+      baseDateInput,
+      labelElement,
+      labelAdditions,
+      baseIcon,
+      inputFromElement: nativeInputElements.inputFromElement,
+      inputToElement: nativeInputElements.inputToElement,
+      wrapLabelRow,
+      showIcons,
+      useFadeOutFrom: fadeOut.fadeOutFrom,
+      useFadeOutTo: fadeOut.fadeOutTo,
+      calcFadeOut,
+      // input field state
+      invalidFrom,
+      invalidTo,
+      errorMessageFrom,
+      errorMessageTo,
+      requiredFrom,
+      requiredTo,
+      disabledFrom,
+      disabledTo,
+    };
   },
   data() {
     return {
-      /**
-       * internal input representation with all possible values for
-       * date and time
-       * @typedef {Object} inputInt
-       * @property {string} inputInt.date - attribute a single date or datetime date is stored in
-       * @property {string} inputInt.date_from - storing daterange from
-       * @property {string} inputInt.date_to - storing daterange to
-       * @property {string} inputInt.time - storing the time for datetime type
-       * @property {string} inputInt.time_from - storing timerange from
-       * @property {string} inputInt.time_to - storing timerange to
-       */
-      inputInt: {
-        date: '',
-        date_from: '',
-        date_to: '',
-        time: '',
-        time_from: '',
-        time_to: '',
-      },
-      /**
-       * variable for toggling format between date and year for date_year format
-       * @type {string}
-       */
-      dateFormatInt: '',
       /**
        * variable to store the date when switching from date to year in order to be
        * able to restore exact date when switching back
@@ -489,73 +1072,14 @@ export default {
        */
       tempDateStore: {},
       /**
-       * to steer closing of datepicker from input field once date is selected
+       * flag set true on mounted to indicate that its ok to render the datepicker
+       * (otherwise SSR or hydration mismatch errors)
        * @type {boolean}
        */
-      fromOpen: false,
-      /**
-       * to steer closing of datepicker to input field once date is selected
-       * @type {boolean}
-       */
-      toOpen: false,
-      /**
-       * variable to keep active state in sync with potential parent prop
-       * (this is needed as independent variable from toOpen and fromOpen for example in
-       * BaseAdvancedSearchRow to keep dropdown open even if datepicker is closed)
-       */
-      isActiveInt: false,
-      /**
-       * variable to steer if input fade out of from field should be shown
-       * @type {boolean}
-       */
-      useFadeOutFrom: false,
-      /**
-       * variable to steer if input fade out of to field should be shown
-       * @type {boolean}
-       */
-      useFadeOutTo: false,
-      /**
-       * variable to steer if icons should be shown (becoming false if not enough
-       * space)
-       * @type {boolean}
-       */
-      showIcons: true,
-      /**
-       * variable to store icon size which is calculated in the beginning and might be
-       * hidden later
-       * @type {number}
-       */
-      iconSize: 24,
-      /**
-       * Resize Observer to trigger fade out calculations when component is resized
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
-      /**
-       * function needs to be triggered when date switch is populated
-       * @type {?ResizeObserver}
-       */
-      labelAdditionsObserver: null,
-      /**
-       * datepicker localisations
-       *   using object fixes problem of missing localisation files in rollup-esm-build
-       */
-      lang: {
-        de,
-        en,
-        fr,
-      },
-      /**
-       * variable to set css class according to label elements wrapping or not
-       * @type {boolean}
-       */
-      wrapLabelRow: false,
+      mounted: false,
     };
   },
   computed: {
-    internalId() {
-      return this.id || createId();
-    },
     /**
      * this is the format we want to store computed based on what
      * was specified in format and what date toggle tabs (via dateFormatInt) might say
@@ -592,110 +1116,6 @@ export default {
       return this.format;
     },
     /**
-     * compute the properties of the object provided in input prop
-     * @returns {string[]}
-     */
-    inputProperties() {
-      // if input is object return those keys // else for a single date it
-      // could also be a string - then just return an empty array
-      return typeof this.input === 'object' ? Object.keys(this.input) : [];
-    },
-    /**
-     * check if input is just a single date or an object
-     * @returns {boolean}
-     */
-    isInputTypeString() {
-      return typeof this.input === 'string' || !this.inputProperties.length;
-    },
-    /**
-     * handle input for the 'from' input field
-     */
-    inputFrom: {
-      /**
-       * get back the appropriate inputInt attribute value
-       * @returns {string} - a date in the format DD.MM.YYYY
-       */
-      get() {
-        // if it is a time field just return the time_from value
-        if (this.isFromTimeField) {
-          return this.inputInt.time_from;
-        }
-        // else it is a date (either single or date_from) --> convert it into the
-        // correct format for display (DD.MM.YYYY instead of the saved DD-MM-YYY)
-        return this.parseToDateDisplay(this.inputInt.date || this.inputInt.date_from);
-      },
-      /**
-       * also assign them again accordingly
-       * @param {string} val - the value provided by the input element
-       * @param {string} oldValue - the previous value of inputFrom
-       */
-      set(val, oldValue) {
-        let newDate = val;
-        if (this.isFromTimeField) {
-          this.inputInt.time_from = newDate;
-        } else {
-          newDate = this.parseToDateStorage(val);
-          if (this.inputProperties.includes('date_from')) {
-            this.inputInt.date_from = newDate;
-          } else {
-            this.inputInt.date = newDate;
-          }
-        }
-        // watching of computed values does not work so emit event for altered inputInt right here
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (newDate !== oldValue) {
-          this.emitData();
-        }
-      },
-    },
-    /**
-     * as above - if there is only a single time field get value from 'time' variable
-     * if it is a range use 'time_to''
-     */
-    inputTo: {
-      /**
-       * get back the appropriate inputInt attribute value
-       * @returns {string}
-       */
-      get() {
-        // check if a to time field exists
-        if (this.isToTimeField) {
-          // return the appropriate attribute value
-          return this.inputInt.time || this.inputInt.time_to;
-        }
-        // else return the date_to attribute value
-        return this.parseToDateDisplay(this.inputInt.date_to);
-      },
-      /**
-       * also assign them again accordingly
-       * @param {string} val - the value provided by the input element
-       * @param {string} oldValue - the previous value of inputTo
-       */
-      set(val, oldValue) {
-        let newValue = val;
-        // check if field is date field
-        if (!this.isToTimeField) {
-          newValue = this.parseToDateStorage(newValue);
-          // if so, set date_to attribute value and transform value appropriately
-          // TODO: this could be insufficient since currently no validity checks on input string
-          this.inputInt.date_to = newValue;
-          // else check if type is timerange
-        } else if (this.inputProperties.includes('time_from')) {
-          this.inputInt.time_to = newValue;
-          // else assume the type is datetime
-        } else {
-          this.inputInt.time = newValue;
-        }
-        // watching of computed values does not work so emit event for altered inputInt right here
-        // the actual value is not needed here since data were transformed and
-        // original object structure with correct data is retrieved with function getInputData
-        if (newValue !== oldValue) {
-          this.emitData();
-        }
-      },
-    },
-    /**
      * determine if the initially provided date is a year or a full date
      * (used to set the correct date display format and date/year switch button)
      * @returns {boolean}
@@ -712,13 +1132,6 @@ export default {
         || this.inputProperties.some(key => !!key.includes('date')
           && this.inputInt[key]
           && /^(-?[0-9]{1,4}|-[0-9]{0,4})-[0-1]?[0-9]$/.test(this.inputInt[key])));
-    },
-    /**
-     * check if format switch tabs should be shown
-     * @returns {boolean}
-     */
-    isSwitchableFormat() {
-      return this.format === 'date_month_year' || this.format === 'date_year';
     },
     /**
      * return the format options for date, month, year switches
@@ -739,80 +1152,17 @@ export default {
       }
       return options;
     },
-    /**
-     * determine if the from field is a time field
-     * @returns {boolean}
-     */
-    isFromTimeField() {
-      return this.type === 'timerange';
-    },
-    /**
-     * determine if the to field is a time field
-     * @returns {boolean}
-     */
-    isToTimeField() {
-      return this.type === 'datetime' || this.type === 'timerange';
-    },
-    /**
-     * compute an object that takes component $listeners and manipulate them for custom
-     * needs
-     * @returns {Object}
-     */
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$listeners,
-        // and add custom listeners
-        ...{
-          // stop these BaseInput originating events to substitute them with the
-          // correct events in search container element
-          'clicked-outside': (event) => {
-            event.stopPropagation();
-          },
-          // need to stop the event triggered in original BaseInput and only trigger
-          // when component isActiveInt has changed
-          'update:is-active': () => {},
-          // stop BaseInput input event since BaseDateInput will propagate their own
-          input: () => {},
-        },
-      };
-    },
-    /**
-     * compute an object that takes component $listeners and manipulate them for custom
-     * needs
-     * @returns {Object}
-     */
-    dateInputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$listeners,
-        // stop native input event here and emit own event (in inputInt watcher)
-        // with just the values
-        input: () => {},
-      };
-    },
-    /**
-     * check if label-addition slot exists is filled
-     */
-    labelRowSlotsHaveData() {
-      // get label-addition slot
-      const slotElements = this.$slots['label-addition'];
-      // check if slot exists and has data and actually has content
-      // (this did not work with SSR otherwise...)
-      return !!slotElements && !!slotElements.length
-        && slotElements.some(elem => elem.tag || elem.text?.trim());
-    },
-    /**
-     * determines if label row should be shown
-     * @returns {Boolean|boolean}
-     */
-    showLabelRow() {
-      // show label when prop is set true or a label addition was added via slot
-      return this.showLabel || this.isSwitchableFormat || this.labelRowSlotsHaveData;
-    },
   },
   watch: {
+    /**
+     * watch if dateInt (in storage format YYYY(MM-(DD)))
+     * changes and inform parent
+     */
     inputInt: {
+      /**
+       * watch if dateInt (in storage format YYYY(MM-(DD)))
+       * changes and inform parent
+       */
       handler() {
         /**
          * Event emitted on input, passing input string
@@ -847,14 +1197,20 @@ export default {
      * watch input set from outside and set internal inputInt accordingly as well as
      * set the correct display format
      */
-    input: {
+    modelValue: {
       handler(val) {
         // check if input string is different from inputInt
         if (JSON.stringify(val) !== JSON.stringify(this.getInputData())) {
-          const isDateTimeField = this.type === 'datetime';
-          this.inputFrom = isDateTimeField
-            ? val.date : val.date ?? val.date_from ?? val.time ?? val.time_from ?? val ?? '';
-          this.inputTo = isDateTimeField ? val.time : val.date_to ?? val.time_to ?? '';
+          if (typeof this.modelValue === 'string') {
+            this.inputInt.date = val;
+          } else {
+            this.inputInt = {
+              // keep all inputInt props
+              ...this.inputInt,
+              // and add the ones set by parent
+              ...JSON.parse(JSON.stringify(val)),
+            };
+          }
           // check if external input was year format and set internal format accordingly
           if (this.isSwitchableFormat) {
             if (this.isDateFormatYear) {
@@ -898,13 +1254,13 @@ export default {
               // date should be overwritten if month or year are different from
               // the already stored date
               if (!this.monthAndYearIdent(
-                // check if the positive dates are identical
-                this.removeYearMinusFromStorageDate(this.inputInt[dateKey], old),
-                (/^-/.test(this.tempDateStore[dateKey]) ? this.tempDateStore[dateKey].replace('-', '') : this.tempDateStore[dateKey]),
-                // and also check if the operator in front of year is identical
-              ) && this.isNegativeStorageDate(this.inputInt[dateKey], old)
+                  // check if the positive dates are identical
+                  this.removeYearMinusFromStorageDate(this.inputInt[dateKey], old),
+                  (/^-/.test(this.tempDateStore[dateKey]) ? this.tempDateStore[dateKey].replace('-', '') : this.tempDateStore[dateKey]),
+                  // and also check if the operator in front of year is identical
+                ) && this.isNegativeStorageDate(this.inputInt[dateKey], old)
                 === /^-/.test(this.tempDateStore[dateKey])) {
-                this.$set(this.tempDateStore, dateKey, this.inputInt[dateKey]);
+                this.tempDateStore[dateKey] = this.inputInt[dateKey];
               }
             });
         }
@@ -914,46 +1270,13 @@ export default {
       // inputFrom and inputTo setters are not triggered and we need to emit the new data manually
       this.emitData();
     },
-    /**
-     * watch for changes in input field active variable to keep in sync with parent
-     * @param {boolean} val - the changed internal is active variable
-     */
-    isActiveInt(val) {
-      /**
-       * replace BaseInput state with BaseDateInput field active state and
-       * propagate this one
-       *
-       * @event update:is-active
-       * @param {boolean} - is input field active
-       */
-      this.$emit('update:is-active', val);
-    },
-    /**
-     * also adjust internal variable when active state changes from outside
-     * @param {boolean} val - the changed isActive prop
-     */
-    isActive: {
-      handler(val) {
-        if (val !== this.isActiveInt) {
-          this.isActiveInt = val;
-          // if is active is set from outside also open the first date field
-          this.fromOpen = val;
-        }
-        // if isActive is set false from outside also close date picker
-        if (!val) {
-          this.fromOpen = false;
-          this.toOpen = false;
-        }
-      },
-      immediate: true,
-    },
   },
-  mounted() {
-    if (this.$refs.baseIcon) {
-      this.iconWidth = this.$refs.baseIcon.$el.clientWidth;
-    }
-    // initialize the resize observer to calculate fade out and label row when component is resized
-    this.initObservers();
+  async mounted() {
+    // in order to avoid SSR and hydration problems only render the datepicker when component is mounted
+    // first import the relevant language package
+    await import(`./../../../node_modules/vue-datepicker-next/locale/${this.language}.es.js`);
+    // then set mounted flag which will serve as the notification to render
+    this.mounted = true;
   },
   updated() {
     // this hack is necessary because otherwise keyboard navigation was impaired by the datepicker
@@ -976,10 +1299,6 @@ export default {
       });
     }
   },
-  beforeDestroy() {
-    if (this.resizeObserver) this.resizeObserver.disconnect();
-    if (this.labelAdditionsObserver) this.labelAdditionsObserver.disconnect();
-  },
   methods: {
     /**
      * since the complete datepicker lies within the BaseInput, the BaseInput click event
@@ -993,83 +1312,6 @@ export default {
       if (event.target.tagName !== 'INPUT') {
         event.stopPropagation();
       }
-    },
-    /**
-     * in general input field active styling is handled via focusin and
-     * clicked-outside, however for special case iOS touch  devices have
-     * up and down arrows that do not trigger any event other than blur and will
-     * cause the dropdowns of input fields to remain open
-     * @param {FocusEvent} event - the native blur event
-     * @param {string} origin - did event emit from 'from' or 'to' date field
-     */
-    onInputBlur(event, origin) {
-      const relatedTargetInput = event.relatedTarget?.parentElement ? event.relatedTarget.parentElement
-        .getElementsByTagName('input') : null;
-      // so since these arrows only navigate between input fields we check if there is a
-      // related target and if this related target is an input field and if yes we make sure
-      // the id is different from the input id of this component (the one the event originated from)
-      if (event.relatedTarget
-        && ((event.relatedTarget.tagName === 'INPUT'
-            && (!event.relatedTarget?.id || event.relatedTarget.id !== event.target.id))
-          // additionally also set input active false when the BaseInput 'remove' button
-          // (displayed if `clearable` is true) is triggered in the other date field of the range
-          || (event.relatedTarget?.className === 'base-input__remove-icon-wrapper'
-            && relatedTargetInput && relatedTargetInput[0]?.id !== event.target.id))) {
-        // set input active state false
-        this[`${origin}Open`] = false;
-      }
-    },
-    initObservers() {
-      // create an observer with the fade out calc function
-      const tempResizeObserver = new ResizeObserver(debounce(50, () => {
-        if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
-          this.calcLabelAdditionsWidth();
-        }
-        this.calcFadeOut(['From', 'To']);
-      }));
-      // put it on the relevant element
-      tempResizeObserver.observe(this.$refs.baseDateInput);
-      // store it in variable
-      this.resizeObserver = tempResizeObserver;
-
-      if (this.showLabel && (this.isSwitchableFormat || this.labelRowSlotsHaveData)) {
-        // second observer to trigger label additions width calc as soon as element is rendered
-        const tempLabelAdditionsObserver = new ResizeObserver(debounce(50, (entries, observer) => {
-          // only do calc when element is filled
-          if (entries[0].contentRect.width > 0) {
-            this.calcLabelAdditionsWidth(this.$refs.baseDateInput.clientWidth);
-            // only do this once as soon as elements are rendered - then disconnect!
-            observer.disconnect();
-          }
-        }));
-        tempLabelAdditionsObserver.observe(this.$refs.labelAdditions);
-        this.labelAdditionsObserver = tempLabelAdditionsObserver;
-      }
-    },
-    /**
-     * transform the date to the correct display format
-     * @param {string} dateString - the date string in YYYY-MM-DD format
-     */
-    parseToDateDisplay(dateString) {
-      // if no date string was provided just return an empty string
-      if (!dateString) return '';
-      // now check if year is negative
-      const isNegativeYear = this.isNegativeStorageDate(dateString);
-      // if so, create a positive date string
-      const positiveDateString = isNegativeYear
-        ? this.removeYearMinusFromStorageDate(dateString) : dateString;
-      // now do the transformation and add the minus to the year again if necessary
-      return this.addYearMinusToDateDisplay(
-        positiveDateString.split('-').reverse().join('.'),
-        isNegativeYear,
-      );
-    },
-    /**
-     * transform the date to the correct storage format
-     * @param {string} dateString - the date string in DD.MM.YYYY format
-     */
-    parseToDateStorage(dateString) {
-      return dateString ? dateString.split('.').reverse().join('-') : '';
     },
     /**
      * checks done on keydown events
@@ -1117,11 +1359,11 @@ export default {
       // * if type is time and key was colon and last char was already a colon
       // * and also make sure copy & paste is allowed!
       if ((!allowedKeysRegex.test(key)
-        || (disallowedKeysOnLengthRegex.test(key) && currentInputString.length >= formatLength
-          && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
-        || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
-          || currentInputString.charAt(currentInputString.length - 1) === '.'))
-        || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
+          || (disallowedKeysOnLengthRegex.test(key) && currentInputString.length >= formatLength
+            && document.activeElement.selectionEnd - document.activeElement.selectionStart === 0)
+          || (!isTimeField && key === '.' && (this.dateFormatInt === 'YYYY'
+            || currentInputString.charAt(currentInputString.length - 1) === '.'))
+          || (isTimeField && key === ':' && currentInputString.charAt(currentInputString.length - 1) === ':'))
         && !(['c', 'v', 'x'].includes(key) && event.ctrlKey)) {
         event.preventDefault();
       }
@@ -1165,7 +1407,7 @@ export default {
         }
         // now check the date format and if input so far matches the appropriate regex
         if ((!isTimeField && this.dateFormatInt === 'DD.MM.YYYY' && /^(\d{2}$|\d{2}\.\d{2})$/.test(modifiedValue))
-            || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(modifiedValue))) {
+          || ((this.dateFormatInt === 'MM.YYYY' || isTimeField) && /^\d{2}$/.test(modifiedValue))) {
           // if so - add a period character
           modifiedValue = `${modifiedValue}${charToAdd}`;
         }
@@ -1336,8 +1578,11 @@ export default {
           // new Date(input) will always convert to the actual day in the next month
           // e.g. 31.06. --> 01.07. ; 30.02. --> 02.03.
           const tempDate = this.getDateString(this.convertToDate(this.parseToDateStorage(positiveDate)));
+          // now check if date in the format YYYY-(MM-(DD)) is valid
           if (!Number.isNaN(Date.parse(this.parseToDateStorage(tempDate)))) {
-            positiveDate = tempDate;
+            // if it is a valid date after conversion and if yes store it so it can
+            // be assigned back to inputFrom/inputTo
+            positiveDate = this.parseToDateDisplay(tempDate);
           } else {
             positiveDate = '';
           }
@@ -1347,9 +1592,9 @@ export default {
           positiveDate,
           this.isNegativeDisplayDate(this[`input${origin}`]),
         );
-        // after everything also still check if the new date/time string needs a fade out
-        this.calcFadeOut([origin]);
       }
+      // after everything also still check if the new date/time string needs a fade out
+      this.calcFadeOut([origin]);
       const data = this.getInputData();
       /**
        * this event is emitted when the value was validated in case input should just be considered
@@ -1364,10 +1609,11 @@ export default {
      * a function to have the time picker close automatically as soon as minutes
      * are selected
      * @param {string} origin - is it from the 'from' or 'to' part of the picker
-     * @param {any} time - the selected time (not needed here but passed by event)
      * @param {string} type - was 'hour' or 'minute' selected
      */
-    closeTimePicker(origin, time, type) {
+    closeTimePicker({ origin, type }) {
+      // else check if value selected was type 'minute' - this will automatically also
+      // exclude date fields from any action
       if (type === 'minute') {
         // get capitalized origin here since needed 2x
         const uppercaseOrigin = capitalizeString(origin);
@@ -1375,64 +1621,15 @@ export default {
         this.checkDateValidity(uppercaseOrigin);
         // close the drop down
         this[`${origin}Open`] = false;
-        // check if the new date/time string needs a fade out
-        this.calcFadeOut([uppercaseOrigin]);
       }
     },
     /**
      * function triggered on datepicker 'pick' event, handling date picker closing
-     * and date validation
      *  caveat: this event is just triggered for DATE picker - not time!
      * @param origin
      */
     datePicked(origin) {
       this[`${origin}Open`] = false;
-      // need this here because on blur() date is not updated
-      this.checkDateValidity(capitalizeString(origin));
-    },
-    /**
-     * handle click outside event and adjust input active variable accordingly
-     * @param {MouseEvent} event - the event provided by the click outside directive
-     */
-    clickedOutside(event) {
-      this.isActiveInt = false;
-      /**
-       * emit a custom clicked-outside event instead of BaseInput event (propagation stopped)
-       *
-       * @event clicked-outside
-       * @param {MouseEvent} - the native Event
-       */
-      this.$emit('clicked-outside', event);
-    },
-    /**
-     * handle click inside the component and adjust input active variable accordingly
-     * @param {MouseEvent} event - event triggered by mouse click
-     */
-    clickedInside(event) {
-      this.isActiveInt = true;
-      /**
-       * event additionally triggered to BaseInput default click-input-field to also
-       * set field active if component sourroundings are clicked
-       *
-       * @event click-input-field
-       * @param {MouseEvent} - the native Event
-       */
-      this.$emit('click-input-field', event);
-    },
-    /**
-     * data emit function, transforming data before emit event
-     */
-    emitData() {
-      // get a data object that only contains fields that were also present
-      // in external input
-      const data = this.getInputData();
-      /**
-       * emit an event when focus leaves the input
-       *
-       * @event selected
-       * @param {string, Object} - the input string or object
-       */
-      this.$emit('selected', data);
     },
     /**
      * convert function triggered on format tab switch
@@ -1447,10 +1644,10 @@ export default {
           if (dateToConvert) {
             if (this.minDateView === 'year') {
               // convert date string to real date in order to get year and convert back to string
-              this.$set(this.inputInt, dateKey, this.addYearMinusToDateStorage(
+              this.inputInt[dateKey] = this.addYearMinusToDateStorage(
                 this.convertToDate(dateToConvert).getFullYear().toString(),
                 this.isNegativeStorageDate(dateValue, oldFormat),
-              ));
+              );
               return;
             }
             let useStorageDate;
@@ -1474,41 +1671,23 @@ export default {
             } else {
               // check if a previous date was stored and year (coming from year)
               useStorageDate = !!positiveTempStorageDate && ((this.isDateFormatYear
-                && new Date(positiveTempStorageDate).getFullYear().toString() === dateToConvert
+                  && new Date(positiveTempStorageDate).getFullYear().toString() === dateToConvert
                   && isNegativeTempStorageDate === this.isNegativeStorageDate(dateValue, oldFormat))
                 // or month and year (coming from month) was changed or is still the same
                 || (this.isDateFormatMonth
-                && this.monthAndYearIdent(positiveTempStorageDate, dateToConvert)
+                  && this.monthAndYearIdent(positiveTempStorageDate, dateToConvert)
                   && (isNegativeTempStorageDate === isNegativeNewDateValue)));
               // if a previous date was stored use this one else use the input date
             }
             const newDate = useStorageDate ? positiveTempStorageDate : dateToConvert;
             // now assign the new date to the input variable
-            this.$set(
-              this.inputInt,
-              dateKey,
-              this.addYearMinusToDateStorage(
-                this.getDateString(this.convertToDate(newDate)),
-                // use the original dates here before minus was removed, depending on which date was used
-                (useStorageDate ? isNegativeTempStorageDate : isNegativeNewDateValue),
-              ),
+            this.inputInt[dateKey] = this.addYearMinusToDateStorage(
+              this.getDateString(this.convertToDate(newDate)),
+              // use the original dates here before minus was removed, depending on which date was used
+              (useStorageDate ? isNegativeTempStorageDate : isNegativeNewDateValue),
             );
           }
         });
-    },
-    /**
-     * if input was just a single string return that otherwise
-     * only return the properties provided by external input
-     * if input is empty set value to empty string instead of null (default vue2-datepicker)
-     * @returns {string | Object}
-     */
-    getInputData() {
-      if (this.isInputTypeString) {
-        return this.inputInt.date !== null ? this.inputInt.date : '';
-      }
-      const data = {};
-      this.inputProperties.forEach(key => this.$set(data, key, this.inputInt[key] !== null ? this.inputInt[key] : ''));
-      return data;
     },
     /**
      * convert a value to a date in local time at zero hours
@@ -1558,170 +1737,8 @@ export default {
       const yearDate2 = convertedDate2.getFullYear();
       return monthDate1 === monthDate2 && yearDate1 === yearDate2;
     },
-    /**
-     * check for a negative year in the date that is displayed
-     * @param {string} date - date string in the format DD.MM.YYYY
-     * @returns {boolean}
-     */
-    isNegativeDisplayDate(date) {
-      if (!date) return false;
-      if (this.dateFormatInt === 'MM.YYYY') {
-        return /^\d{0,2}\.-\d{0,4}$/.test(date);
-      }
-      if (this.dateFormatInt === 'YYYY') {
-        return /^-\d{0,4}$/.test(date);
-      }
-      return /^\d{0,2}\.\d{0,2}\.-\d{0,4}$/.test(date);
-    },
-    /**
-     * check if year is negative in the stored date
-     * @param {string} date - a date string in the format YYYY-MM-DD
-     * @param {string} [format=undefined] - in case not the current format (this.dateFormatInt) should
-     *  be used for evaluation provide it with this param
-     * @returns {boolean}
-     */
-    isNegativeStorageDate(date, format = undefined) {
-      // if there is no date to evaluate just return false
-      if (!date) return false;
-      // either use the format provided as param or the currently set format in dateFormatInt
-      const formatToCheck = format || this.dateFormatInt;
-      if (formatToCheck === 'MM.YYYY') {
-        return /^-\d{0,4}-\d{0,2}$/.test(date);
-      }
-      if (formatToCheck === 'YYYY') {
-        return /^-\d{0,4}$/.test(date);
-      }
-      return /^-\d{0,4}-\d{0,2}-\d{0,2}$/.test(date);
-    },
-    /**
-     * since minus has to be temporarily removed for some actions add it again
-     *  after with this function (for displayed date)
-     * @param {string} date - date in the format DD.MM.YYYY
-     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
-     *  function
-     * @returns {string}
-     */
-    addYearMinusToDateDisplay(date, isNegative = true) {
-      if (isNegative) {
-        const [year, month, day] = date.split('.').reverse();
-        return `${day !== undefined ? `${day}.` : ''}${month !== undefined ? `${month}.` : ''}-${year}`;
-      }
-      return date;
-    },
-    /**
-     * since minus has to be temporarily removed for some actions add it again
-     *  after with this function (for stored date)
-     * @param {string} date - date in the format YYYY-MM-DD
-     * @param {boolean} [isNegative=true] - optionally do not add minus when calling this
-     *  function
-     * @returns {string}
-     */
-    addYearMinusToDateStorage(date, isNegative = true) {
-      if (isNegative) {
-        return `-${date}`;
-      }
-      return date;
-    },
-    /**
-     * remove the minus from the date since some functions (especially Date() ) can
-     *  not cope with negative dates (for displayed date)
-     * @param {string} date - the date string in format DD.MM.YYYY
-     * @returns {string}
-     */
-    removeYearMinusFromDisplayDate(date) {
-      return this.isNegativeDisplayDate(date)
-        ? date.replace('-', '') : date;
-    },
-    /**
-     * remove the minus from the date since some functions (especially Date()) can
-     *  not cope with negative dates (for stored date)
-     * @param {string} date - the date string in format YYYY-MM-DD
-     * @param {string} [format=undefined] - in case not the currently selected format should be used
-     *  for date evaluation provide the format with this param
-     * @returns {string}
-     */
-    removeYearMinusFromStorageDate(date, format = undefined) {
-      return this.isNegativeStorageDate(date, format)
-        ? date.replace('-', '') : date;
-    },
     isTimeInputField(origin) {
-      return this.type === 'timerange' || (this.type === 'datetime' && origin.toLowerCase() === 'to');
-    },
-    /**
-     * function to calculate if fade out in the input fields should be shown, needs to be
-     * recalculated after resize or if input changes
-     */
-    calcFadeOut(inputFields) {
-      // now iterate through the relevant fields
-      inputFields.forEach((field) => {
-        // check if element exists
-        if (this.$refs[`input${field}`]) {
-          // now get the input field value
-          const inputValue = this.$refs[`input${field}`].value;
-          // for width (and fade out) calculation either use that or the placeholder visible
-          // in the field (this is saved in a separate variable from inputValue because for
-          // show icons only input value is relevant)
-          const text = inputValue || this.$refs[`input${field}`].getAttribute('placeholder');
-          // now check if any of the two exists
-          if (text) {
-            // create a span
-            const span = document.createElement('span');
-            // hide the span
-            span.setAttribute('class', 'hide');
-            // add the input extracted text to this span
-            span.innerHTML = text;
-            // add the element to the document body
-            document.body.appendChild(span);
-            // get the width of that element
-            const textWidth = span.offsetWidth;
-            // remove the element again
-            document.body.removeChild(span);
-            // now also get the input width
-            const inputWidth = this.$refs[`input${field}`].offsetWidth;
-            // check if the input value or placeholder width exceeds input width
-            if (textWidth > inputWidth) {
-              // if yes and there is input and icons are shown
-              if (inputValue && this.showIcons) {
-                // remove icons
-                this.showIcons = false;
-                // otherwise use fade out
-              } else {
-                this[`useFadeOut${field}`] = true;
-              }
-              // if input value or placeholder fit the input width
-            } else if (textWidth <= inputWidth) {
-              // check first if the fade out is used
-              if (this[`useFadeOut${field}`]) {
-                // if so - disable this one first
-                this[`useFadeOut${field}`] = false;
-                // else check if the icon would actually fit in the input together with the
-                // input width - if so - show icons
-              } else if (!this.showIcons && textWidth + this.iconWidth <= inputWidth) {
-                this.showIcons = true;
-              }
-            }
-          }
-        }
-      });
-    },
-    /**
-     * function to correctly style the date format switch buttons and prevent
-     * overlay with label
-     */
-    calcLabelAdditionsWidth() {
-      // get the complete element width
-      const observableWidth = this.$refs.baseDateInput.clientWidth;
-      // get the label margin
-      const labelMargin = this.showLabel
-        ? Number(getComputedStyle(this.$refs.label)['margin-right'].replace('px', '')) : 0;
-      const labelWidth = this.showLabel ? this.$refs.label.clientWidth : 0;
-      // calculate the remaining container space after label, label margin and date switch width
-      const spacingLeft = observableWidth
-        - labelWidth
-        - labelMargin
-        - this.$refs.labelAdditions.clientWidth;
-      // if no space is left set a class that sets label additions width to 100% so element has to wrap
-      this.wrapLabelRow = spacingLeft < 0;
+      return this.dateType === 'timerange' || (this.dateType === 'datetime' && origin.toLowerCase() === 'to');
     },
     /**
      * add delay before value is set
@@ -1750,8 +1767,258 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    ref="baseDateInputEl"
+    v-bind="rootAttrs"
+    class="base-date-input">
+    <div
+      v-if="showLabelRow"
+      :class="['base-date-input__label-row',
+               { 'base-date-input__label-row--visible': showLabel }]">
+      <legend
+        v-if="showLabel"
+        ref="labelEl"
+        class="base-date-input__label"
+        @click.prevent="">
+        {{ label }}
+      </legend>
+      <div
+        :class="['base-date-input__label-additions',
+                 {'base-date-input__label-additions--switch-height': isSwitchableFormat },
+                 {'base-date-input__label-additions--wrap': wrapLabelRow }]">
+        <div
+          ref="labelAdditionsEl"
+          :class="['base-date-input__label-additions-inner',
+                   {'base-date-input__label-additions-inner--switch': isSwitchableFormat },
+                   {'base-date-input__label-additions-inner--no-label-switch': isSwitchableFormat
+                     && !showLabel }]">
+          <!-- @slot to add additional elements to the label row -->
+          <slot name="label-addition" />
+          <BaseSwitchButton
+            v-if="isSwitchableFormat"
+            v-model="dateFormatInt"
+            :options="tabSwitchOptions"
+            :label="formatTabsLegend"
+            :active-tab="dateFormatInt"
+            class="base-date-input__switch-buttons" />
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM FIELDS -->
+    <!-- vuejs-accessibility/click-events-have-key-events: keydown event is counter productive to workflow here -->
+    <!-- vuejs-accessibility/no-static-element-interactions: click is just for handling focus no
+      interaction/accessibility needed -->
+    <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events vuejs-accessibility/no-static-element-interactions -->
+    <div
+      v-click-outside="onClickOutsideHandler"
+      class="base-date-input__field-wrapper"
+      @click="clickedInside">
+      <!-- @slot to add elements within form field but before the input element line for an example see [BaseInput](BaseInput)-->
+      <slot name="pre-input-field" />
+      <div class="base-date-input__input-fields">
+        <!-- @slot add elements within input form field but before all other elements - this field wraps if necessary for an example see [BaseInput](BaseInput) -->
+        <slot name="input-field-addition-before" />
+        <div class="base-date-input__input-line">
+          <!-- @slot add elements directly in the input line (no wrapping) for an example see [BaseInput](BaseInput)-->
+          <slot name="input-field-inline-before" />
+          <!-- INPUT FROM -->
+          <BaseInput
+            ref="baseInputFromEl"
+            v-model="inputFrom"
+            :input-id="`input-${internalId}-from`"
+            :label="label"
+            :show-label="false"
+            :is-active="fromOpen"
+            :use-form-field-styling="useFormFieldStyling"
+            :show-input-border="showInputBorder"
+            :clearable="clearable"
+            :assistive-text="{
+              clearInput: typeof assistiveText.clearInput === 'string'
+                ? assistiveText.clearInput
+                : assistiveText.clearInput?.date_from ?? assistiveText.clearInput?.time_from
+                  ?? assistiveText.clearInput?.date ?? 'clear input',
+            }"
+            :required="requiredFrom"
+            :invalid="invalidFrom"
+            :disabled="disabledFrom"
+            :show-error-icon="showErrorIcon"
+            :error-message="errorMessageFrom"
+            :input-class="inputClass"
+            :set-focus-on-active="setFocusOnActive"
+            :use-fade-out="useFadeOutFrom"
+            class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('from', $event)">
+            <template #input>
+              <div
+                class="base-date-input__datepicker">
+                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
+                <DatePicker
+                  v-if="mounted"
+                  v-model:value="inputFrom"
+                  :placeholder="isFromTimeField ? placeholder.time : placeholder.date"
+                  :clearable="false"
+                  :append-to-body="false"
+                  :lang="lang"
+                  :open="fromOpen"
+                  :type="isFromTimeField ? 'time' : minDateView"
+                  :format="isFromTimeField ? 'HH:mm' : datePickerValueFormat"
+                  :value-type="isFromTimeField ? 'format' : datePickerValueFormat"
+                  input-class="base-date-input__datepicker-input"
+                  @pick="datePicked('from')"
+                  @click.prevent="onInputClick"
+                  @change="(time, timeType) => closeTimePicker({ origin: 'from', type: timeType })">
+                  <template #input>
+                    <!-- need to disable because label is there - it is just in BaseInput
+                    component -->
+                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+                    <input
+                      :id="`input-${internalId}-from`"
+                      ref="inputFromEl"
+                      enterkeyhint="done"
+                      autocomplete="off"
+                      v-bind="forwardAttrs"
+                      :value="inputFrom"
+                      :placeholder="isFromTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
+                      :type="inputType"
+                      :aria-describedby="label + '-' + internalId"
+                      :aria-required="required"
+                      :aria-invalid="invalid"
+                      :required="required"
+                      :disabled="disabled"
+                      :aria-disabled="disabled"
+                      :class="['base-date-input__input', inputClass]"
+                      @input="checkDate($event, 'From')"
+                      @keydown="handleInputKeydown($event, 'From')"
+                      @blur="onInputBlur($event, 'from')"
+                      @vue:mounted="calcFadeOut(['From'])">
+                  </template>
+                  <!-- this empty element is here so that the default icon of datepicker
+                  is not used -->
+                  <template #icon-calendar>
+                    <div class="base-date-input__icon-wrapper" />
+                  </template>
+                </DatePicker>
+              </div>
+            </template>
+            <template #post-input-field>
+              <BaseIcon
+                ref="baseIconEl"
+                :name="isFromTimeField ? 'clock' : 'calendar-many'"
+                :class="['base-date-input__date-icon', { hide: !showIcons }]"
+                @click.stop="fromOpen = !fromOpen" />
+            </template>
+          </BaseInput>
+
+          <span
+            v-if="dateType === 'daterange' || dateType === 'timerange'"
+            class="base-date-input__separator">{{ rangeSeparator }}</span>
+
+          <!-- INPUT TO -->
+          <BaseInput
+            v-if="dateType !== 'single'"
+            ref="baseInputToEl"
+            v-model="inputTo"
+            :input-id="`input-${internalId}-to`"
+            :label="label"
+            :show-label="false"
+            :is-active="toOpen"
+            :use-form-field-styling="useFormFieldStyling"
+            :show-input-border="showInputBorder"
+            :clearable="clearable"
+            :assistive-text="{
+              clearInput: typeof assistiveText.clearInput === 'string'
+                ? assistiveText.clearInput
+                : assistiveText.clearInput?.date_to ?? assistiveText.clearInput?.time_to
+                  ?? assistiveText.clearInput?.time ?? 'clear input',
+            }"
+            :required="requiredTo"
+            :invalid="invalidTo"
+            :disabled="disabledTo"
+            :show-error-icon="showErrorIcon"
+            :error-message="errorMessageTo"
+            :set-focus-on-active="setFocusOnActive"
+            :use-fade-out="useFadeOutTo"
+            class="base-date-input__input-wrapper"
+            @update:is-active="isActiveHandler('to', $event)">
+            <template #input>
+              <div
+                class="base-date-input__datepicker">
+                <!-- date picker needs to be added on mounted because otherwise SSR errors or hydration missmatches -->
+                <DatePicker
+                  v-if="mounted"
+                  v-model:value="inputTo"
+                  :placeholder="isToTimeField ? placeholder.time : placeholder.date"
+                  :clearable="false"
+                  :append-to-body="false"
+                  :lang="lang"
+                  :open="toOpen"
+                  :type="isToTimeField ? 'time' : minDateView"
+                  :format="isToTimeField ? 'HH:mm' : datePickerValueFormat"
+                  :value-type="isToTimeField ? 'format' : datePickerValueFormat"
+                  input-class="base-date-input__datepicker-input"
+                  @pick="datePicked('to')"
+                  @click.prevent="onInputClick"
+                  @change="(time, timeType) => closeTimePicker({ origin: 'to', type: timeType })">
+                  <template #input>
+                    <!-- need to disable because label is there - it is just in BaseInput
+                      component -->
+                    <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+                    <input
+                      :id="`input-${internalId}-to`"
+                      ref="inputToEl"
+                      enterkeyhint="done"
+                      autocomplete="off"
+                      v-bind="forwardAttrs"
+                      :value="inputTo"
+                      :placeholder="isToTimeField ? placeholder.time ?? placeholder
+                        : placeholder.date ?? placeholder"
+                      :type="inputType"
+                      :aria-describedby="label + '-to-' + internalId"
+                      :aria-required="required"
+                      :aria-invalid="invalid"
+                      :required="required"
+                      :disabled="disabled"
+                      :aria-disabled="disabled"
+                      :class="['base-date-input__input', inputClass]"
+                      @input="checkDate($event, 'To')"
+                      @keydown="handleInputKeydown($event, 'To')"
+                      @blur="onInputBlur($event, 'to')"
+                      @vue:mounted="calcFadeOut(['To'])">
+                  </template>
+                  <!-- this empty element is here so that the default icon of
+                  datepicker is not used -->
+                  <template #icon-calendar>
+                    <div class="base-date-input__icon-wrapper" />
+                  </template>
+                </DatePicker>
+              </div>
+            </template>
+            <template #post-input-field>
+              <BaseIcon
+                v-if="showIcons"
+                :name="isToTimeField ? 'clock' : 'calendar-many'"
+                class="base-date-input__date-icon"
+                @click.stop="toOpen = !toOpen" />
+            </template>
+          </BaseInput>
+        </div>
+      </div>
+      <!-- @slot for adding elements after input -->
+      <slot name="post-input-field" />
+    </div>
+
+    <div class="base-date-input__below">
+      <!-- @slot to add elements below input fields e.g. add drop down -->
+      <slot name="below-input" />
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import '../../styles/variables.scss';
+  @use "@/styles/variables" as *;
 
   .base-date-input {
     display: flex;
@@ -1791,6 +2058,10 @@ export default {
         &.base-date-input__label-additions--switch-height {
           height: calc(#{$line-height} + #{$spacing-small-half});
 
+          @media screen and (max-width: $mobile) {
+            height: calc(#{$line-height} + #{$spacing-small});
+          }
+
           &.base-date-input__label-additions--wrap {
             margin-top: 2px;
           }
@@ -1827,7 +2098,6 @@ export default {
         .base-date-input__switch-buttons {
           bottom: 0;
           display: flex;
-          line-height: $line-height;
         }
       }
     }
@@ -1846,7 +2116,7 @@ export default {
         .base-date-input__input-line {
           display: flex;
           flex: 1 1 auto;
-          align-items: center;
+          align-items: baseline;
 
           .base-date-input__input-wrapper {
 
@@ -1859,12 +2129,12 @@ export default {
               width: auto;
               font-family: inherit;
               font-size: inherit;
-              line-height: $row-height-small;
 
               .base-date-input__input {
-                padding: $spacing-small-half 0;
                 min-height: $row-height-small;
+                line-height: $row-height-small;
                 width: 100%;
+                height: 100%;
               }
             }
 
@@ -1904,5 +2174,5 @@ export default {
 </style>
 
 <style lang="scss">
-  @import '../../styles/_datepicker.scss';
+  @use '@/styles/datepicker';
 </style>

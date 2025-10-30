@@ -21,9 +21,9 @@ Example for a MultilineTextInput:
 <template>
   <div>
     <BaseFormFieldCreator
+      v-model="value"
       field-key="aSingleMultilineTextField"
       :field="fieldJson"
-      :field-value="value"
       label="FormFieldCreator Multiline Text Field"
       placeholder="Enter Text"
       :secondary-dropdown="typeList"
@@ -167,14 +167,14 @@ Example for a chips input:
         <BaseFormFieldCreator
           field-key="singleChipsInput"
           :field="field"
-          :field-value="value"
+          :model-value="value"
           label="Select Director"
           :drop-down-list="list"
           :autocomplete-loading="showInfo"
           language="de"
           :available-locales="['de', 'en']"
           sort-text="Sort"
-          @field-value-changed="value = [...$event]"
+          @update:model-value="value = [...$event]"
           @fetch-autocomplete="fetch" />
     <div>{{ value }}</div>
   </div>
@@ -320,8 +320,8 @@ Example for a field group:
         <BaseFormFieldCreator
           field-key="singleChipsInput"
           :field="field"
-          :field-value="value"
-          @field-value-changed="value = {...$event}" />
+          :model-value="value"
+          @update:model-value="value = {...$event}" />
     <div class="value-display">{{ value }}</div>
   </div>
 </template>
@@ -342,7 +342,7 @@ export default {
                   field_format: 'half',
                   placeholder: 'Ortsbeschreibung eintragen',
                   field_type: 'text',
-                  order: 3,
+                  order: 1,
                 },
               },
               date: {
@@ -357,7 +357,7 @@ export default {
                   placeholder: {
                     date: 'Datum eintragen',
                   },
-                  order: 1,
+                  order: 2,
                 },
               },
             },
@@ -367,7 +367,7 @@ export default {
           'x-attrs': {
             field_type: 'group',
             show_label: false,
-            order: 6,
+            order: 1,
           },
         },
         value: {},

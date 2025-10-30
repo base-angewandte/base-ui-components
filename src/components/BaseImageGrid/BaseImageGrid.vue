@@ -1,21 +1,5 @@
-<template>
-  <div
-    :class="['base-image-grid',
-             'base-image-grid--' + imagesInt.length]">
-    <div
-      v-for="(image, index) in imagesInt"
-      :key="'image' + index"
-      class="base-image-grid__item">
-      <BaseImage
-        :lazyload="true"
-        :src="src(image)"
-        :srcset="srcset(image)" />
-    </div>
-  </div>
-</template>
-
 <script>
-import BaseImage from '@/components/BaseImage/BaseImage';
+import BaseImage from '@/components/BaseImage/BaseImage.vue';
 
 /**
  * Base Component to render 1 to 4 images in a static grid
@@ -87,8 +71,24 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    :class="['base-image-grid',
+             'base-image-grid--' + imagesInt.length]">
+    <div
+      v-for="(image, index) in imagesInt"
+      :key="'image' + index"
+      class="base-image-grid__item">
+      <BaseImage
+        :lazyload="true"
+        :src="src(image)"
+        :srcset="srcset(image)" />
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-@import '../../styles/variables.scss';
+@use "@/styles/variables" as *;
 
 $baseImageGrid: base-image-grid;
 .#{$baseImageGrid} {

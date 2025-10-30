@@ -1,17 +1,4 @@
-<template>
-  <img
-    :alt="alt"
-    :data-src="lazyload ? source : null"
-    :data-srcset="lazyload ? sourceSet : null"
-    :src="lazyload ? clearPng : source"
-    :srcset="lazyload ? null : sourceSet"
-    :class="['base-image', { lazyload: lazyload }]"
-    @error="emitError">
-</template>
-
 <script>
-import 'lazysizes';
-
 /**
  * Component to render an image and optional lazy-loading
  */
@@ -49,6 +36,7 @@ export default {
       default: () => [],
     },
   },
+  emits: ['error'],
   computed: {
     clearPng() {
       return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8//t3PQAJbAN2AyakNQAAAABJRU5ErkJggg==';
@@ -63,6 +51,13 @@ export default {
         .map(width => `${size[width]} ${width}`)).join(', ') : null;
     },
   },
+  async mounted() {
+    // to avoid hydration problems with lazysizes in SSR mode
+    // check if component runs on client-side and import lazysizes if needed
+    if (window && this.lazyload) {
+      await import('lazysizes');
+    }
+  },
   methods: {
     emitError(event) {
       /**
@@ -75,6 +70,17 @@ export default {
 };
 </script>
 
+<template>
+  <img
+    :alt="alt"
+    :data-src="lazyload ? source : undefined"
+    :data-srcset="lazyload ? sourceSet : undefined"
+    :src="lazyload ? clearPng : source"
+    :srcset="lazyload ? null : sourceSet"
+    :class="['base-image', { lazyload: lazyload }]"
+    @error="emitError">
+</template>
+
 <style lang="scss" scoped>
   .base-image {
     max-width: 100%;
@@ -82,6 +88,7 @@ export default {
     vertical-align: top;
     transition: opacity 250ms ease-in-out;
 
+    &.lazyload,
     &.lazyloading {
       opacity: 0;
     }

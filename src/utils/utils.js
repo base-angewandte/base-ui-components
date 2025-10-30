@@ -7,7 +7,7 @@ export const capitalizeString = (string) => {
       .toUpperCase() + partialString.slice(1)).join(' ');
 };
 
-export const createId = () => Math.random().toString(36).substr(2, 9);
+export const createId = () => Math.random().toString(36).slice(2, 9);
 
 /**
  * function to extract the value from a nested object property

@@ -1,4 +1,119 @@
+<script>
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
+import { computed, useSlots } from 'vue';
+
+/**
+ * Toggle Component
+ */
+export default {
+  name: 'BaseToggle',
+  components: {
+    BaseIcon,
+  },
+  props: {
+    /**
+     * specify a descriptive name
+     * this will not be displayed but is only there for usability purposes
+     */
+    name: {
+      type: String,
+      default: 'baseToggle',
+    },
+    /**
+     * specify label
+     */
+    label: {
+      type: String,
+      default: 'baseToggle',
+    },
+    /**
+     * disable the toggle button
+     */
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * is toggle checked
+     */
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * specify visibility of the label
+     */
+    hideLabel: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * bind visibility of slot content to components checked state
+     */
+    bindSlotToState: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if field is occurring more than once - set an id
+     */
+    inputId: {
+      type: String,
+      default: '',
+    },
+  },
+  emits: ['update:model-value'],
+  setup(props) {
+    // create id outside of computed to make sure we just have one fixed id
+    const internalId = useId();
+    // access slots to check if it is filled later
+    const slots = useSlots();
+    // slot is not directly accessible anymore - use composable to determine
+    // if slot has content
+    const { slotHasContent } = useHasSlotContent(slots.default);
+    /**
+     * check if an id was provided (to handle label input connection), if not
+     *  use the created one
+     * @returns {String|string}
+     */
+    const idInt = computed(() => props.inputId || internalId);
+    return {
+      idInt,
+      slotHasContent,
+    };
+  },
+  data() {
+    return {
+      checkedInt: false,
+      animate: false,
+    };
+  },
+  watch: {
+    modelValue: {
+      handler(val) {
+        if (val !== this.checkedInt) {
+          this.checkedInt = val;
+        }
+      },
+      immediate: true,
+    },
+    checkedInt(val) {
+      /**
+       * event emitted on radio button / checkmark click
+       * @event update:model-value
+       * @param {string, boolean} - emitted input value (string for Radio Button, boolean value for Checkmark)
+       */
+      this.$emit('update:model-value', val);
+    },
+  },
+};
+</script>
+
 <template>
+  <!-- events are just here to handle animation - no accessibility needed -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     :class="['base-toggle',
              { 'base-toggle--checked': checkedInt },
@@ -43,10 +158,9 @@
         {{ label }}
       </span>
     </label>
-
     <span
-      v-if="(!!$slots.default && checked && bindSlotToState)
-        || (!!$slots.default && !bindSlotToState)"
+      v-if="(slotHasContent && checkedInt && bindSlotToState)
+        || (slotHasContent && !bindSlotToState)"
       class="base-toggle__subtext">
       <!-- @slot slot after the label -->
       <slot />
@@ -54,112 +168,9 @@
   </div>
 </template>
 
-<script>
-import { createId } from '@/utils/utils';
-import BaseIcon from '../BaseIcon/BaseIcon';
-
-/**
- * Toggle Component
- */
-export default {
-  name: 'BaseToggle',
-  components: {
-    BaseIcon,
-  },
-  model: {
-    prop: 'checked',
-    event: 'clicked',
-  },
-  props: {
-    /**
-     * specify a descriptive name
-     * this will not be displayed but is only there for usability purposes
-     */
-    name: {
-      type: String,
-      default: 'baseToggle',
-    },
-    /**
-     * specify label
-     */
-    label: {
-      type: String,
-      default: 'baseToggle',
-    },
-    /**
-     * disable the toggle button
-     */
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * is toggle checked
-     */
-    checked: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * specify visibility of the label
-     */
-    hideLabel: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * bind visibility of slot content to components checked state
-     */
-    bindSlotToState: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * if field is occurring more than once - set an id
-     */
-    id: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      checkedInt: false,
-      animate: false,
-    };
-  },
-  computed: {
-    /**
-     * check if an id was provided (to handle label input connection), if not create one
-     * @returns {String|string}
-     */
-    idInt() {
-      return this.id || createId();
-    },
-  },
-  watch: {
-    checked: {
-      handler(val) {
-        if (val !== this.checkedInt) {
-          this.checkedInt = val;
-        }
-      },
-      immediate: true,
-    },
-    checkedInt(val) {
-      /**
-       * event emitted on radio button / checkmark click
-       * @event clicked
-       * @param {string, boolean} - emitted input value (string for Radio Button, boolean value for Checkmark)
-       */
-      this.$emit('clicked', val);
-    },
-  },
-};
-</script>
-
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
   .base-toggle {
     position: relative;
@@ -176,7 +187,7 @@ export default {
       position: absolute;
       left: -1000px;
       opacity: 0;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
 
       &:focus-visible ~ .base-switch {
         border: 1px solid $app-color;

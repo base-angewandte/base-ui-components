@@ -1,126 +1,9 @@
-<template>
-  <div
-    class="base-collapsed-filter-row">
-    <!-- Container to add fade out effect -->
-    <div
-      ref="filterListContainer"
-      :class="['base-collapsed-filter-row__filter-list-container',
-               {
-                 'base-collapsed-filter-row__filter-list-container__fade-right':
-                   filterFade.right,
-               },
-               {
-                 'base-collapsed-filter-row__filter-list-container__fade-left':
-                   filterFade.left,
-               }]">
-      <!-- the actual list of filters -->
-      <ul
-        ref="filterList"
-        :aria-description="assistiveText.appliedFiltersLabel"
-        :class="[
-          'base-collapsed-filter-row__filter-list',
-          { 'base-collapsed-filter-row__filter-list__scrollable': filterListScrollable },
-          { 'base-collapsed-filter-row__filter-list__scrolling': isScrolling }
-        ]"
-        @mousedown="mouseDownHandler"
-        @touchstart="mouseDownHandler">
-        <li
-          v-for="(filter, filterIndex) in filtersInt"
-          :key="filter.idInternal"
-          :aria-describedby="`${filter.idInternal}-label`"
-          role="listitem"
-          tabindex="0"
-          :class="['base-collapsed-filter-row__filter',
-                   { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
-                     .fieldType === 'boolean' }]">
-          <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
-            <div
-              :id="`${filter.idInternal}-label`"
-              class="base-collapsed-filter-row__filter-label">
-              {{ filter.labelInternal }}
-            </div>
-            <!-- the chips for each filter -->
-            <ul
-              class="base-collapsed-filter-row__chips-list">
-              <!-- iterate through the filter values list -->
-              <template
-                v-for="(value, valueIndex) in filter.filter_values?.values">
-                <!-- check if filter.fieldType is an array to determine if it belongs to a field group -->
-                <template v-if="filter.filter_values.fieldType === 'group'">
-                  <!-- if yes - also iterate through those values -->
-                  <template v-for="(groupValue, groupIndex) in value.values">
-                    <BaseCollapsedFilterItem
-                      v-if="groupValue.labelInternal"
-                      :key="groupValue.idInternal
-                        || `${groupValue.labelInternal}-${valueIndex}-${groupIndex}`"
-                      :value="groupValue"
-                      :type="value.fieldType"
-                      :range-indicator="getRangeIndicator(value, groupIndex)"
-                      :scrollable="filterListScrollable"
-                      :is-scrolling="isScrolling"
-                      :date-time-text="dateTimeText"
-                      :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
-                        && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
-                        && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
-                      :assistive-text="{
-                        booleanFilterLabel: assistiveText.booleanFilterLabel
-                          ? assistiveText.booleanFilterLabel
-                            .replace('{label}', filter.labelInternal) : groupValue.labelInternal.toString(),
-                        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
-                      }"
-                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
-                  </template>
-                </template>
-                <template v-else>
-                  <BaseCollapsedFilterItem
-                    v-if="value.labelInternal"
-                    :key="value.idInternal || `${value.labelInternal}-${valueIndex}`"
-                    :value="value"
-                    :type="filter.filter_values.fieldType"
-                    :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
-                    :scrollable="filterListScrollable"
-                    :is-scrolling="isScrolling"
-                    :date-time-text="dateTimeText"
-                    :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
-                      && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
-                      && interpretLabelAsHtml.includes(filter.idInternal))"
-                    :assistive-text="{
-                      booleanFilterLabel: assistiveText.booleanFilterLabel
-                        ? assistiveText.booleanFilterLabel
-                          .replace('{label}', filter.labelInternal) : value.labelInternal.toString(),
-                      optionToRemoveSelected: assistiveText.optionToRemoveSelected,
-                    }"
-                    @remove-chip="removeChip(filterIndex, valueIndex)" />
-                </template>
-              </template>
-            </ul>
-          </template>
-        </li>
-      </ul>
-    </div>
-    <span
-      v-if="chipRemovedAssistiveText"
-      aria-live="assertive"
-      class="assistive-text">
-      {{ chipRemovedAssistiveText }}
-    </span>
-
-    <!-- remove all filters button -->
-    <button
-      :title="assistiveText.removeFiltersLabel"
-      class="base-collapsed-filter-row__remove"
-      @click="removeFilters">
-      <BaseIcon
-        name="remove"
-        class="base-collapsed-filter-row__remove-icon" />
-    </button>
-  </div>
-</template>
-
 <script>
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem';
-import { hasData } from '@/utils/utils';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import BaseCollapsedFilterItem from '@/components/BaseAdvancedSearch/BaseCollapsedFilterItem.vue';
+import { hasData } from '@/utils/utils.js';
+import { useTemplateRef } from 'vue';
+import { useHorizontalDragScroll } from '@/composables/useHorizontalDragScroll.js';
 
 /**
  * component for BaseAdvancedSearch 'form' mode to display form filter values efficiently
@@ -237,6 +120,28 @@ export default {
       }),
     },
   },
+  emits: ['update:filters', 'remove-all'],
+  setup() {
+    /**
+     * store the scroll drag element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const scrollContainer = useTemplateRef('filterList');
+
+    const {
+      boxFadeOut,
+      calcFadeOut,
+    } = useHorizontalDragScroll(scrollContainer, {
+      scrollableClassNames: ['base-collapsed-filter-row__filter-list__scrollable'],
+    });
+
+    return {
+      scrollContainer,
+      // fade out
+      boxFadeOut,
+      calcFadeOut,
+    }
+  },
   data() {
     return {
       /**
@@ -246,58 +151,12 @@ export default {
        */
       filtersInt: [],
       /**
-       * variable to steer filter mobile display fade outs
-       * also if element is scrollable is determined from this variable (see computed
-       * prop filterListScrollable)
-       * @type {Object}
-       * @property {boolean} filterFade.left - left fade out
-       * @property {boolean} filterFade.right - right fade out
-       */
-      filterFade: {
-        left: false,
-        right: true,
-      },
-      /**
-       * store the element scroll and mouse cursor position, needed for drag scrolling
-       * @type {Object}
-       * @property {number} top - element scrollTop value
-       * @property {number} left - element scrollLeft value
-       * @property {number} x - cursor x position
-       * @property {number} y - cursor y position
-       */
-      pos: { top: 0, left: 0, x: 0, y: 0 },
-      /**
-       * store the scroll drag element
-       * @type {?HTMLElement}
-       */
-      scrollContainer: null,
-      /**
-       * set cursor styling according to current scroll state
-       * use variable instead of setting css class directly so child component
-       *  BaseCollapsedFilter item can also be steered easily
-       */
-      isScrolling: false,
-      /**
-       * Resize Observer to trigger fade out calculations
-       * @type {?ResizeObserver}
-       */
-      resizeObserver: null,
-      /**
        * assistive text set when a chip was removed to be read
        * by screenreader
        * @type {string}
        */
       chipRemovedAssistiveText: '',
     };
-  },
-  computed: {
-    /**
-     * determine from fade out calculations if element is scrollable
-     * @returns {boolean}
-     */
-    filterListScrollable() {
-      return this.filterFade.right || this.filterFade.left;
-    },
   },
   watch: {
     /**
@@ -323,20 +182,6 @@ export default {
       },
       deep: true,
     },
-  },
-  mounted() {
-    // check if filter list exists (which it should since element only displayed
-    // if filter values are present)
-    if (this.$refs.filterList) {
-      // store the filter list element (which is the scroll container)
-      this.scrollContainer = this.$refs.filterList;
-    }
-    // add a resize observer for the fade out and scroll functionalities
-    this.initResizeObserver();
-  },
-  beforeDestroy() {
-    // remove resize observer from element
-    if (this.resizeObserver) this.resizeObserver.unobserve(this.$refs.filterList);
   },
   methods: {
     /**
@@ -414,99 +259,16 @@ export default {
       setTimeout(() => {
         this.chipRemovedAssistiveText = '';
       }, 300);
-    },
-
-    /** SCROLL RELATED FUNCTIONALITIES */
-
-    /**
-     * set up resize observer for filterList to be able to adjust filter fade out
-     * and scroll functionality
-     */
-    initResizeObserver() {
-      const tempResizeObserver = new ResizeObserver(this.calcFadeOut);
-      tempResizeObserver.observe(this.$refs.filterList);
-      this.resizeObserver = tempResizeObserver;
-    },
-    /**
-     * function triggered by mouse down on filter list, triggering scroll functionality
-     * @param {MouseEvent} event - the mouse down event
-     */
-    mouseDownHandler(event) {
-      // check if filterList is actually scrollable
-      if (this.filterListScrollable) {
-        // save the current element scroll state and mouse position
-        this.pos = {
-          // The current scroll
-          left: this.scrollContainer.scrollLeft,
-          top: this.scrollContainer.scrollTop,
-          // Get the current mouse position
-          x: event.clientX ?? (event.touches ? event.touches[0]?.clientX : 0),
-          y: event.clientY ?? (event.touches ? event.touches[0]?.clientY : 0),
-        };
-        // add event listeners for mousemove and mouseup to be able to trigger scroll
-        // for touch devices add touch event listeners
-        if (event.type === 'touchstart') {
-          document.addEventListener('touchmove', this.mouseMoveHandler);
-          document.addEventListener('touchend', this.mouseUpHandler);
-        } else {
-          // else add mouse events
-          document.addEventListener('mousemove', this.mouseMoveHandler);
-          document.addEventListener('mouseup', this.mouseUpHandler);
+      // on iOS Safari the container remains the previous size so we scroll back to the max
+      // position manually
+      this.$nextTick(() => {
+        // if the scroll container is not present anymore, do nothing
+        if (!this.scrollContainer) return;
+        // otherwise calculate and scroll back to max position
+        if (this.scrollContainer.scrollLeft + this.scrollContainer.clientWidth >= this.scrollContainer.scrollWidth) {
+          this.scrollContainer.scrollLeft = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
         }
-        // Change the cursor and prevent user from selecting the text
-        this.isScrolling = true;
-      }
-    },
-    /**
-     * function triggered by document mouse move after event listeners were added
-     * in mouse down filter list element event
-     * @param {MouseEvent} e
-     */
-    mouseMoveHandler(e) {
-      // get event position - touch event does not have clientX/clientY - fallback
-      // to touches position
-      const eventXPosition = e.clientX ?? (e.touches ? e.touches[0]?.clientX : 0);
-      const eventYPosition = e.clientY ?? (e.touches ? e.touches[0]?.clientY : 0);
-      // How far the mouse has been moved
-      const dx = eventXPosition - this.pos.x;
-      const dy = eventYPosition - this.pos.y;
-
-      // Scroll the element
-      this.scrollContainer.scrollTop = this.pos.top - dy;
-      this.scrollContainer.scrollLeft = this.pos.left - dx;
-      // check if fade out needs to be shown / has changed
-      this.calcFadeOut();
-    },
-    /**
-     * function triggered by document mouse up after event listeners were added
-     * in mouse down filter list element event
-     */
-    mouseUpHandler() {
-      // remove all the event listeners again
-      document.removeEventListener('mousemove', this.mouseMoveHandler);
-      document.removeEventListener('mouseup', this.mouseUpHandler);
-      document.removeEventListener('touchmove', this.mouseMoveHandler);
-      document.removeEventListener('touchend', this.mouseUpHandler);
-
-      // change the styling of the element back to normal
-      this.isScrolling = false;
-    },
-    /**
-     * function to calculate if filterList fade out should be shown on element left and/or right border
-     */
-    calcFadeOut() {
-      // get current element scroll position
-      const scrollPosition = Math.floor(this.scrollContainer.scrollLeft);
-      // get element max scroll position
-      const scrollMax = this.scrollContainer.scrollWidth - this.scrollContainer.clientWidth;
-      // set filter fade variables
-      this.filterFade = {
-        // show fade out left as soon as scroll position is different from 0
-        left: scrollPosition !== 0,
-        // show fade out right as soon as scroll position is different from maximum position
-        // but only if element exceeds available space
-        right: scrollMax !== 0 && scrollPosition !== scrollMax,
-      };
+      });
     },
 
     /** OTHER METHODS */
@@ -560,8 +322,113 @@ export default {
 };
 </script>
 
+<template>
+  <div
+    class="base-collapsed-filter-row">
+    <!-- Container to add fade out effect -->
+    <div
+      ref="filterListContainer"
+      :class="['base-collapsed-filter-row__filter-list-container']">
+      <!-- the actual list of filters -->
+      <ul
+        ref="filterList"
+        :aria-description="assistiveText.appliedFiltersLabel"
+        :class="[
+          'base-collapsed-filter-row__filter-list',
+        ]">
+        <li
+          v-for="(filter, filterIndex) in filtersInt"
+          :key="filter.idInternal"
+          :aria-describedby="`${filter.idInternal}-label`"
+          tabindex="0"
+          :class="['base-collapsed-filter-row__filter',
+                   { 'base-collapsed-filter-row__filter__boolean': filter.filter_values
+                     .fieldType === 'boolean' }]">
+          <template v-if="filter.filter_values && filterValuesHaveData(filter.filter_values.values)">
+            <div
+              :id="`${filter.idInternal}-label`"
+              class="base-collapsed-filter-row__filter-label">
+              {{ filter.labelInternal }}
+            </div>
+            <!-- the chips for each filter -->
+            <ul
+              class="base-collapsed-filter-row__chips-list">
+              <!-- iterate through the filter values list -->
+              <template
+                v-for="(value, valueIndex) in filter.filter_values?.values">
+                <!-- check if filter.fieldType is an array to determine if it belongs to a field group -->
+                <template v-if="filter.filter_values.fieldType === 'group'">
+                  <!-- if yes - also iterate through those values -->
+                  <template
+                    v-for="(groupValue, groupIndex) in value.values"
+                    :key="groupValue.idInternal
+                      || `${groupValue.labelInternal}-${valueIndex}-${groupIndex}`">
+                    <BaseCollapsedFilterItem
+                      v-if="groupValue.labelInternal"
+                      :value="groupValue"
+                      :type="value.fieldType"
+                      :range-indicator="getRangeIndicator(value, groupIndex)"
+                      :date-time-text="dateTimeText"
+                      :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                        && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                        && calcSubFormChipHtmlRender(filter.idInternal, value.fieldId))"
+                      :assistive-text="{
+                        booleanFilterLabel: assistiveText.booleanFilterLabel
+                          ? assistiveText.booleanFilterLabel
+                            .replace('{label}', filter.labelInternal) : groupValue.labelInternal.toString(),
+                        optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                      }"
+                      @remove-chip="removeChip(filterIndex, valueIndex, groupIndex)" />
+                  </template>
+                </template>
+                <template v-else>
+                  <BaseCollapsedFilterItem
+                    v-if="value.labelInternal"
+                    :key="value.idInternal || `${value.labelInternal}-${valueIndex}`"
+                    :value="value"
+                    :type="filter.filter_values.fieldType"
+                    :range-indicator="getRangeIndicator(filter.filter_values, valueIndex)"
+                    :date-time-text="dateTimeText"
+                    :interpret-label-as-html="(typeof interpretLabelAsHtml === 'boolean'
+                      && interpretLabelAsHtml) || (typeof interpretLabelAsHtml === 'object'
+                      && interpretLabelAsHtml.includes(filter.idInternal))"
+                    :assistive-text="{
+                      booleanFilterLabel: assistiveText.booleanFilterLabel
+                        ? assistiveText.booleanFilterLabel
+                          .replace('{label}', filter.labelInternal) : value.labelInternal.toString(),
+                      optionToRemoveSelected: assistiveText.optionToRemoveSelected,
+                    }"
+                    @remove-chip="removeChip(filterIndex, valueIndex)" />
+                </template>
+              </template>
+            </ul>
+          </template>
+        </li>
+      </ul>
+    </div>
+    <span
+      v-if="chipRemovedAssistiveText"
+      aria-live="assertive"
+      class="assistive-text">
+      {{ chipRemovedAssistiveText }}
+    </span>
+
+    <!-- remove all filters button -->
+    <button
+      :title="assistiveText.removeFiltersLabel"
+      class="base-collapsed-filter-row__remove"
+      @keydown.enter.stop="removeFilters"
+      @click.stop="removeFilters">
+      <BaseIcon
+        name="remove"
+        class="base-collapsed-filter-row__remove-icon" />
+    </button>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-collapsed-filter-row {
   position: relative;
@@ -578,47 +445,22 @@ export default {
     flex: 1 1 auto;
     overflow: hidden;
 
-    &.base-collapsed-filter-row__filter-list-container__fade-left::before {
-      content: '';
-      width: $fade-out-width;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
-      z-index: map-get($zindex, chips-fadeout);
-      pointer-events: none;
-    }
-
-    &.base-collapsed-filter-row__filter-list-container__fade-right::after {
-      content: '';
-      width: $fade-out-width;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(255, 255, 255));
-      z-index: map-get($zindex, chips-fadeout);
-      pointer-events: none;
-    }
-
     .base-collapsed-filter-row__filter-list {
       display: flex;
       overflow-x: auto;
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none;  /* Internet Explorer 10+ */
+      // need to add 1px because fade out not positioned perfectly else
+      margin-left: 1px;
 
       &::-webkit-scrollbar { /* WebKit */
         width: 0;
         height: 0;
       }
 
-      &.base-collapsed-filter-row__filter-list__scrollable {
+      &.base-collapsed-filter-row__filter-list__scrollable,
+      &.base-collapsed-filter-row__filter-list__scrollable * {
         cursor: grab;
-      }
-
-      &.base-collapsed-filter-row__filter-list__scrolling {
-        cursor: grabbing;
-        user-select: none;
       }
 
       .base-collapsed-filter-row__filter {
@@ -640,6 +482,7 @@ export default {
 
         .base-collapsed-filter-row__filter-label {
           font-size: $font-size-small;
+          line-height: normal;
           color: $font-color-second;
           white-space: nowrap;
           width: 100%;
@@ -651,7 +494,6 @@ export default {
           display: flex;
           flex-direction: row;
           white-space: nowrap;
-          align-items: center;
           flex: 1 0 auto;
           height: calc(#{$line-height} + #{$spacing-small});
 

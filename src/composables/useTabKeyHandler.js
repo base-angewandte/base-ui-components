@@ -12,7 +12,6 @@ import { computed, ref, watchEffect } from 'vue';
  * @param {boolean} disable - disable method and do nothing
  * @returns {{focusableHTMLTags: *, disableHandler: *}}
  */
-// eslint-disable-next-line import/prefer-default-export
 export function useTabKeyHandler(target, focusableElements, disable = false) {
   const focusableHTMLTags = ref(focusableElements);
   const disableHandler = ref(disable);

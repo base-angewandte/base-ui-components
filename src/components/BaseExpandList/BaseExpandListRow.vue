@@ -1,159 +1,16 @@
-<template>
-  <component
-    :is="renderAs"
-    :class="[{
-      'base-expand': !edit,
-      expanded: expanded,
-    }]">
-    <template
-      v-if="!edit && dataInt.label">
-      <button
-        :id="'base-expand-control-' + _uid"
-        :aria-expanded="expanded ? 'true' : 'false'"
-        :aria-controls="'base-expand-region-' + _uid"
-        type="button"
-        class="base-expand__head base-expand-item"
-        @click="expand">
-        <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
-          <span
-            class="base-expand__head__label">{{ dataInt.label }}</span>
-          <span
-            class="base-expand__head__additional">
-            ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
-          </span>
-        </span>
-        <base-icon
-          name="drop-down"
-          class="base-expand-item__col base-expand__head__icon" />
-      </button>
-
-      <transition
-        name="expand"
-        @enter="enter"
-        @after-enter="afterEnter"
-        @leave="leave"
-        @before-leave="beforeLeave">
-        <ul
-          v-show="expanded"
-          :id="'base-expand-region-' + _uid"
-          :aria-labelledby="'base-expand-control-' + _uid"
-          :aria-hidden="!expanded ? 'true' : 'false'"
-          class="base-expand__body">
-          <!-- Todo: limit levels (counter) -->
-          <base-expand-list-row
-            v-for="(items, index) in dataInt.data"
-            ref="baseExpandListRow"
-            :key="`${parentIndex}-${index}`"
-            :data="items"
-            :multiple="multiple"
-            render-as="li"
-            @expanded-state="emitExpandedState">
-            <template
-              #content="dataNextLevel">
-              <!-- @slot a slot to provide customized entry row in next level -->
-              <slot
-                name="content"
-                :data="dataNextLevel.data" />
-            </template>
-          </base-expand-list-row>
-        </ul>
-      </transition>
-    </template>
-
-    <template
-      v-if="!edit && dataInt.value">
-      <div
-        :class="['base-expand-item',
-                 'base-expand-item--intend',
-                 {
-                   'base-text-fade-out-left': fadeOutLeft,
-                   'base-text-fade-out': fadeOutRight,
-                 }]">
-        <span
-          ref="listItemScrollable"
-          class="base-expand-item__col base-expand-item__label">
-          <!-- @slot a slot to provide customized entry row -->
-          <slot
-            name="content"
-            :data="dataInt">
-            {{ dataInt.value }}
-          </slot>
-        </span>
-      </div>
-    </template>
-
-    <template
-      v-if="edit">
-      <div
-        :class="['base-expand-item', { 'base-expand-item--movable': movable }]">
-        <span
-          ref="baseExpandItemHandle"
-          :title="dataInt.label"
-          tabindex="0"
-          class="base-expand-item__col base-expand-item__handle"
-          @keydown.down.prevent.stop="moveItem('down')"
-          @keydown.up.prevent.stop="moveItem('up')"
-          @keydown.enter.prevent.stop="movable = !movable"
-          @focus="assistiveText('activate')"
-          @keyup.esc="cancelMovable"
-          @blur="cancelMovable">
-          <base-icon
-            name="drag-lines" />
-        </span>
-        <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
-          <div
-            v-if="!itemVisible"
-            class="base-expand-item__overlay" />
-          <span
-            :class="[
-              'base-expand__head__label',
-              { 'base-expand__head__label--disabled': !itemVisible }]">
-            {{ dataInt.label }}
-          </span>
-          <span
-            class="base-expand__head__additional">
-            ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
-          </span>
-        </div>
-        <div class="base-expand-item__col base-expand-item__controls">
-          <base-button
-            v-if="controlType === 'button'"
-            :icon="itemVisible ? 'eye' : 'eye-hide'"
-            :text="''"
-            :has-background-color="false"
-            :disabled="disabled"
-            :aria-label="`${itemVisible ? editHideText : editShowText } ${dataInt.label}`"
-            icon-size="large"
-            icon-position="left"
-            @clicked="setVisibility(!itemVisible)" />
-          <BaseToggle
-            v-else-if="controlType === 'toggle'"
-            v-model="itemVisible"
-            :disabled="disabled"
-            :hide-label="true"
-            :label="`${editShowText} ${dataInt.label}`"
-            class="base-expand-item__toggle" />
-        </div>
-      </div>
-    </template>
-  </component>
-</template>
-
 <script>
-// eslint-disable-next-line
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import i18n from '../../mixins/i18n';
+import { defineAsyncComponent } from 'vue';
+import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
+import { useId } from '@/composables/useId.js';
 
 export default {
   name: 'BaseExpandListRow',
   components: {
-    BaseToggle: () => import('../BaseToggle/BaseToggle').then(m => m.default || m),
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    // eslint-disable-next-line import/no-self-import
-    BaseExpandListRow: () => import('./BaseExpandListRow').then(m => m.default || m),
+    BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BaseExpandListRow: defineAsyncComponent(() => import('@/components/BaseExpandList/BaseExpandListRow.vue')),
     BaseIcon,
   },
-  mixins: [i18n],
   props: {
     /**
      * data object: { label: 'String', data: [{ value: 'String', }],
@@ -232,6 +89,14 @@ export default {
       default: false,
     },
   },
+  emits: ['expanded-state', 'update:data', 'sorted', 'assistive'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       // toggle item
@@ -250,7 +115,7 @@ export default {
   computed: {
     itemVisible: {
       set(val) {
-        this.$set(this.dataInt, 'hidden', !val);
+        this.dataInt.hidden = !val;
       },
       get() {
         return !this.dataInt.hidden;
@@ -308,7 +173,7 @@ export default {
       scrollable.addEventListener('scroll', () => this.scrollHandler(scrollable));
     }
   },
-  destroyed() {
+  unmounted() {
     if (this.$refs.listItemScrollable) {
       const scrollable = this.$refs.listItemScrollable;
       scrollable.removeEventListener('scroll', () => this.scrollHandler(scrollable));
@@ -325,7 +190,6 @@ export default {
         e.stopPropagation();
         e.stopImmediatePropagation();
         e.preventDefault();
-        e.cancelBubble = false;
         this.movable = false;
       }
     },
@@ -356,7 +220,7 @@ export default {
     expand() {
       // which element(s) are currently expanded
       // eg: level1, first item = 0; level2, second item: 0-1
-      const currentState = this.$vnode.key.toString().split('-');
+      const currentState = this.$.vnode.key.toString().split('-');
 
       if (this.expanded) {
         this.expanded = false;
@@ -482,8 +346,150 @@ export default {
 };
 </script>
 
+<template>
+  <component
+    :is="renderAs"
+    :class="[{
+      'base-expand': !edit,
+      expanded: expanded,
+    }]">
+    <template
+      v-if="!edit && dataInt.label">
+      <button
+        :id="'base-expand-control-' + internalId"
+        :aria-expanded="expanded"
+        :aria-controls="'base-expand-region-' + internalId"
+        type="button"
+        class="base-expand__head base-expand-item"
+        @click="expand">
+        <span class="base-expand-item__col base-expand-item__label base-text-fade-out">
+          <span
+            class="base-expand__head__label">{{ dataInt.label }}</span>
+          <span
+            class="base-expand__head__additional">
+            ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
+          </span>
+        </span>
+        <BaseIcon
+          name="drop-down"
+          class="base-expand-item__col base-expand__head__icon" />
+      </button>
+
+      <transition
+        name="expand"
+        @enter="enter"
+        @after-enter="afterEnter"
+        @leave="leave"
+        @before-leave="beforeLeave">
+        <ul
+          v-show="expanded"
+          :id="'base-expand-region-' + internalId"
+          :aria-labelledby="'base-expand-control-' + internalId"
+          :aria-hidden="!expanded"
+          class="base-expand__body">
+          <!-- Todo: limit levels (counter) -->
+          <BaseExpandListRow
+            v-for="(items, index) in dataInt.data"
+            ref="baseExpandListRow"
+            :key="`${parentIndex}-${index}`"
+            :data="items"
+            :multiple="multiple"
+            render-as="li"
+            @expanded-state="emitExpandedState">
+            <template
+              #content="dataNextLevel">
+              <!-- @slot a slot to provide customized entry row in next level -->
+              <slot
+                name="content"
+                :data="dataNextLevel.data" />
+            </template>
+          </BaseExpandListRow>
+        </ul>
+      </transition>
+    </template>
+
+    <template
+      v-if="!edit && dataInt.value">
+      <div
+        :class="['base-expand-item',
+                 'base-expand-item--intend',
+                 {
+                   'base-text-fade-out-left': fadeOutLeft,
+                   'base-text-fade-out': fadeOutRight,
+                 }]">
+        <span
+          ref="listItemScrollable"
+          class="base-expand-item__col base-expand-item__label">
+          <!-- @slot a slot to provide customized entry row -->
+          <slot
+            name="content"
+            :data="dataInt">
+            {{ dataInt.value }}
+          </slot>
+        </span>
+      </div>
+    </template>
+
+    <template
+      v-if="edit">
+      <div
+        :class="['base-expand-item', { 'base-expand-item--movable': movable }]">
+        <span
+          ref="baseExpandItemHandle"
+          :title="dataInt.label"
+          role="button"
+          tabindex="0"
+          class="base-expand-item__col base-expand-item__handle"
+          @keydown.down.prevent.stop="moveItem('down')"
+          @keydown.up.prevent.stop="moveItem('up')"
+          @keydown.enter.prevent.stop="movable = !movable"
+          @focus="assistiveText('activate')"
+          @keyup.esc="cancelMovable"
+          @blur="cancelMovable">
+          <BaseIcon
+            name="drag-lines" />
+        </span>
+        <div class="base-expand-item__col base-expand-item__label base-text-fade-out">
+          <div
+            v-if="!itemVisible"
+            class="base-expand-item__overlay" />
+          <span
+            :class="[
+              'base-expand__head__label',
+              { 'base-expand__head__label--disabled': !itemVisible }]">
+            {{ dataInt.label }}
+          </span>
+          <span
+            class="base-expand__head__additional">
+            ({{ dataInt.count !== undefined ? dataInt.count : dataInt.data.length }})
+          </span>
+        </div>
+        <div class="base-expand-item__col base-expand-item__controls">
+          <BaseButton
+            v-if="controlType === 'button'"
+            :icon="itemVisible ? 'eye' : 'eye-hide'"
+            :text="''"
+            :has-background-color="false"
+            :disabled="disabled"
+            :aria-label="`${itemVisible ? editHideText : editShowText } ${dataInt.label}`"
+            icon-size="large"
+            icon-position="left"
+            @clicked="setVisibility(!itemVisible)" />
+          <BaseToggle
+            v-else-if="controlType === 'toggle'"
+            v-model="itemVisible"
+            :disabled="disabled"
+            :hide-label="true"
+            :label="`${editShowText} ${dataInt.label}`"
+            class="base-expand-item__toggle" />
+        </div>
+      </div>
+    </template>
+  </component>
+</template>
+
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .base-expand-item {
   display: flex;
@@ -601,7 +607,7 @@ export default {
 </style>
 
 <style lang="scss">
-@import "../../styles/variables";
+@use "@/styles/variables" as *;
 
 .expand-enter-active,
 .expand-leave-active {
@@ -610,17 +616,17 @@ export default {
 }
 
 .expand-enter-to,
-.expand-leave {
+.expand-leave-from {
   overflow: hidden;
 }
 
-.expand-enter,
+.expand-enter-from,
 .expand-leave-to {
   overflow: hidden;
   max-height: 0 !important;
 }
 
-.expand-enter {
+.expand-enter-from {
   .base-expand-item {
     border-color: transparent !important;
   }
@@ -634,5 +640,5 @@ export default {
 </style>
 
 <style lang="scss">
-@import "../../styles/baseExpand";
+@use "@/styles/baseExpand";
 </style>

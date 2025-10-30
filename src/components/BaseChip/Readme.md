@@ -1,16 +1,16 @@
 ## Demo
 
-A chip that can be edited
+Chips with not-linked and linked styling - the latter one being editable
 
 ```vue live
 <template>
   <div>
       <BaseChip
-          :entry="entry"
+          :model-value="entry"
           :is-linked="false"
           @remove-entry="remove"/>
       <BaseChip
-          :entry="'i am linked and editable!'"
+          :model-value="'i am linked and editable!'"
           :is-linked="true"
           :editable="true"
           assistive-text="testing this now???"

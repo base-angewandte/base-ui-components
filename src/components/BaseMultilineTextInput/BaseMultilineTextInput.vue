@@ -1,92 +1,9 @@
-<template>
-  <BaseInput
-    :id="idInt"
-    v-model="fieldContent[activeTabInt]"
-    :is-active.sync="isActive"
-    :label="label"
-    :show-label="showLabel"
-    :placeholder="placeholder"
-    :required="required"
-    :invalid="invalid"
-    :disabled="disabled"
-    :show-error-icon="showErrorIcon"
-    :error-message="errorMessage"
-    :clearable="clearable"
-    :use-fade-out="false"
-    class="base-multiline-text-input"
-    v-on="$listeners">
-    <template #label-addition>
-      <div class="base-multiline-text-input__additions">
-        <!-- @slot to add drop down needed for text input field (base specific) or any other element deemed necessary -->
-        <slot name="label-addition" />
-        <BaseSwitchButton
-          v-if="tabs && tabs[0] !== 'default'"
-          v-model="activeTabInt"
-          :options="switchTabs"
-          :label="tabsLegend"
-          :active-tab="activeTab"
-          class="base-multiline-text-input__tabs">
-          <template
-            #right-of-content="tab">
-            <BaseIcon
-              v-if="hasText(tab.value)"
-              class="base-multiline-text-input__text-icon"
-              name="text" />
-          </template>
-        </BaseSwitchButton>
-      </div>
-    </template>
-    <template #input>
-      <div
-        ref="textareaWrapper"
-        :class="['base-multiline-text-input__textarea-wrapper',
-                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut }]">
-        <!-- need to disable because label is there - it is just in BaseInput component -->
-        <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
-        <textarea
-          :id="idInt"
-          ref="textarea"
-          v-model="fieldContent[activeTabInt]"
-          :required="required"
-          :aria-required="required.toString()"
-          :aria-describedby="idInt"
-          :aria-invalid="invalid.toString()"
-          :disabled="disabled"
-          :aria-disabled="disabled.toString()"
-          :placeholder="placeholder"
-          class="base-multiline-text-input__textarea"
-          v-on="inputListeners"
-          @keydown.tab="isActive = false" />
-      </div>
-    </template>
-    <template
-      #input-field-addition-before>
-      <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
-      <slot name="input-field-addition-before" />
-    </template>
-    <template #input-field-addition-after>
-      <!-- @slot for adding elements after input -->
-      <slot name="input-field-addition-after" />
-    </template>
-    <template #post-input-field>
-      <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-      <slot name="post-input-field" />
-    </template>
-    <template #error-icon>
-      <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-      <slot name="error-icon" />
-    </template>
-    <template #remove-icon>
-      <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
-      <slot name="remove-icon" />
-    </template>
-  </BaseInput>
-</template>
-
 <script>
-import BaseInput from '@/components/BaseInput/BaseInput';
-import BaseIcon from '@/components/BaseIcon/BaseIcon';
-import { createId } from '@/utils/utils';
+import { defineAsyncComponent, toRef, useTemplateRef, computed } from 'vue';
+import BaseInput from '@/components/BaseInput/BaseInput.vue';
+import { useId } from '@/composables/useId.js';
+import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
+import { useElementFadeOut } from '@/composables/useElementFadeOut.js';
 
 /**
  * A multiline textfield base component
@@ -96,20 +13,17 @@ export default {
   name: 'BaseMultilineTextInput',
   components: {
     BaseInput,
-    BaseIcon,
-    BaseSwitchButton: () => import('@/components/BaseSwitchButton/BaseSwitchButton').then(m => m.default || m),
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
+    BaseSwitchButton: defineAsyncComponent(() => import('@/components/BaseSwitchButton/BaseSwitchButton.vue')),
   },
-  model: {
-    prop: 'input',
-    event: 'input',
-  },
+  inheritAttrs: false,
   props: {
     /**
      * input displayed in the textarea.
      *   if `tabs` prop is set, this needs to be an object with properties corresponding to
      *   tab names.
      */
-    input: {
+    modelValue: {
       type: [Object, String],
       default: '',
     },
@@ -153,9 +67,7 @@ export default {
      */
     activeTab: {
       type: String,
-      default() {
-        return this.tabs[0] || 'default';
-      },
+      default: '',
     },
     /**
      * set a legend for the tabs to be read (for accessibility only, hidden)
@@ -167,7 +79,7 @@ export default {
     /**
      * set id which is used for label + id
      */
-    id: {
+    inputId: {
       type: [String, Number],
       default: '',
     },
@@ -227,55 +139,94 @@ export default {
       type: Boolean,
       default: false,
     },
+    /**
+     * provide assistive text for screen readers
+     * **clearInput**: text read for remove input icon if prop `clearable` is set `true`
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        clearInput: 'Clear input',
+      }),
+    },
+  },
+  emits: ['update:model-value'],
+  setup(props) {
+    /** INTERNAL ID */
+    /**
+     * create a permanent id (also suitable for ssr)
+     * @type {Ref<UnwrapRef<string>> | Ref<UnwrapRef<number>>}
+     */
+    const idInt = toRef(props.inputId);
+    // check if one was provided by prop or create one
+    if (!idInt.value) {
+      idInt.value = useId();
+    }
+
+    /** ATTRS HANDLING */
+    // split up the $attrs to leave class style and data-base-id at root level
+    const { rootAttrs, forwardAttrs } = useExtractAttrs();
+
+    /** INPUT ELEMENT */
+    /**
+     * get the reference to the BaseInput component
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const baseInput = useTemplateRef('baseInputEl');
+    /**
+     * get the native input element from BaseInput
+     * @type {ComputedRef<HTMLElement>}
+     */
+    const inputElement = computed(() => baseInput.value?.inputElement || null);
+
+    /** FADE OUT HANDLING */
+    /**
+     * variable to store a reference the textarea element
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const textarea = useTemplateRef('textareaEl');
+    const { boxFadeOut } = useElementFadeOut(textarea, {
+      // TODO: refactor to use build in classes and pseudo elements
+      className: '',
+    });
+
+    return {
+      idInt,
+      rootAttrs,
+      forwardAttrs,
+      textarea,
+      inputElement,
+      boxFadeOut,
+    };
   },
   data() {
     return {
-      activeTabInt: this.activeTab || 'default',
+      activeTabInt: this.tabs[0],
       fieldContent: {},
       isActive: false,
     };
   },
   computed: {
     /**
-     * check if an id was provided (to handle label input connection), if not create one
-     * @returns {String|string}
+     * map the switch options to the format required by BaseSwitchButton (an object with label
+     * value and (optionally) icon)
+     * @returns {{value: string, label: string}[]}
      */
-    idInt() {
-      return this.id || createId();
-    },
-    // TODO: refactor component props to already match object necessary for switch component
     switchTabs() {
       return this.tabs.map((tab, index) => ({ value: tab, label: this.tabLabels[index] || tab }));
     },
-    inputListeners() {
-      return {
-        // add all the listeners from the parent
-        ...this.$listeners,
-        // and add custom listeners
-        ...{
-          input: () => {
-            /**
-             * Event emitted on input, passing input string or input object
-             *
-             * @event input
-             * @param {string, Object} - the altered field input
-             */
-            this.$emit('input', this.emitFieldContent());
-          },
-        },
-      };
-    },
+    /**
+     * calc if fade out should be visible which is if textarea height is overflown (calculated in
+     * composable) AND only if the input is not active
+     * @returns {boolean}
+     */
     showFadeOut() {
-      if (this.$refs && this.$refs.textarea) {
-        return !this.isActive
-          && this.$refs.textarea.scrollHeight > this.$refs.textareaWrapper.clientHeight;
-      }
-      return !this.isActive;
+      return !this.isActive && (this.boxFadeOut.top || this.boxFadeOut.bottom);
     },
   },
   watch: {
     // watch for input changes from outside
-    input: {
+    modelValue: {
       handler(val) {
         if ((typeof val === 'object' && JSON.stringify(val) !== JSON.stringify(this.fieldContent))
           || (typeof val === 'string' && val !== this.fieldContent[this.activeTabInt])) {
@@ -287,25 +238,38 @@ export default {
       deep: true,
     },
     // get updates for active tab from outside
-    activeTab(val) {
-      this.activeTabInt = val;
+    activeTab: {
+      handler(val) {
+        this.activeTabInt = val || this.tabs[0] || 'default';
+      },
+      immediate: true,
     },
   },
   methods: {
+    /**
+     * forward the input
+     */
+    onInput() {
+      /**
+       * Event emitted on input, passing input string or input object
+       *
+       * @event update:model-value
+       * @param {string, Object} - the altered field input
+       */
+      this.$emit('update:model-value', this.emitFieldContent());
+    },
     setFieldContent(val) {
       if (this.tabs.length < 2) {
         const propName = this.activeTabInt || 'default';
-        this.$set(this.fieldContent, propName, typeof val === 'string' ? val : val[propName]);
+        this.fieldContent[propName] = typeof val === 'string' ? val : val[propName];
       } else {
-        this.tabs.forEach(tab => this.$set(
-          this.fieldContent,
-          tab,
-          val[tab],
-        ));
+        this.tabs.forEach((tab) => {
+          this.fieldContent[tab] = val[tab];
+        });
       }
     },
     emitFieldContent() {
-      if (typeof this.input === 'object') {
+      if (typeof this.modelValue === 'object') {
         return this.fieldContent;
       }
       return this.fieldContent[this.activeTabInt];
@@ -317,8 +281,97 @@ export default {
 };
 </script>
 
+<template>
+  <BaseInput
+    ref="baseInputEl"
+    v-model="fieldContent[activeTabInt]"
+    v-model:is-active="isActive"
+    v-bind="rootAttrs"
+    :input-id="idInt"
+    :label="label"
+    :show-label="showLabel"
+    :placeholder="placeholder"
+    :required="required"
+    :invalid="invalid"
+    :disabled="disabled"
+    :show-error-icon="showErrorIcon"
+    :error-message="errorMessage"
+    :clearable="clearable"
+    :assistive-text="assistiveText"
+    :use-fade-out="false"
+    class="base-multiline-text-input">
+    <template #label-addition>
+      <div class="base-multiline-text-input__additions">
+        <!-- @slot to add drop down needed for text input field (base specific) or any other element deemed necessary -->
+        <slot name="label-addition" />
+        <BaseSwitchButton
+          v-if="tabs && tabs[0] !== 'default'"
+          v-model="activeTabInt"
+          :options="switchTabs"
+          :label="tabsLegend"
+          class="base-multiline-text-input__tabs">
+          <template
+            #right-of-content="tab">
+            <BaseIcon
+              v-if="hasText(tab.value)"
+              class="base-multiline-text-input__text-icon"
+              name="text" />
+          </template>
+        </BaseSwitchButton>
+      </div>
+    </template>
+    <template #input>
+      <div
+        :class="['base-multiline-text-input__textarea-wrapper',
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out': showFadeOut },
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out--top': boxFadeOut.top },
+                 { 'base-multiline-text-input__textarea-wrapper__fade-out--bottom': boxFadeOut.bottom }]">
+        <!-- need to disable because label is there - it is just in BaseInput component -->
+        <!-- eslint-disable-next-line  vuejs-accessibility/form-control-has-label -->
+        <textarea
+          :id="idInt"
+          ref="textareaEl"
+          v-model="fieldContent[activeTabInt]"
+          v-bind="forwardAttrs"
+          :required="required"
+          :aria-required="required"
+          :aria-describedby="idInt"
+          :aria-invalid="invalid"
+          :disabled="disabled"
+          :aria-disabled="disabled"
+          :placeholder="placeholder"
+          class="base-multiline-text-input__textarea"
+          @keydown.tab="isActive = false"
+          @input="onInput" />
+      </div>
+    </template>
+    <template
+      #input-field-addition-before>
+      <!-- @slot Slot to allow for additional elements in the input field <div> (before <input>) -->
+      <slot name="input-field-addition-before" />
+    </template>
+    <template #input-field-addition-after>
+      <!-- @slot for adding elements after input -->
+      <slot name="input-field-addition-after" />
+    </template>
+    <template #post-input-field>
+      <!-- @slot elements after the actual input element but within the input field container. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <slot name="post-input-field" />
+    </template>
+    <template #error-icon>
+      <!-- @slot use a custom icon instead of standard error/warning icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <slot name="error-icon" />
+    </template>
+    <template #remove-icon>
+      <!-- @slot use a custom icon instead of standard remove icon. for an example see [BaseChipsInputField](BaseChipsInputField)-->
+      <slot name="remove-icon" />
+    </template>
+  </BaseInput>
+</template>
+
 <style lang="scss" scoped>
-@import '../../styles/variables.scss';
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-multiline-text-input {
   font-family: inherit;
@@ -336,11 +389,8 @@ export default {
       flex-shrink: 0;
 
       .base-multiline-text-input__text-icon {
-        margin-left: $spacing-small;
         height: 10px;
         width: 10px;
-        vertical-align: middle;
-        margin-bottom: $spacing-small-half;
         color: $font-color-second;
         fill: $font-color-second;
       }
@@ -350,15 +400,26 @@ export default {
   .base-multiline-text-input__textarea-wrapper {
     width: 100%;
 
-    &.base-multiline-text-input__textarea-wrapper__fade-out::after {
+    &.base-multiline-text-input__textarea-wrapper__fade-out::after,
+    &.base-multiline-text-input__textarea-wrapper__fade-out::before {
       content: '';
       width: 100%;
       height: $fade-out-width;
       position: absolute;
-      bottom: 0;
+      pointer-events: none;
+      z-index: map.get($zindex, fadeout);
+    }
+
+    &.base-multiline-text-input__textarea-wrapper__fade-out--bottom::after {
+      bottom: 1px;
       left: 0;
       background: linear-gradient(to bottom, rgba(255, 255, 255, 0) , white);
-      pointer-events: none;
+    }
+
+    &.base-multiline-text-input__textarea-wrapper__fade-out--top::before {
+      top: 1px;
+      left: 0;
+      background: linear-gradient(to top, rgba(255, 255, 255, 0) , white);
     }
 
     .base-multiline-text-input__textarea {

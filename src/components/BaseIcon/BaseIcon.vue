@@ -1,20 +1,5 @@
-<template>
-  <svg
-    :aria-labelledby="title || desc ? ariaAttribute : false"
-    class="base-icon">
-    <title
-      v-if="title"
-      :id="'title_' + id">{{ title }}</title>
-    <desc
-      v-if="desc"
-      :id="'desc_' + id">{{ desc }}</desc>
-    <use
-      v-if="baseIcons"
-      :href="icon" />
-  </svg>
-</template>
-
 <script>
+import { useId } from '@/composables/useId.js';
 
 /**
  * A wrapper component for base icons
@@ -55,6 +40,12 @@ export default {
       default: '',
     },
   },
+  setup() {
+    const internalId = useId();
+    return {
+      internalId,
+    };
+  },
   data() {
     return {
       // path to base-ui-icons.svg
@@ -65,17 +56,13 @@ export default {
     icon() {
       return `${this.baseIcons}#${this.name}`;
     },
-    id() {
-      // eslint-disable-next-line no-underscore-dangle
-      return this._uid;
-    },
     ariaAttribute() {
       const aria = [];
       if (this.title) {
-        aria.push(`title_${this.id}`);
+        aria.push(`title_${this.internalId}`);
       }
       if (this.desc) {
-        aria.push(`desc_${this.id}`);
+        aria.push(`desc_${this.internalId}`);
       }
       return aria.join(' ');
     },
@@ -90,6 +77,22 @@ export default {
   },
 };
 </script>
+
+<template>
+  <svg
+    :aria-labelledby="title || desc ? ariaAttribute : undefined"
+    class="base-icon">
+    <title
+      v-if="title"
+      :id="'title_' + internalId">{{ title }}</title>
+    <desc
+      v-if="desc"
+      :id="'desc_' + internalId">{{ desc }}</desc>
+    <use
+      v-if="baseIcons"
+      :href="icon" />
+  </svg>
+</template>
 
 <style lang="scss" scoped>
   .base-icon {

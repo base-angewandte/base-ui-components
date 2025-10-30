@@ -1,58 +1,16 @@
-<template>
-  <div>
-    <div
-      class="base-carousel swiper">
-      <div
-        class="swiper-wrapper">
-        <div
-          v-for="(item, index) in items"
-          v-show="swiperIsActive"
-          :key="index"
-          :class="['base-carousel-slide', { 'swiper-slide': swiperIsActive }]">
-          <BaseImageBox
-            :title="item.title"
-            :subtext="subtext(item.subtext)"
-            :description="item.description"
-            :additional="item.additional"
-            :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '640w')"
-            :box-size="boxSize"
-            :lazyload="true"
-            :image-first="true"
-            :center-header="true"
-            :render-element-as="vueRouterAvailable && item.href ? renderLinkElementAs : 'div'"
-            :link-to="vueRouterAvailable && item.href ? item.href : ''"
-            style="margin-right: 0"
-            @clicked="boxClicked(item)" />
-        </div>
-      </div>
-
-      <div
-        v-if="items.length > 2"
-        class="swiper-pagination" />
-
-      <template
-        v-if="items.length > 1">
-        <base-icon
-          name="prev"
-          class="swiper-button swiper-button-prev" />
-
-        <base-icon
-          name="next"
-          class="swiper-button swiper-button-next" />
-      </template>
-    </div>
-  </div>
-</template>
-
 <script>
-import 'lazysizes';
-import BaseIcon from '../BaseIcon/BaseIcon';
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
+import { useI18n } from '@/composables/useI18n.js';
+
+/**
+ * Component to render a image slider, based on the JS Library <a href="https://swiperjs.com/">Swiper</a>
+ */
 
 export default {
   name: 'BaseCarousel',
   components: {
-    BaseIcon,
+    BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseImageBox,
   },
   props: {
@@ -74,20 +32,70 @@ export default {
       default: () => ([]),
     },
     /**
-     * specify [swiper API options](https://swiperjs.com/swiper-api)
+     * By default, slides are grouped with a maximum of three elements per view, depending on screen resolution.
+     * If there are fewer than three elements, the single element takes up 50% of the space; otherwise, it takes up 33%.
+     * The default configuration with all settings can be found in the sample file code [BaseCarousel](BaseCarousel#demo).
+     *
+     * Otherwise, you can freely set all [swiper API options](https://swiperjs.com/swiper-api).
      */
     swiperOptions: {
       type: Object,
       default: () => ({}),
     },
     /**
-     * specify how the link element should be rendered -
-     * this needs to be a valid vue link component (e.g. `RouterLink`, `NuxtLink`) and `vue-router` is necessary
+     * specify how a link element should be rendered
+     * this needs to be a valid vue link component string (e.g. `'RouterLink'`) or a component directly
+     * and vue-router is necessary
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
      */
     renderLinkElementAs: {
-      type: String,
+      type: [String, Object],
       default: 'RouterLink',
     },
+    /**
+     * this prop gives the option to add assistive text for screen readers.
+     *
+     * properties:
+     * **gotoSlide**: describing a single pagination bullet
+     * **nextSlide**: describing the next button
+     * **prevSlide**: describing the previous button
+     * **roleDescription**: describing the role of outer swiper container
+     * **slide**: describing a single slide
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        gotoSlide: 'Go to slide',
+        nextSlide: 'Next slide',
+        prevSlide: 'Previous slide',
+        roleDescription: 'Carousel element with {total} items',
+        slide: 'Slide',
+      }),
+      validator: val => Object.keys(val).every(key => ['gotoSlide', 'nextSlide', 'prevSlide', 'roleDescription', 'slide'].includes(key)),
+    },
+  },
+  emits: ['initialized', 'clicked'],
+  setup() {
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
+    /** CHECK ROUTER AVAILABILITY */
+      // we need to access the current component instance
+      // to check for router
+    const { app } = getCurrentInstance().appContext;
+
+    /**
+     * check if vue router is available
+     * @type {ComputedRef<boolean>}
+     */
+    const isRouterAvailable = computed(() => !!app.config.globalProperties?.$router);
+    return {
+      getI18nTerm,
+      isRouterAvailable,
+    };
   },
   data() {
     return {
@@ -100,13 +108,18 @@ export default {
     boxSize() {
       return this.swiperIsActive ? { height: '400px' } : { 'min-height': '250px', 'max-height': '350px' };
     },
-    vueRouterAvailable() {
-      return !!this.$router;
-    },
   },
   watch: {
-    data() {
-      this.swiper.update();
+    items: {
+      handler() {
+        if (!this.swiperIsActive) return;
+        // the pagination and a11y doesn't update correctly, when items change,
+        // so destroy swiper but keep instance
+        this.swiper.destroy(false);
+        // reinit swiper
+        this.initSwiper();
+      },
+      deep: true,
     },
     swiperOptions: {
       handler(val) {
@@ -133,7 +146,6 @@ export default {
 
         // otherwise take first one
         if (!imageSrc.length) {
-          // eslint-disable-next-line
           imageSrc = Object.values(object[0])[0];
         }
       }
@@ -144,25 +156,81 @@ export default {
       // to avoid import/require issues in an SSR setup
       // we import swiper when the component is already mounted
       const { Swiper } = await import('swiper');
-      const { Autoplay } = await import('swiper');
-      const { Keyboard } = await import('swiper');
-      const { Navigation } = await import('swiper');
-      const { Pagination } = await import('swiper');
+      const { A11y } = await import('swiper/modules');
+      const { Autoplay } = await import('swiper/modules');
+      const { Keyboard } = await import('swiper/modules');
+      const { Navigation } = await import('swiper/modules');
+      const { Pagination } = await import('swiper/modules');
 
       this.swiperIsActive = true;
       this.swiperOptionsInt.init = false;
+
+      // default swiper options
+      const defaultSwiperOptions = {
+        keyboard: true,
+        rewind: true,
+        spaceBetween: 16,
+        speed: 750,
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+        breakpoints: {
+          640: {
+            slidesPerView: 2,
+            slidesPerGroup: 2,
+          },
+          1024: {
+            slidesPerView: this.items.length < 3 ? 2 : 3,
+            slidesPerGroup: this.items.length < 3 ? 2 : 3,
+          },
+        },
+      };
+
+      // if no swiper options are set externally, use the default ones
+      if (!Object.keys(this.swiperOptions).length) this.swiperOptionsInt = defaultSwiperOptions;
+
+      // add autoplay settings if needed
       if (this.swiperOptionsInt.autoplay) {
         this.swiperOptionsInt.autoplay = {};
         this.swiperOptionsInt.autoplay.delay = this.swiperOptionsInt.autoplayDelay || 3000;
         this.swiperOptionsInt.autoplay.disableOnInteraction = true;
       }
 
+      // enable accessibility settings
+      this.swiperOptionsInt.a11y = {
+        enabled: true,
+        containerMessage: '',
+        containerRole: 'region',
+        containerRoleDescriptionMessage: this.getI18nTerm(this.assistiveText.roleDescription).replace('{total}', this.items.length),
+        itemRoleDescriptionMessage: this.getI18nTerm(this.assistiveText.slide),
+        nextSlideMessage: this.getI18nTerm(this.assistiveText.nextSlide),
+        paginationBulletMessage: `${this.getI18nTerm(this.assistiveText.gotoSlide)} {{index}}`,
+        prevSlideMessage: this.getI18nTerm(this.assistiveText.prevSlide),
+        slideLabelMessage: '{{index}} / {{slidesLength}}',
+        // override with values from outside if defined
+        ...this.swiperOptions?.a11y,
+      }
+
+      // add classes for custom navigation elements
       this.swiperOptionsInt.navigation = {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
+        // override with values from outside if defined
+        ...this.swiperOptions?.navigation,
       };
-      this.swiperOptionsInt.modules = [Autoplay, Keyboard, Navigation, Pagination];
 
+      // define pagination elements
+      this.swiperOptionsInt.pagination = {
+        el: '.swiper-pagination',
+        clickable: true,
+        bulletElement: 'button',
+        // override with values from outside if defined
+        ...this.swiperOptions?.pagination,
+      };
+
+      // init swiper modules
+      this.swiperOptionsInt.modules = [A11y, Autoplay, Keyboard, Navigation, Pagination];
+
+      // init swiper
       setTimeout(() => {
         this.swiper = new Swiper('.swiper', this.swiperOptionsInt);
         this.swiper.init();
@@ -191,8 +259,54 @@ export default {
 };
 </script>
 
+<template>
+  <div>
+    <div
+      class="base-carousel swiper">
+      <div
+        class="swiper-wrapper">
+        <div
+          v-for="(item, index) in items"
+          v-show="swiperIsActive"
+          :key="index"
+          :class="['base-carousel-slide', { 'swiper-slide': swiperIsActive }]">
+          <BaseImageBox
+            :title="item.title"
+            :subtext="subtext(item.subtext)"
+            :description="item.description"
+            :additional="item.additional"
+            :image-url="getImageSrc(item.previews, items.length < 3 ? '768w' : '640w')"
+            :box-size="boxSize"
+            :lazyload="true"
+            :image-first="true"
+            :center-header="true"
+            :render-element-as="isRouterAvailable && item.href ? renderLinkElementAs : 'div'"
+            :link-to="isRouterAvailable && item.href ? item.href : ''"
+            style="margin-right: 0"
+            @clicked="boxClicked(item)" />
+        </div>
+      </div>
+
+      <div
+        v-if="items.length > 2"
+        class="swiper-pagination" />
+
+      <template
+        v-if="items.length > 1">
+        <BaseIcon
+          name="prev"
+          class="swiper-button swiper-button-prev" />
+
+        <BaseIcon
+          name="next"
+          class="swiper-button swiper-button-next" />
+      </template>
+    </div>
+  </div>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-carousel {
     max-width: 1400px;
@@ -244,14 +358,14 @@ export default {
 </style>
 
 <style lang="scss">
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   // import swiper styles
   @import '../../../node_modules/swiper/swiper.scss';
-  @import '../../../node_modules/swiper/modules/navigation/navigation.scss';
-  @import '../../../node_modules/swiper/modules/pagination/pagination.scss';
-  @import '../../../node_modules/swiper/modules/keyboard/keyboard.scss';
-  @import '../../../node_modules/swiper/modules/autoplay/autoplay.scss';
+  @import '../../../node_modules/swiper/modules/navigation.scss';
+  @import '../../../node_modules/swiper/modules/pagination.scss';
+  @import '../../../node_modules/swiper/modules/keyboard.scss';
+  @import '../../../node_modules/swiper/modules/autoplay.scss';
 
   .base-carousel {
     .base-image-box-image {

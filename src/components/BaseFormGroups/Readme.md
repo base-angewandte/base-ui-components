@@ -1,10 +1,8 @@
 ## Demo
 
-This component acts as a wrapper around [BaseForm](BaseForm), so the form fields can be grouped into visually distinct forms without this being reflected in the field information of the [OpenAPI]((https://www.openapis.org/)) definition by simply adding an `x-attrs` field `form_group` with an order number as value.
+This component acts as a wrapper around [BaseForm](BaseForm), so the form fields can be grouped into visually distinct forms without this being reflected in the field information of the [OpenAPI](https://www.openapis.org/) definition by simply adding an `x-attrs` field `form_group` with an order number as value.
 
 The events and slots (and mostly also props) of this component are identical to [BaseForm](BaseForm).
-
->Please note that this component should be rendered client side (important for SSR projects). So for example if you have a Nuxt project you will have to wrap the component in a `<client-only>` tag.
 
 Below is a basic example (the form input fields are not fully functional) to demonstrate the layout.
 
@@ -15,9 +13,9 @@ Below is a basic example (the form input fields are not fully functional) to dem
     <p>Current form values:</p>
     {{ valueList }}
     <BaseFormGroups
-      :value-list="valueList"
+      :model-value="valueList"
       :form-field-json="formFieldJSON"
-      @values-changed="handleInput" />
+      @update:model-value="handleInput" />
   </div>
 </template>
 

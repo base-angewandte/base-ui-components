@@ -1,5 +1,1181 @@
+<script>
+import { defineAsyncComponent, ref, useTemplateRef, watch } from 'vue';
+import { useI18n } from '@/composables/useI18n.js';
+import { extractNestedPropertyValue } from '@/utils/utils.js';
+import { useId } from '@/composables/useId.js';
+import { useWindowResize } from '@/composables/useWindowResize.js';
+import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
+
+/**
+ * A component to display rows of boxes with or without pagination
+ */
+export default {
+  name: 'BaseResultBoxSection',
+  components: {
+    BaseImageBox,
+    BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
+    BaseOptions: defineAsyncComponent(() => import('@/components/BaseOptions/BaseOptions.vue')),
+    BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue')),
+    BasePagination: defineAsyncComponent(() => import('@/components/BasePagination/BasePagination.vue')),
+    BaseBoxButton: defineAsyncComponent(() => import('@/components/BaseBoxButton/BaseBoxButton.vue')),
+    BaseSelectOptions: defineAsyncComponent(() => import('@/components/BaseSelectOptions/BaseSelectOptions.vue')),
+  },
+  props: {
+    /**
+     * actual entries list - if slot `result-box` is not used to use custom elements this
+     * object array should have the following properties to be displayed
+     * in a [BaseImageBox](BaseImageBox):
+     *
+     *    **id** `string` - a unique identifier
+     *    **title** `?string` - the title of the box
+     *    **subtext** `?string` - a subtitle
+     *    **description** `?string` - text displayed at the bottom of the box
+     *    **imageUrl** `?string` - url to display an image
+     *    **text** `?string[]` - an array with strings that will be
+     *    displayed if no image is provided
+     *
+     *    if a different schema is used please use the slot 'result-box' to create your own
+     *    elements - only id and title should still be provided but can also
+     *    be customized via `identifierPropertyName` and `titlePropertyName`
+     */
+    modelValue: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * if `false` the header row (title and options) will not be available
+     *   **Caveat**: for draggable functionality this needs to be true
+     */
+    showHeader: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * title of section
+     * it is recommended to also set the `headerText` even if slot `header` is used for header
+     * for accessibility reasons
+     */
+    headerText: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if options should be shown
+     */
+    showOptions: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * set text for the options button if `showOptions` is `true`
+     *   this needs to be an object with `show` (displayed when options are hidden)
+     *   and `hide` (displayed when options are visible) attributes
+     */
+    optionsButtonText: {
+      type: Object,
+      default: () => ({
+        show: 'edit',
+        hide: 'editReturn',
+      }),
+      validator: val => ['show', 'hide'].every(requiredProp => Object.keys(val).includes(requiredProp)),
+    },
+    /**
+     * set the icon for the options button.
+     * if `showOptions` is `true` this needs to be an object with `show`
+     *  (displayed when options are hidden) and `hide` (displayed when
+     *  options are visible) attributes
+     */
+    optionsButtonIcon: {
+      type: Object,
+      default: () => ({
+        show: 'edit',
+        hide: 'remove',
+      }),
+      validator: val => ['show', 'hide'].every(requiredProp => Object.keys(val).includes(requiredProp)),
+    },
+    /**
+     * specify how many boxes should be displayed in a row in an array
+     * with "tupples" (array with min-size and number of boxes).
+     * depending on the size of the container (not screen width - unless
+     * `calcBoxNumberRelativeToWindow` is set to `true`)
+     * like the following:
+     *   `[[0, [number of boxes]], [[min px size for this number of boxes], [number of boxes]], ...]`
+     */
+    boxBreakpoints: {
+      type: Array,
+      default: () => ([
+        [0, 2],
+        [640, 4],
+        [1024, 6],
+      ]),
+      validator: val => val
+        .every(point => typeof point === 'object' && point.length === 2
+          && point.every(pointValue => typeof pointValue === 'number')),
+    },
+    /**
+     * set component loader active
+     */
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * flag if component should be in edit mode (dragging, deleting,
+     * other custom options visible)
+     *   the v-model directive may be used on this prop
+     */
+    editMode: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set this variable `true` if `background-color` should be white in edit mode
+     */
+    editModeWhiteBackground: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * provide a list of selected entries for select options (can
+     * be entry objects or entry ids).
+     *  the v-model directive may be used on this prop
+
+     */
+    selectedList: {
+      type: Array,
+      default: () => [],
+    },
+    /**
+     * set a text for '[x] entries selected' and 'select all / none'
+     */
+    selectOptionsText: {
+      type: Object,
+      default: () => ({
+        selectAll: 'select all',
+        selectNone: 'select none',
+        entriesSelected: 'entries selected',
+      }),
+    },
+    /**
+     * if slot `options-message-area` is not used this variable
+     * can be used to customize message text.
+     *   this should be a string or an object with the actions needed (default: `delete`,
+     *   if `draggable` is `true` than also a `drag` property with suiting text is needed).
+     *     in case of a string the same text is used for all actions
+     */
+    messageText: {
+      type: String,
+      default: 'Drag or Select',
+    },
+    /**
+     * if slot `options-message-area` is not used this variable
+     * can be used to customize message subtext.
+     *   this should be a string or an object with the actions needed (default: `delete`,
+     *   if `draggable` is `true` than also a `drag` property with suiting text is needed).
+     *     in case of a string the same text is used for all actions
+     */
+    messageSubtext: {
+      type: String,
+      default: 'Drag\'n Drop to reorder or select the relevant items and choose an action',
+    },
+    /**
+     * determine if boxes can be dragged
+     *   (only applicable if `showHeader` and `showOptions` is set to `true`)
+     */
+    draggable: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set `true` if pagination should be used
+     */
+    usePagination: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `usePagination` is set `true` this will determine the number of
+     * rows shown on one page
+     *   (only applicable if `usePagination` is set `true`)
+     */
+    maxRows: {
+      type: Number,
+      default: 5,
+    },
+    /**
+     * set this `true` if only a limited number of boxes should be shown
+     * and rest can be displayed by clicking a "show more" button
+     */
+    useExpandMode: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * if `useExpandMode` is `true` set the state of 'show more' from outside
+     *   the v-model directive may be used on this prop
+     */
+    expanded: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Provide text that should be shown within the button with the
+     * expand / collapse functionality.
+     *   should be an object with props `expand` for text to expand
+     *   and `collapse` for text to collapse
+     */
+    expandText: {
+      type: Object,
+      default: () => ({
+        expand: 'more objects',
+        collapse: 'collapse',
+      }),
+    },
+    /**
+     * add a number of total elements (needed for `useExpandMode` and
+     * `usePagination`)
+     */
+    total: {
+      type: Number,
+      default: null,
+    },
+    /**
+     * set the current page number from outside if `usePagination` is `true`.
+     *   the v-model directive may be used on this prop
+     */
+    currentPageNumber: {
+      type: Number,
+      default: 1,
+    },
+    /**
+     * how many rows should be shown with show more button (expandMode)
+     *   (only applicable with `useExpandMode true`)
+     */
+    maxShowMoreRows: {
+      type: Number,
+      default: 1,
+    },
+    /**
+     * define if the section should scroll to top on page change
+     *   (only applicable with `usePagination true`)
+     */
+    jumpToTop: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * define if the big button box at the end of all attached items should be shown
+     */
+    showActionButtonBoxes: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * set some config for each action used - needs to be an array of objects with the
+     *  following properties:
+     *
+     *   **text** `string` - the text displayed in the button
+     *   **icon** `string` - the icon name to display
+     *    (for available icons see [BaseIcon](BaseIcon) )
+     *   **value** `string` - the value emitted on button click
+     *   **[display='all']** `?string` - define where the action should be displayed:
+     *     *top*: only in top row
+     *     *bottom*: only in action button box at bottom of list
+     *     *all*: on top as well as bottom
+     *   **disabled** `?boolean` - disable button
+     */
+    actionButtonsConfig: {
+      type: Array,
+      default: () => [{
+        text: 'delete',
+        icon: 'waste-bin',
+        value: 'delete',
+        display: 'all',
+        disabled: false,
+      }],
+      validator: val => val.every((action) => {
+        const requiredProps = ['text', 'icon', 'value'];
+        const actionProps = Object.keys(action);
+        return requiredProps.every(prop => actionProps.includes(prop))
+          && (['all', 'top', 'bottom'].includes(action.display) || !action.display);
+      }),
+    },
+    /**
+     * define a custom identifier property name for objects in your
+     * `modelValue` array.
+     *   if relevant property is contained in a nested object the string can
+     *   be in dot notation. e.g. `nestedObject.id`
+     */
+    identifierPropertyName: {
+      type: String,
+      default: 'id',
+    },
+    /**
+     * define a custom title property name for objects in your
+     * `modelValue` array.
+     *   if relevant property is contained in a nested object the string can
+     *   be in dot notation. e.g. `nestedObject.title`
+     */
+    titlePropertyName: {
+      type: String,
+      default: 'title',
+    },
+    /**
+     * specify if pagination elements should be a link element - if pagination element should
+     * be a link element - please specify the kind of element either as a string (e.g. `'RouterLink'`
+     * or pass the component directly (currently only Vue components (e.g.
+     * [`RouterLink`](https://router.vuejs.org/guide/#router-link),
+     * [`NuxtLink`](https://nuxtjs.org/docs/features/nuxt-components/#the-nuxtlink-component)) are supported)
+     *
+     * **caveat**: if you are using Nuxt the string `'NuxtLink'` is not enough,
+     *  but you need to import the component as `import { NuxtLink } from '#components';`
+     *  and pass the component to the prop!
+     */
+    usePaginationLinkElement: {
+      type: [String, Boolean, Object],
+      default: false,
+      validator: val => (typeof val === 'boolean' && !val)
+        || (typeof val === 'string' && val)
+        || (typeof val === 'object' && val.name && ['NuxtLink', 'RouterLink'].includes(val.name)),
+    },
+    /**
+     * set this variable `true` if pagination is used and data fetching is done per page
+     */
+    fetchDataExternally: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * specify an additional number of px for the position the page
+     * should jump to on page change
+     */
+    scrollToOffset: {
+      type: Number,
+      default: 0,
+    },
+    /**
+     * specify an initial number of items per row that should be assumed before
+     * rendering the page
+     */
+    // this is necessary because otherwise in SSR serverside and client side DOM tree
+    // might not match
+    initialItemsPerRow: {
+      type: Number,
+      default: 6,
+    },
+    /**
+     * add text for screen reader users that helps them navigate list and use edit mode
+     * functionalities.
+     * object should have the following properties:
+     *
+     *   **description**: Text read on edit mode activation
+     *   **activated**: Text read after item was activated for reordering
+     *    (selected by enter key)
+     *    property moved can contain variable `{pos}` which will be filled with current
+     *    position
+     *   **moved**: Text read after item was moved
+     *    property moved can contain variables `{pos}` (new position) and `{total}` (total number
+     *    of list items)
+     */
+    assistiveText: {
+      type: Object,
+      default: () => ({
+        description: 'Select items via space bar to carry out actions or use enter '
+          + 'key to select an item for reordering. Use Tab key to navigate between items.',
+        activated: 'Item at position {pos} selected for reordering. Use arrow keys to order item.',
+        moved: 'Item moved to position {pos} of {total}',
+        loaderActive: 'loading.',
+      }),
+    },
+    /**
+     * this prop gives the option to add assistive text for the pagination:
+     *
+     *   **currentPage**: aria-label for the current page
+     *   **nextPage**: aria-label for the next page
+     *   **pagination**: aria-label for the pagination element description
+     *   **previousPage**: aria-label for the previous page
+     *   **toPage**: aria-label for all page buttons except the current one
+     *
+     * The values of this object might be plain text or a key for an i18n file
+     */
+    paginationAssistiveText: {
+      type: Object,
+      default: () => ({
+        currentPage: 'Current Page, Page',
+        nextPage: 'Go to next page',
+        pagination: 'Pagination',
+        previousPage: 'Go to previous page',
+        toPage: 'Go to page',
+      }),
+    },
+    /**
+     * `BaseResultBoxSection` is for example used to display search results - which contain a link
+     * to the entry - in this case the focus should be on the link element so that navigation to
+     * route link triggers on enter and focus on the list element itself is disabled (if not edit
+     * mode!)
+     */
+    disableListElementFocus: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['entry-clicked', 'items-per-row-changed', 'submit-action', 'update:edit-mode', 'update:expanded', 'update:current-page-number', 'update:selected-list', 'update:model-value'],
+  setup(props, { emit }) {
+    /** INTERNAL ID HANDLING */
+      // unique persistent id to assign javascript calculated styles to
+    const elementId = useId();
+
+    /** BOX DISPLAY FUNCTIONALITIES */
+    /**
+     * a template reference to the root element to be able to add the css variable
+     * for items per row
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const resultBoxSection = useTemplateRef('resultBoxSectionElement');
+    /**
+     * template reference to the boxes container (needed for calculating avaiable space
+     * for boxes)
+     * @type {Readonly<ShallowRef<unknown | null>>}
+     */
+    const resultBoxesArea = useTemplateRef('resultBoxesAreaElement');
+    // how many items do fit in one row
+    const itemsPerRow = ref(props.initialItemsPerRow);
+    // try to only do initial box size calculation once
+    const initialBoxCalcDone = ref(false);
+
+    // recalc box number on window resize
+    useWindowResize({
+      target: 'resultboxsection',
+      callback: calcBoxNumber,
+      setDebounce: 300,
+    })
+
+    /**
+     * calculate the box number according to available space and breaking points set
+     */
+    function calcBoxNumber() {
+      // get the result boxes parent - in case of draggable active this is a vue component
+      // and $el needs to be addressed - otherwise native HTML element can be used directly
+      const resultBoxesElement = resultBoxesArea.value && resultBoxesArea.value.$el
+        ? resultBoxesArea.value.$el : resultBoxesArea.value;
+      // if such an element was found and element has children (= boxes are rendered)
+      if (resultBoxesElement) {
+        // get the element width
+        const totalWidth = resultBoxesElement.clientWidth;
+        // create a copy of the prop to avoid direct prop mutation
+        const boxBreakpointsCopy = [...props.boxBreakpoints];
+        // calculate how many items should be displayed according to
+        // breakpoints set
+        itemsPerRow.value = boxBreakpointsCopy
+          // then also sorting should not be necessary anymore (maybe keep to
+          // be on the save side?
+          .sort((a, b) => a[0] > b[0])
+          // get the correct box number
+          .reduce((prev, [size, number]) => {
+            if (totalWidth > size) {
+              return number;
+            }
+            return prev;
+          }, 0);
+        // set the styles
+        // set a css variable that is responsible for the number of items
+        resultBoxSection.value.style.setProperty('--items-per-row', itemsPerRow.value);
+        // set the correct margins for the boxes
+        const nodeId = `base-result-box-section__box-style-${elementId}`;
+        let style = document.getElementById(nodeId);
+        // check if element already exists to only create it once
+        if (!style) {
+          // if not - create the style element
+          style = document.createElement('style');
+          // set an id
+          style.id = nodeId;
+          // append the style element
+          resultBoxSection.value.appendChild(style);
+        }
+        // set the actually css in the style element
+        style.innerHTML = `
+          .base-result-box-section__box-item-${elementId}:nth-child(n + ${itemsPerRow.value + 1}) {
+            margin-top: var(--spacing-regular);
+          }
+          .base-result-box-section__box-item-${elementId}:not(:nth-child(${itemsPerRow.value}n)) {
+            margin-right: var(--spacing-regular);
+          }`;
+        initialBoxCalcDone.value = true;
+      }
+    }
+
+    /**
+     * calc the number of boxes that fits the space as soon as the container
+     * has been rendered
+     * (we can not use the useWindowResize callOnMounted since this is just considering
+     * window not the component)
+     */
+    watch(resultBoxesArea, (value) => {
+      // as soon as area is rendered and variable received a value calc
+      // how much space per box is available
+      if (value) {
+        calcBoxNumber();
+      }
+    }, { once: true });
+
+    // in order to only trigger event when value has really changed create a watcher
+    watch(itemsPerRow, (val, oldVal) => {
+      if (val !== oldVal) {
+        /**
+         * communicate to parent when items per row changed, either after initial
+         * render space calculations or when window was resized
+         * @event items-per-row-changed
+         * @param {number} - the new number of items that fit in a row
+         */
+        emit('items-per-row-changed', itemsPerRow.value);
+      }
+    });
+
+    /** INTERNATIONALIZATION */
+    const { getI18nTerm } = useI18n();
+
+    return {
+      // internal id
+      elementId,
+      // box rendering
+      resultBoxesArea,
+      resultBoxSection,
+      itemsPerRow,
+      initialBoxCalcDone,
+      // i18n
+      getI18nTerm,
+      calcBoxNumber,
+    };
+  },
+  data() {
+    return {
+      // internal representation of entry list to be able to
+      // modify list via draggable
+      entryListInt: [],
+      // flag for edit mode activated
+      editModeActive: false,
+      // current page number
+      currentPageNumberInt: 1,
+      // store the expand state internally
+      expandedInt: false,
+      // store collapsed state on action start
+      wasExpanded: false,
+      // to manipulate selectedList internally
+      selectedListInt: [],
+      imageBoxesSelectable: false,
+      // store state if component is mounted and window is present
+      initialized: false,
+      /**
+       * variable for keyboard sorting - is element currently selected for moving
+       * @type {?string}
+       */
+      movableElementId: null,
+      /**
+       * add assistive text especially to ease use of drag mode accessibly
+       * @type {string}
+       */
+      currentAssistiveText: '',
+      /**
+       * control pagination display with this variable and only render after
+       *  entryListInt was initialized from outside
+       *  @type {boolean}
+       */
+      showPagination: false,
+    };
+  },
+  computed: {
+    /**
+     * to lazy load vuedraggable only if draggable mode is set true
+     *
+     * @returns {string|ComponentPublicInstanceConstructor}
+     */
+    draggableComponent() {
+      if (this.draggable) {
+        return defineAsyncComponent(() => import('vue-draggable-plus').then(m => m.VueDraggable));
+      }
+      return 'ul';
+    },
+    /**
+     * get the entries that should be displayed in the section -
+     * taking into consideration pagination and 'show more' functionality
+     * @returns {Object[]}
+     */
+    visibleBoxes() {
+      if (this.editModeActive && (this.draggable || !this.usePagination)) {
+        return [...this.entryListInt];
+      }
+      // if expand mode is used and status is collapsed and there
+      // are more items than can be displayed in the rows specified by 'show more'
+      // slice first few
+      if (!this.editModeActive && this.useExpandMode && !this.expandedInt && this.expandNeeded) {
+        // slice from 0 to number of rows * items per row - 1 so that the button
+        // take the last box
+        return this.entryListInt.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
+      }
+      // else if pagination is active and items are not fetched from outside
+      // slice items fitting one page
+      if (this.usePagination && !this.fetchDataExternally) {
+        // slice taking into account current pagination and the total number of
+        // visible items
+        return this.entryListInt
+          .slice(
+            (this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
+            this.currentPageNumberInt * this.visibleNumberOfItems,
+          );
+      }
+      if (this.fetchDataExternally) {
+        return this.modelValue.slice(0, this.visibleNumberOfItems);
+      }
+      // else return complete list
+      return this.entryListInt;
+    },
+    /**
+     * in order to only set model-value when the VueDraggable component
+     * is rendered (and not for the <li> element) add a separate computed
+     * variable
+     */
+    draggableBoxes: {
+      get() {
+        // if boxes are not draggable do not set the attribute
+        if (!this.draggable) return undefined;
+        // else return the boxes computed in visibleBoxes
+        return this.visibleBoxes;
+      },
+      // since boxes are only changed by draggable have set here now instead
+      // of in visibleBoxes
+      set(val) {
+        this.entryListInt = [...val];
+      }
+    },
+    /** PAGINATION AND EXPAND MODE */
+    /**
+     * the number of items that should be visible on one page
+     * (if pagination is active)
+     * @returns {number}
+     */
+    visibleNumberOfItems() {
+      const availableSpaces = this.itemsPerRow * this.maxRows;
+      if (this.editModeActive && this.showActionButtonBoxes) {
+        return availableSpaces - this.actionButtonsConfig.length;
+      }
+      if (!this.editModeActive && this.useExpandMode) {
+        // subtract 1 for the Expand Box Button or Action Button
+        return availableSpaces - 1;
+      }
+      return availableSpaces;
+    },
+    /**
+     * number of pages (if pagination is active)
+     * @returns {?number}
+     */
+    pages() {
+      if (!this.initialBoxCalcDone) return null;
+      return (this.total || this.entryListInt.length) && this.visibleNumberOfItems >= 0
+        ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
+    },
+    /**
+     * determines if the total number of entries exceeds the number of entries that
+     * can be displayed and thus if an expand button is needed
+     */
+    expandNeeded() {
+      return (this.itemsPerRow * this.maxShowMoreRows) < this.modelValue.length;
+    },
+  },
+  watch: {
+    modelValue: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.entryListInt)) {
+          this.entryListInt = [...val];
+          // check if showPagination was already set true otherwise do it after
+          // entryListInt was set for the first time
+          if (!this.showPagination) {
+            // make sure this is one last (and boxes are already rendered)
+            setTimeout(() => {
+              this.showPagination = true;
+            }, 0);
+          }
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
+    entryListInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.modelValue)) {
+          /**
+           * event emitted when the list of entries changed internally
+           * (relevant if `draggable` is set `true`)
+           *
+           * @event update:model-value
+           * @param {Object[]} - the updated list of entries
+           */
+          this.$emit('update:model-value', val);
+        }
+      },
+      deep: true,
+    },
+    // watch selectedList prop and assign to internal value if changes occur
+    selectedList: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
+          this.selectedListInt = JSON.parse(JSON.stringify(val));
+        }
+      },
+      immediate: true,
+    },
+    // watch selectedList prop and assign to internal value if changes occur
+    selectedListInt: {
+      handler(val) {
+        if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
+          /**
+           * inform the parent of the changes in `selectedList` and provide
+           * the ids of all selected.
+           *   the v-model directive may be used on the corresponding prop
+           *
+           * @event update:selected-list
+           * @param {Array} - the list of selected entry ids
+           */
+          this.$emit('update:selected-list', val);
+        }
+      },
+      deep: true,
+    },
+    // watch pages in case of deletion of items and take care
+    // current page is not higher than total page number
+    pages: {
+      handler(val) {
+        if (this.currentPageNumberInt > val) {
+          // if the current page number exceeds the total number of pages
+          // set the value to the last existing page
+          this.currentPageNumberInt = val;
+        }
+      },
+      immediate: true,
+    },
+    // update internal page number if changed from outside
+    currentPageNumber: {
+      handler(val) {
+        if (val && val !== this.currentPageNumberInt) {
+          // check if number is larger than max number of pages currently available and
+          // set to max possible value if yes instead
+          // TODO: changed this to internal handling for now because it makes problems with
+          // externally provided data but maybe it would make sense to get rid of it all together
+          this.currentPageNumberInt = this.pages && val > this.pages && !this.fetchDataExternally
+            ? this.pages : val;
+        }
+      },
+      immediate: true,
+    },
+    /**
+     * watch internal page number to inform parent about changes
+     * @param {number} val
+     */
+    currentPageNumberInt: {
+      handler(val) {
+        if (val !== this.currentPageNumber) {
+          /** emitted when pagination is used and page number was changed
+           *
+           * @event update:current-page-number
+           * @param {number} - the new page number
+           */
+          this.$emit('update:current-page-number', this.currentPageNumberInt);
+        }
+      },
+      immediate: true,
+    },
+    // if expanded variable is set from outside change
+    // internal variable accordingly
+    expanded: {
+      handler(val) {
+        if (val !== this.expandedInt) {
+          this.expandedInt = val;
+        }
+      },
+      immediate: true,
+    },
+    // if internal value changes, reset page number and inform parent
+    expandedInt(val) {
+      // reset current page number on collapse
+      if (!val) {
+        this.currentPageNumberInt = 1;
+      }
+      // inform parent of internal change
+      if (val !== this.expanded) {
+        /**
+         * event emitted on expand toggle.
+         *   the v-model directive may be used on the corresponding prop
+         * @event update:expanded
+         * @param { Boolean } - true if list is expanded
+         */
+        this.$emit('update:expanded', val);
+      }
+    },
+    editModeActive(val) {
+      // have setting true of selectable delayed for animation
+      setTimeout(() => {
+        this.imageBoxesSelectable = val;
+      }, 50);
+      setTimeout(() => {
+        if (val) {
+          this.$nextTick(() => {
+            if (this.$refs.resultBoxItemElement && this.$refs.resultBoxItemElement.length) {
+              this.$refs.resultBoxItemElement.forEach((element) => {
+                const inputElement = element.getElementsByTagName('input');
+                if (inputElement?.length) {
+                  inputElement[0].setAttribute('tabindex', '-1');
+                }
+              });
+              // it appears refs are not reactive and do not reflect reordering so we need
+              // to look for the actual current first element in the visibleBoxes array
+              const firstElement = this.$refs.resultBoxItemElement
+                .find(element => element.id.includes(this.visibleBoxes[0].id));
+              firstElement.focus({ preventScroll: true });
+            }
+          });
+        }
+      }, 500);
+      if (val) {
+        this.currentAssistiveText = this.assistiveText.description;
+      } else {
+        this.movableElementId = null;
+        this.currentAssistiveText = '';
+      }
+      if (val !== this.editMode) {
+        /**
+         * emitted on edit mode toggle (options toggle).
+         *   the v-model directive may be used on the corresponding prop
+         *
+         * @event update:edit-mode
+         * @param {Boolean} - flag for edit mode active
+         */
+        this.$emit('update:edit-mode', val);
+      }
+
+      // add listener to esc key event (toggle edit mode)
+      if (!this.initialized) return;
+      if (val) {
+        window.addEventListener('keyup', this.escEventHandler);
+      } else {
+        window.removeEventListener('keyup', this.escEventHandler);
+      }
+    },
+    editMode: {
+      handler(val) {
+        if (val !== this.editModeActive) {
+          this.editModeActive = val && this.showOptions && this.showHeader;
+        }
+      },
+      immediate: true,
+    },
+    showOptions(val) {
+      if (!val) {
+        this.editModeActive = false;
+      }
+    },
+    showHeader(val) {
+      if (!val) {
+        this.editModeActive = false;
+      }
+    },
+  },
+  created() {
+    if (!this.useExpandMode) {
+      this.expandedInt = true;
+    }
+    // since prop `editMode` watcher does not have immediate flag set the
+    // internal variables in sync here and also already set `imageBoxesSelectable`
+    // since this is giving a hydration error with nuxt otherwise
+    this.editModeActive = this.editMode;
+    if (this.editModeActive) {
+      this.imageBoxesSelectable = true;
+    }
+  },
+  mounted() {
+    /**
+     * Calculate the number of boxes that fit in the space.
+     * Do this during mounting to ensure that page transitions work correctly in Nuxt.
+     * Note: a watcher in setup() is currently triggered before the component is mounted
+     */
+    this.calcBoxNumber();
+    /**
+     * component is initialized and ready
+     */
+    this.initialized = true;
+  },
+  methods: {
+    dragStart(event) {
+      this.movableElementId = event.data?.id;
+      const className = 'grabbing';
+      const html = document.getElementsByTagName('html').item(0);
+      if (html && new RegExp(className).test(html.className) === false) {
+        html.className += ' ' + className; // use a space in case there are other classNames
+      }
+    },
+    dragEnd() {
+      // due to an click event being fired on Firefox on dragend (mouseup) we need
+      // to move the resetting of the movableElementId to the very end of the queue
+      // so when the click event comes i can check for an ongoing drag event (see below)
+      setTimeout(() => {
+        this.movableElementId = null;
+      }, 0)
+      const className = 'grabbing';
+      const html = document.getElementsByTagName('html').item(0);
+      if (html && new RegExp(className).test(html.className) === true) {
+        // Remove className with the added space (from setClassToHTMLElement)
+        html.className = html.className.replace(
+          new RegExp(' ' + className),
+          ''
+        );
+        // Remove className without added space (just in case)
+        html.className = html.className.replace(new RegExp(className), '');
+      }
+    },
+    /**
+     * in Firefox a click event is triggered on dragend (mouseup) with vue-draggable
+     * which causes the box to get selected/unselected after dragging - to stop this
+     * we need to check here if drag is ongoing (=movableElementId is still set) and
+     * stop event propagation if yes
+     * @param {MouseEvent} event
+     */
+    onBoxClick(event) {
+      if (this.movableElementId) {
+        event.stopPropagation();
+      }
+    },
+    /** EDIT MODE FUNCTIONALITIES */
+    /**
+     * toggling of options when options are behind a 'options' button
+     *
+     * @param {Boolean} actionsVisible true for open, false for close
+     */
+    optionsToggle(actionsVisible) {
+      this.editModeActive = actionsVisible;
+      if (!actionsVisible) {
+        // on close return to original collapsed state
+        this.expandedInt = this.wasExpanded;
+        // clear selected boxes
+        this.selectedListInt = [];
+        // on open - store the original collapsed state
+      } else {
+        this.wasExpanded = this.expandedInt;
+      }
+    },
+    /**
+     * function triggered when selecteAll was clicked in select mode
+     *
+     * @param {boolean} selectAll - true if everything was selected,
+     * false if everything was deselected
+     */
+    selectAllTriggered(selectAll) {
+      if (selectAll) {
+        // select all entries that are currently visible
+        // deduplicate by creating Set and converting back to array
+        this.selectedListInt = [...new Set([...this.selectedListInt,
+          ...this.visibleBoxes.map(entry => this
+            .getPropValue(this.identifierPropertyName, entry))])];
+      } else {
+        const visibleEntryIds = this.visibleBoxes
+          .map(visibleEntry => this.getPropValue(this.identifierPropertyName, visibleEntry));
+        this.selectedListInt = this.selectedListInt
+          .filter(entry => !visibleEntryIds
+            .includes(this.getPropValue(this.identifierPropertyName, entry) || entry));
+      }
+    },
+    /**
+     * triggered when an entry is selected or is clicked upon
+     *
+     * @param {string} entryId - the entry id of the selected entry
+     * @param {boolean} [selected=undefined] - not provided and thus undefined
+     * if entry was clicked
+     */
+    entrySelected(entryId, selected) {
+      // if entry was selected in edit mode and list does not contain entry
+      // already - add it to the list
+      if (selected && !this.selectedListInt.includes(entryId)) {
+        this.selectedListInt.push(entryId);
+      } else if (!selected) {
+        this.selectedListInt = this.selectedListInt.filter(boxId => boxId !== entryId);
+      }
+    },
+    /**
+     * function to calc if image box is currently selected
+     *
+     * @param {Object} entry - the entry in question
+     * @returns {Boolean}
+     */
+    isEntrySelected(entry) {
+      return this.selectedListInt
+        .map(selectedEntry => this.getPropValue(this.identifierPropertyName, selectedEntry)
+          || selectedEntry).includes(this.getPropValue(this.identifierPropertyName, entry));
+    },
+    /**
+     * function triggered when user has
+     * clicked action button to go through with the action
+     */
+    submitAction(action) {
+      /**
+       * event triggered when an action is triggered (after selecting boxes)
+       *
+       * @event submit-action
+       * @param {string} - the action type
+       */
+      this.$emit('submit-action', action);
+    },
+    /**
+     * intercept escape key event and reset edit mode
+     */
+    escEventHandler(e) {
+      if (e.key === 'Escape') {
+        // first use escape key to leave drag mode
+        if (this.movableElementId) {
+          this.cancelDragMode();
+          // else use it to leave edit mode
+        } else {
+          this.editModeActive = false;
+          this.currentAssistiveText = '';
+        }
+      }
+    },
+    /**
+     * event handler on keydown 'Enter'
+     * @param {KeyboardEvent} event - the keydown event
+     * @param {Object} entry - the entry the event was triggered on
+     * @param {number} index - the index of the entry in the visibleBoxes array
+     */
+    onEnterKey(event, entry, index) {
+      if (this.editModeActive && this.draggable) {
+        event.preventDefault();
+        // check if movableElementId is null
+        if (!this.movableElementId) {
+          // if yes activate drag mode by assigning the entry id as movableElementId
+          this.movableElementId = entry.id;
+          // add assistive text for the screen reader
+          this.currentAssistiveText = this.assistiveText.activated
+            .replace('{pos}', (index + 1).toString());
+        } else {
+          // if drag mode was active before - cancel it
+          this.cancelDragMode();
+        }
+      } else {
+        this.entryClicked(this.getPropValue(this.identifierPropertyName, entry));
+      }
+    },
+    /**
+     * event handler on keydown with arrow keys
+     * @param {KeyboardEvent} event - the keydown event
+     * @param {number} index - the index of the entry on which the event was triggered
+     *  in the draggableBoxes array
+     */
+    moveEntry(event, index) {
+      // reset assistive text
+      this.currentAssistiveText = '';
+      // get key that was pressed
+      const { key } = event;
+      // determine if element should be moved up or down in the list
+      const shiftDown = ['ArrowRight', 'ArrowDown'].includes(key);
+      // get the corresponding number to add to the array index
+      const shiftIndex = shiftDown ? 1 : -1;
+      // get new Index
+      const newIndex = index + shiftIndex;
+      // check if move is possible or if item is first or last respectively already
+      if (this.isWithinArrayLimit(this.draggableBoxes, shiftDown, newIndex)) {
+        // assign box list to variable so the set() of draggableBoxes is actually triggered
+        // when it is assigned again later on (doing it directly on draggableBoxes or entryListInt
+        // has no effect)
+        const newArray = this.draggableBoxes;
+        // do swapping with array destructuring
+        [newArray[index], newArray[newIndex]] = [newArray[newIndex], newArray[index]];
+        // assign it again to draggableBoxes variable
+        this.draggableBoxes = newArray;
+        // next tick so there is time to repaint and get new order
+        this.$nextTick(() => {
+          // get all box elements
+          const movedElement = document.getElementById(`li-${this.movableElementId}`);
+          // element is loosing focus in the process of swapping so refocus here
+          movedElement.focus();
+        });
+        // add matching assistive text informing the user of the move and the new position
+        this.currentAssistiveText = this.assistiveText.moved
+          .replace('{pos}', newIndex + 1)
+          .replace('{total}', this.draggableBoxes.length);
+      }
+    },
+    /**
+     * reset drag related variable and assistive text
+     */
+    cancelDragMode() {
+      this.movableElementId = null;
+      this.currentAssistiveText = '';
+    },
+
+    /** PAGINATION */
+    /**
+     * function triggered when page in pagination component is selected
+     *
+     * @param {number} number - the selected page number
+     */
+    setPage(number) {
+      // set internal page number - this will also trigger an event to parent
+      this.currentPageNumberInt = number;
+      // if variable is set true jump to top of element
+      if (this.jumpToTop) {
+        window.scrollTo(0, this.$el.offsetTop - this.scrollToOffset);
+      }
+    },
+
+    /** GENERAL FUNCTIONALITIES */
+    /**
+     * triggered when an entry is clicked upon (edit mode not acive)
+     *
+     * @param {string} entryId - the entry id of the selected entry
+     */
+    entryClicked(entryId) {
+      /**
+       * event emitted from default image box when clicked
+       * @event entry-clicked
+       * @property {string} entryId - the id of the clicked entry
+       * the select mode was not active but the box was clicked
+       */
+      this.$emit('entry-clicked', { entryId });
+    },
+    /**
+     * get an internationalized string
+     *
+     * @param {string|Object} localizationArguments - string or object to look
+     * up in localization files
+     *   if it is an object it should have the following properties:
+     * @property {string} string - string to look up in a Locale messages file
+     * @property {number} count - for pluralization
+     * @property {Object} variables - locale string variables object
+     * @returns {string}
+     */
+    getI18nString(localizationArguments) {
+      // check if a string was provided
+      if (typeof localizationArguments === 'string') {
+        return this.getI18nTerm(localizationArguments);
+      }
+      // if not - assume an object with the relevant properties
+      const { string, count, variables } = { ...localizationArguments };
+      return this.getI18nTerm(string, count, variables);
+    },
+    /**
+     * to get a nested object property value from a string in dot notation
+     *
+     * @param {string} string - the nested object property path in dot notation
+     * @param {Object} object - the object from which the property value should be extracted
+     * @returns {*}
+     */
+    getPropValue(string, object) {
+      return extractNestedPropertyValue(string, object);
+    },
+  },
+};
+</script>
+
 <template>
-  <div class="base-result-box-section">
+  <div
+    ref="resultBoxSectionElement"
+    class="base-result-box-section">
     <!-- LOADER -->
     <div
       v-if="isLoading"
@@ -115,26 +1291,32 @@
         <template v-if="entryListInt.length">
           <component
             :is="draggableComponent"
-            ref="resultBoxesArea"
-            v-model="visibleBoxes"
-            :animation="draggable ? 150 : false"
-            :tag="draggable ? 'ul' : false"
-            :draggable="editModeActive ? '.base-result-box-section__result-box-item' : false"
+            ref="resultBoxesAreaElement"
+            :model-value="draggableBoxes"
+            :animation="draggable ? 150 : undefined"
+            :tag="draggable ? 'ul' : undefined"
+            :disabled="draggable ? !editModeActive : undefined"
+            :draggable="editModeActive ? '.base-result-box-section__result-box-item' : undefined"
             :aria-label="headerText"
-            tabindex="0"
-            handle=".base-result-box-section__result-box-item__draggable .base-image-box"
-            force-fallback="true"
-            role="list"
-            class="base-result-box-section__boxes-container">
+            :handle="draggable ? '.base-result-box-section__result-box-item__draggable .base-image-box' : undefined"
+            :force-fallback="draggable ? true : undefined"
+            :role="draggable ? 'list' : undefined"
+            class="base-result-box-section__boxes-container"
+            @start="dragStart"
+            @end="dragEnd"
+            @click.capture="onBoxClick"
+            @update:model-value="draggableBoxes = $event">
+            <!-- element NEEDS to be a listitem element since parent is <ul> -->
+            <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
             <li
               v-for="(entry, index) of visibleBoxes"
               :id="`li-${entry.id}`"
               :key="getPropValue(identifierPropertyName, entry)"
-              ref="resultBoxItem"
+              ref="resultBoxItemElement"
               :tabindex="editModeActive || !disableListElementFocus ? 0 : -1"
               :aria-label="getPropValue(titlePropertyName, entry)"
-              :aria-grabbed="(movableElementId === entry.id).toString()"
-              :aria-selected="editModeActive ? (isEntrySelected(entry)).toString() : false"
+              :aria-grabbed="movableElementId === entry.id"
+              :aria-selected="editModeActive ? isEntrySelected(entry) : undefined"
               :class="['base-result-box-section__box-item',
                        'base-result-box-section__result-box-item',
                        { 'base-result-box-section__box-item__hidden': !initialBoxCalcDone },
@@ -145,7 +1327,7 @@
                        },
                        {
                          'base-result-box-section__result-box-item__dragging':
-                           movableElementId === entry.id,
+                           movableElementId === entry[identifierPropertyName],
                        }]"
               @keydown.enter="onEnterKey($event, entry, index)"
               @keydown.up.down.left.right.prevent="editModeActive && draggable && movableElementId
@@ -173,7 +1355,7 @@
                   :draggable="editModeActive && draggable"
                   :selected="isEntrySelected(entry)"
                   :box-size="{ width: 'auto' }"
-                  :box-ratio="100"
+                  :box-ratio="'100'"
                   :title="getPropValue(titlePropertyName, entry)"
                   :subtext="entry.subtext"
                   :description="entry.description"
@@ -206,7 +1388,7 @@
                   :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
                   :icon="action.icon"
                   box-style="small"
-                  box-type="button"
+                  render-element-as="button"
                   :class="['base-result-box-section__box-item',
                            `base-result-box-section__box-item-${elementId}`]"
                   @clicked="submitAction(action.value)" />
@@ -218,7 +1400,7 @@
               :box-size="{ width: 'calc(25% - 8rem/19 - (8rem/19/2))', height: '100%' }"
               icon=""
               text=""
-              box-type="button"
+              render-element-as="button"
               :class="['base-result-box-section__box-item',
                        `base-result-box-section__box-item-${elementId}`]"
               @clicked="expandedInt = !expandedInt">
@@ -230,7 +1412,7 @@
                   <span
                     v-if="!expandedInt"
                     class="base-result-box-section__expand-button__content-number">
-                    {{ `+${(total || entryList.length) - visibleBoxes.length}` }}
+                    {{ `+${(total || modelValue.length) - visibleBoxes.length}` }}
                   </span>
                   <span
                     :class="[expandedInt
@@ -255,1063 +1437,19 @@
                 || (!editModeActive && expandedInt))"
             :key="'pagination-' + elementId"
             :total="pages"
-            :current="currentPageNumberInt"
+            :model-value="currentPageNumberInt"
             :use-link-element="usePaginationLinkElement"
-            @set-page="setPage" />
+            :assistive-text="paginationAssistiveText"
+            @update:model-value="setPage" />
         </template>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { extractNestedPropertyValue } from '@/utils/utils';
-import navigateList from '../../mixins/navigateList';
-import BaseImageBox from '../BaseImageBox/BaseImageBox';
-import i18n from '../../mixins/i18n';
-
-/**
- * A component to display rows of boxes with or without pagination
- */
-export default {
-  name: 'BaseResultBoxSection',
-  components: {
-    BaseImageBox,
-    BaseLoader: () => import('../BaseLoader/BaseLoader').then(m => m.default || m),
-    BaseOptions: () => import('../BaseOptions/BaseOptions').then(m => m.default || m),
-    BaseButton: () => import('../BaseButton/BaseButton').then(m => m.default || m),
-    BasePagination: () => import('../BasePagination/BasePagination').then(m => m.default || m),
-    BaseBoxButton: () => import('../BaseBoxButton/BaseBoxButton').then(m => m.default || m),
-    BaseSelectOptions: () => import('../BaseSelectOptions/BaseSelectOptions').then(m => m.default || m),
-  },
-  mixins: [i18n, navigateList],
-  model: {
-    prop: 'entryList',
-    event: 'entries-changed',
-  },
-  props: {
-    /**
-     * actual entries list - if slot `result-box` is not used to use custom elements this
-     * object array should have the following properties to be displayed
-     * in a [BaseImageBox](BaseImageBox):
-     *
-     *    **id** `string` - a unique identifier
-     *    **title** `?string` - the title of the box
-     *    **subtext** `?string` - a subtitle
-     *    **description** `?string` - text displayed at the bottom of the box
-     *    **imageUrl** `?string` - url to display an image
-     *    **text** `?string[]` - an array with strings that will be
-     *    displayed if no image is provided
-     *
-     *    if a different schema is used please use the slot 'result-box' to create your own
-     *    elements - only id and title should still be provided but can also
-     *    be customized via `identifierPropertyName` and `titlePropertyName`
-     */
-    entryList: {
-      type: Array,
-      default: () => [],
-    },
-    /**
-     * if `false` the header row (title and options) will not be available
-     *   **Caveat**: for draggable functionality this needs to be true
-     */
-    showHeader: {
-      type: Boolean,
-      default: true,
-    },
-    /**
-     * title of section
-     * it is recommended to also set the `headerText` even if slot `header` is used for header
-     * for accessibility reasons
-     */
-    headerText: {
-      type: String,
-      default: '',
-    },
-    /**
-     * define if options should be shown
-     */
-    showOptions: {
-      type: Boolean,
-      default: true,
-    },
-    /**
-     * set text for the options button if `showOptions` is `true`
-     *   this needs to be an object with `show` (displayed when options are hidden)
-     *   and `hide` (displayed when options are visible) attributes
-     */
-    optionsButtonText: {
-      type: Object,
-      default: () => ({
-        show: 'edit',
-        hide: 'editReturn',
-      }),
-      validator: val => ['show', 'hide'].every(requiredProp => Object.keys(val).includes(requiredProp)),
-    },
-    /**
-     * set the icon for the options button.
-     * if `showOptions` is `true` this needs to be an object with `show`
-     *  (displayed when options are hidden) and `hide` (displayed when
-     *  options are visible) attributes
-     */
-    optionsButtonIcon: {
-      type: Object,
-      default: () => ({
-        show: 'edit',
-        hide: 'remove',
-      }),
-      validator: val => ['show', 'hide'].every(requiredProp => Object.keys(val).includes(requiredProp)),
-    },
-    /**
-     * specify how many boxes should be displayed in a row in an array
-     * with "tupples" (array with min-size and number of boxes).
-     * depending on the size of the container (not screen width - unless
-     * `calcBoxNumberRelativeToWindow` is set to `true`)
-     * like the following:
-     *   `[[0, [number of boxes]], [[min px size for this number of boxes], [number of boxes]], ...]`
-     */
-    boxBreakpoints: {
-      type: Array,
-      default: () => ([
-        [0, 2],
-        [640, 4],
-        [1024, 6],
-      ]),
-      validator: val => val
-        .every(point => typeof point === 'object' && point.length === 2
-          && point.every(pointValue => typeof pointValue === 'number')),
-    },
-    /**
-     * set component loader active
-     */
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * flag if component should be in edit mode (dragging, deleting,
-     * other custom options visible)
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
-     */
-    editMode: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * set this variable `true` if `background-color` should be white in edit mode
-     */
-    editModeWhiteBackground: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * provide a list of selected entries for select options (can
-     * be entry objects or entry ids).
-     *  the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
-
-     */
-    selectedList: {
-      type: Array,
-      default: () => [],
-    },
-    /**
-     * set a text for '[x] entries selected' and 'select all / none'
-     */
-    selectOptionsText: {
-      type: Object,
-      default: () => ({
-        selectAll: 'select all',
-        selectNone: 'select none',
-        entriesSelected: 'entries selected',
-      }),
-    },
-    /**
-     * if slot `options-message-area` is not used this variable
-     * can be used to customize message text.
-     *   this should be a string or an object with the actions needed (default: `delete`,
-     *   if `draggable` is `true` than also a `drag` property with suiting text is needed).
-     *     in case of a string the same text is used for all actions
-     */
-    messageText: {
-      type: String,
-      default: 'Drag or Select',
-    },
-    /**
-     * if slot `options-message-area` is not used this variable
-     * can be used to customize message subtext.
-     *   this should be a string or an object with the actions needed (default: `delete`,
-     *   if `draggable` is `true` than also a `drag` property with suiting text is needed).
-     *     in case of a string the same text is used for all actions
-     */
-    messageSubtext: {
-      type: String,
-      default: 'Drag\'n Drop to reorder or select the relevant items and choose an action',
-    },
-    /**
-     * determine if boxes can be dragged
-     *   (only applicable if `showHeader` and `showOptions` is set to `true`)
-     */
-    draggable: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * set `true` if pagination should be used
-     */
-    usePagination: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * if `usePagination` is set `true` this will determine the number of
-     * rows shown on one page
-     *   (only applicable if `usePagination` is set `true`)
-     */
-    maxRows: {
-      type: Number,
-      default: 5,
-    },
-    /**
-     * set this `true` if only a limited number of boxes should be shown
-     * and rest can be displayed by clicking a "show more" button
-     */
-    useExpandMode: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * if `useExpandMode` is `true` set the state of 'show more' from outside
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
-     */
-    expanded: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * Provide text that should be shown within the button with the
-     * expand / collapse functionality.
-     *   should be an object with props `expand` for text to expand
-     *   and `collapse` for text to collapse
-     */
-    expandText: {
-      type: Object,
-      default: () => ({
-        expand: 'more objects',
-        collapse: 'collapse',
-      }),
-    },
-    /**
-     * add a number of total elements (needed for `useExpandMode` and
-     * `usePagination`)
-     */
-    total: {
-      type: Number,
-      default: null,
-    },
-    /**
-     * set the current page number from outside if `usePagination` is `true`.
-     *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on this prop
-     */
-    currentPageNumber: {
-      type: Number,
-      default: null,
-    },
-    /**
-     * how many rows should be shown with show more button (expandMode)
-     *   (only applicable with `useExpandMode true`)
-     */
-    maxShowMoreRows: {
-      type: Number,
-      default: 1,
-    },
-    /**
-     * define if the section should scroll to top on page change
-     *   (only applicable with `usePagination true`)
-     */
-    jumpToTop: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * define if the big button box at the end of all attached items should be shown
-     */
-    showActionButtonBoxes: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * set some config for each action used - needs to be an array of objects with the
-     *  following properties:
-     *
-     *   **text** `string` - the text displayed in the button
-     *   **icon** `string` - the icon name to display
-     *    (for available icons see [BaseIcon](BaseIcon) )
-     *   **value** `string` - the value emitted on button click
-     *   **[display='all']** `?string` - define where the action should be displayed:
-     *     *top*: only in top row
-     *     *bottom*: only in action button box at bottom of list
-     *     *all*: on top as well as bottom
-     *   **disabled** `?boolean` - disable button
-     */
-    actionButtonsConfig: {
-      type: Array,
-      default: () => [{
-        text: 'delete',
-        icon: 'waste-bin',
-        value: 'delete',
-        display: 'all',
-        disabled: false,
-      }],
-      validator: val => val.every((action) => {
-        const requiredProps = ['text', 'icon', 'value'];
-        const actionProps = Object.keys(action);
-        return requiredProps.every(prop => actionProps.includes(prop))
-          && (['all', 'top', 'bottom'].includes(action.display) || !action.display);
-      }),
-    },
-    /**
-     * define a custom identifier property name for objects in your
-     * `entryList` array.
-     *   if relevant property is contained in a nested object the string can
-     *   be in dot notation. e.g. `nestedObject.id`
-     */
-    identifierPropertyName: {
-      type: String,
-      default: 'id',
-    },
-    /**
-     * define a custom title property name for objects in your
-     * `entryList` array.
-     *   if relevant property is contained in a nested object the string can
-     *   be in dot notation. e.g. `nestedObject.title`
-     */
-    titlePropertyName: {
-      type: String,
-      default: 'title',
-    },
-    /**
-     * specify if pagination elements should be a link element - if pagination element should
-     * be a link element - please specify the kind of element (currently only Vue components (e.g.
-     * [`RouterLink`](https://router.vuejs.org/guide/#router-link),
-     * [`NuxtLink`](https://nuxtjs.org/docs/features/nuxt-components/#the-nuxtlink-component)) are supported)
-     */
-    usePaginationLinkElement: {
-      type: [String, Boolean],
-      default: false,
-      validator: val => (typeof val === 'boolean' && !val) || (typeof val === 'string' && val),
-    },
-    /**
-     * set this variable `true` if pagination is used and data fetching is done per page
-     */
-    fetchDataExternally: {
-      type: Boolean,
-      default: false,
-    },
-    /**
-     * specify an additional number of px for the position the page
-     * should jump to on page change
-     */
-    scrollToOffset: {
-      type: Number,
-      default: 0,
-    },
-    /**
-     * specify an initial number of items per row that should be assumed before
-     * rendering the page
-     */
-    // this is necessary because otherwise in SSR serverside and client side DOM tree
-    // might not match
-    initialItemsPerRow: {
-      type: Number,
-      default: 6,
-    },
-    /**
-     * add text for screen reader users that helps them navigate list and use edit mode
-     * functionalities.
-     * object should have the following properties:
-     *
-     *   **description**: Text read on edit mode activation
-     *   **activated**: Text read after item was activated for reordering
-     *    (selected by enter key)
-     *    property moved can contain variable `{pos}` which will be filled with current
-     *    position
-     *   **moved**: Text read after item was moved
-     *    property moved can contain variables `{pos}` (new position) and `{total}` (total number
-     *    of list items)
-     */
-    assistiveText: {
-      type: Object,
-      default: () => ({
-        description: 'Select items via space bar to carry out actions or use enter '
-          + 'key to select an item for reordering. Use Tab key to navigate between items.',
-        activated: 'Item at position {pos} selected for reordering. Use arrow keys to order item.',
-        moved: 'Item moved to position {pos} of {total}',
-        loaderActive: 'loading.',
-      }),
-    },
-    /**
-     * `BaseResultBoxSection` is for example used to display search results - which contain a link
-     * to the entry - in this case the focus should be on the link element so that navigation to
-     * route link triggers on enter and focus on the list element itself is disabled (if not edit
-     * mode!)
-     */
-    disableListElementFocus: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      // internal representation of entry list to be able to
-      // modify list via draggable
-      entryListInt: [],
-      // flag for edit mode activated
-      editModeActive: false,
-      // current page number
-      currentPageNumberInt: 1,
-      // store the expand state internally
-      expandedInt: false,
-      // store collapsed state on action start
-      wasExpanded: false,
-      // how many items do fit in one row
-      itemsPerRow: null,
-      // try to only do initial box size calculation once
-      initialBoxCalcDone: false,
-      // to manipulate selectedList internally
-      selectedListInt: [],
-      imageBoxesSelectable: false,
-      // unique id to assign javascript calculated styles to
-      elementId: null,
-      // store state if component is mounted and window is present
-      initialized: false,
-      /**
-       * variable for keyboard sorting - is element currently selected for moving
-       * @type {?string}
-       */
-      movableElementId: null,
-      /**
-       * add assistive text especially to ease use of drag mode accessibly
-       * @type {string}
-       */
-      currentAssistiveText: '',
-      /**
-       * control pagination display with this variable and only render after
-       *  entryListInt was initialized from outside
-       *  @type {boolean}
-       */
-      showPagination: false,
-    };
-  },
-  computed: {
-    /**
-     * to lazy load vuedraggable only if draggable mode is set true
-     *
-     * @returns {string|(function(): Promise<U>)}
-     */
-    draggableComponent() {
-      if (this.draggable) {
-        return () => import('vuedraggable').then(m => (m.default || m));
-      }
-      return 'ul';
-    },
-    /**
-     * get the entries that should be displayed in the section -
-     * taking into consideration pagination and 'show more' functionality
-     * @returns {Object[]}
-     */
-    visibleBoxes: {
-      get() {
-        if (this.editModeActive && (this.draggable || !this.usePagination)) {
-          return [...this.entryListInt];
-        }
-        // if expand mode is used and status is collapsed and there
-        // are more items than can be displayed in the rows specified by 'show more'
-        // slice first few
-        if (!this.editModeActive && this.useExpandMode && !this.expandedInt && this.expandNeeded) {
-          // slice from 0 to number of rows * items per row - 1 so that the button
-          // take the last box
-          return this.entryListInt.slice(0, (this.itemsPerRow * this.maxShowMoreRows) - 1);
-        }
-        // else if pagination is active and items are not fetched from outside
-        // slice items fitting one page
-        if (this.usePagination && !this.fetchDataExternally) {
-          // slice taking into account current pagination and the total number of
-          // visible items
-          return this.entryListInt
-            .slice(
-              (this.currentPageNumberInt - 1) * this.visibleNumberOfItems,
-              this.currentPageNumberInt * this.visibleNumberOfItems,
-            );
-        }
-        if (this.fetchDataExternally) {
-          return this.entryList.slice(0, this.visibleNumberOfItems);
-        }
-        // else return complete list
-        return this.entryListInt;
-      },
-      set(val) {
-        this.entryListInt = [...val];
-      },
-    },
-    /** PAGINATION AND EXPAND MODE */
-    /**
-     * the number of items that should be visible on one page
-     * (if pagination is active)
-     * @returns {number}
-     */
-    visibleNumberOfItems() {
-      const availableSpaces = this.itemsPerRow * this.maxRows;
-      if (this.editModeActive && this.showActionButtonBoxes) {
-        return availableSpaces - this.actionButtonsConfig.length;
-      }
-      if (!this.editModeActive && this.useExpandMode) {
-        // subtract 1 for the Expand Box Button or Action Button
-        return availableSpaces - 1;
-      }
-      return availableSpaces;
-    },
-    /**
-     * number of pages (if pagination is active)
-     * @returns {number}
-     */
-    pages() {
-      return (this.total || this.entryListInt.length) && this.visibleNumberOfItems >= 0
-        ? Math.ceil((this.total || this.entryListInt.length) / this.visibleNumberOfItems) : 1;
-    },
-    /**
-     * determines if the total number of entries exceeds the number of entries that
-     * can be displayed and thus if an expand button is needed
-     */
-    expandNeeded() {
-      return (this.itemsPerRow * this.maxShowMoreRows) < this.entryList.length;
-    },
-  },
-  watch: {
-    entryList: {
-      handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.entryListInt)) {
-          this.entryListInt = [...val];
-          // check if showPagination was already set true otherwise do it after
-          // entryListInt was set for the first time
-          if (!this.showPagination) {
-            // make sure this is one last (and boxes are already rendered)
-            setTimeout(() => {
-              this.showPagination = true;
-            }, 0);
-          }
-        }
-      },
-      immediate: true,
-      deep: true,
-    },
-    entryListInt: {
-      handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.entryList)) {
-          /**
-           * event emitted when the list of entries changed internally
-           * (relevant if `draggable` is set `true`)
-           *
-           * @event entries-changed
-           * @param {Object[]} - the updated list of entries
-           */
-          this.$emit('entries-changed', val);
-        }
-      },
-      deep: true,
-    },
-    // watch selectedList prop and assign to internal value if changes occur
-    selectedList: {
-      handler(val) {
-        if (JSON.stringify(val) !== JSON.stringify(this.selectedListInt)) {
-          this.selectedListInt = JSON.parse(JSON.stringify(val));
-        }
-      },
-      immediate: true,
-    },
-    // watch selectedList prop and assign to internal value if changes occur
-    selectedListInt(val) {
-      if (JSON.stringify(val) !== JSON.stringify(this.selectedList)) {
-        /**
-         * inform the parent of the changes in `selectedList` and provide
-         * the ids of all selected.
-         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
-         *
-         * @event update:selected-list
-         * @param {Array} - the list of selected entry ids
-         */
-        this.$emit('update:selected-list', val);
-      }
-    },
-    // watch pages in case of deletion of items and take care
-    // current page is not higher than total page number
-    pages: {
-      handler(val) {
-        if (this.currentPageNumberInt > val) {
-          // if the current page number exceeds the total number of pages
-          // set the value to the last existing page
-          this.currentPageNumberInt = val;
-        }
-      },
-      immediate: true,
-    },
-    // update internal page number if changed from outside
-    currentPageNumber: {
-      handler(val) {
-        if (val !== this.currentPageNumberInt) {
-          // check if number is larger than max number of pages currently available and
-          // set to max possible value if yes instead
-          // TODO: changed this to internal handling for now because it makes problems with
-          // externally provided data but maybe it would make sense to get rid of it all together
-          this.currentPageNumberInt = val > this.pages && !this.fetchDataExternally
-            ? this.pages : val;
-        }
-      },
-      immediate: true,
-    },
-    /**
-     * watch internal page number to inform parent about changes
-     * @param {number} val
-     */
-    currentPageNumberInt: {
-      handler(val) {
-        if (val !== this.currentPageNumber) {
-          /** emitted when pagination is used and page number was changed
-           *
-           * @event update:current-page-number
-           * @param {number} - the new page number
-          */
-          this.$emit('update:current-page-number', this.currentPageNumberInt);
-        }
-      },
-      immediate: true,
-    },
-    // if expanded variable is set from outside change
-    // internal variable accordingly
-    expanded: {
-      handler(val) {
-        if (val !== this.expandedInt) {
-          this.expandedInt = val;
-        }
-      },
-      immediate: true,
-    },
-    // if internal value changes, reset page number and inform parent
-    expandedInt(val) {
-      // reset current page number on collapse
-      if (!val) {
-        this.currentPageNumberInt = 1;
-      }
-      // inform parent of internal change
-      if (val !== this.expanded) {
-        /**
-         * event emitted on expand toggle.
-         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
-         * @event update:expanded
-         * @param { Boolean } - true if list is expanded
-         */
-        this.$emit('update:expanded', val);
-      }
-    },
-    editModeActive(val) {
-      // have setting true of selectable delayed for animation
-      setTimeout(() => {
-        this.imageBoxesSelectable = val;
-      }, 50);
-      setTimeout(() => {
-        if (val) {
-          this.$nextTick(() => {
-            if (this.$refs.resultBoxItem && this.$refs.resultBoxItem.length) {
-              this.$refs.resultBoxItem.forEach((element) => {
-                const inputElement = element.getElementsByTagName('input');
-                inputElement[0].setAttribute('tabindex', '-1');
-              });
-              // it appears refs are not reactive and do not reflect reordering so we need
-              // to look for the actual current first element in the visibleBoxes array
-              const firstElement = this.$refs.resultBoxItem
-                .find(element => element.id.includes(this.visibleBoxes[0].id));
-              firstElement.focus({ preventScroll: true });
-            }
-          });
-        }
-      }, 500);
-      if (val) {
-        this.currentAssistiveText = this.assistiveText.description;
-      } else {
-        this.movableElementId = null;
-        this.currentAssistiveText = '';
-      }
-      if (val !== this.editMode) {
-        /**
-         * emitted on edit mode toggle (options toggle).
-         *   the [`.sync` modifier](https://vuejs.org/v2/guide/components-custom-events.html#sync-Modifier) may be used on the corresponding prop
-         *
-         * @event update:edit-mode
-         * @param {Boolean} - flag for edit mode active
-         */
-        this.$emit('update:edit-mode', val);
-      }
-
-      // add listener to esc key event (toggle edit mode)
-      if (!this.initialized) return;
-      if (val) {
-        window.addEventListener('keyup', this.escEventHandler);
-      } else {
-        window.removeEventListener('keyup', this.escEventHandler);
-      }
-    },
-    editMode: {
-      handler(val) {
-        if (val !== this.editModeActive) {
-          this.editModeActive = val && this.showOptions && this.showHeader;
-        }
-      },
-      immediate: true,
-    },
-    showOptions(val) {
-      if (!val) {
-        this.editModeActive = false;
-      }
-    },
-    showHeader(val) {
-      if (!val) {
-        this.editModeActive = false;
-      }
-    },
-  },
-  created() {
-    if (!this.useExpandMode) {
-      this.expandedInt = true;
-    }
-    this.itemsPerRow = this.initialItemsPerRow;
-  },
-  mounted() {
-    // create an element id to have an unique id to assign javascript calculated styles to
-    // note: done here, cause of mismatching ids (entries, class definition) in ssr-mode
-    // eslint-disable-next-line no-underscore-dangle
-    this.elementId = this._uid;
-
-    if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
-      this.calcBoxNumber();
-    }
-    // need to get the correct number of boxes per row to calculate the visible
-    // number of items correctly
-    window.addEventListener('resize', this.resizeBoxes);
-    this.initialized = true;
-  },
-  updated() {
-    if (!this.initialBoxCalcDone && this.$refs.resultBoxesArea) {
-      this.calcBoxNumber();
-    }
-  },
-  methods: {
-    /** EDIT MODE FUNCTIONALITIES */
-    /**
-     * toggling of options when options are behind a 'options' button
-     *
-     * @param {Boolean} actionsVisible true for open, false for close
-     */
-    optionsToggle(actionsVisible) {
-      this.editModeActive = actionsVisible;
-      if (!actionsVisible) {
-        // on close return to original collapsed state
-        this.expandedInt = this.wasExpanded;
-        // clear selected boxes
-        this.selectedListInt = [];
-        // on open - store the original collapsed state
-      } else {
-        this.wasExpanded = this.expandedInt;
-      }
-    },
-    /**
-     * function triggered when selecteAll was clicked in select mode
-     *
-     * @param {boolean} selectAll - true if everything was selected,
-     * false if everything was deselected
-     */
-    selectAllTriggered(selectAll) {
-      if (selectAll) {
-        // select all entries that are currently visible
-        // deduplicate by creating Set and converting back to array
-        this.selectedListInt = [...new Set([...this.selectedListInt,
-          ...this.visibleBoxes.map(entry => this
-            .getPropValue(this.identifierPropertyName, entry))])];
-      } else {
-        const visibleEntryIds = this.visibleBoxes
-          .map(visibleEntry => this.getPropValue(this.identifierPropertyName, visibleEntry));
-        this.selectedListInt = this.selectedListInt
-          .filter(entry => !visibleEntryIds
-            .includes(this.getPropValue(this.identifierPropertyName, entry) || entry));
-      }
-    },
-    /**
-     * triggered when an entry is selected or is clicked upon
-     *
-     * @param {string} entryId - the entry id of the selected entry
-     * @param {boolean} [selected=undefined] - not provided and thus undefined
-     * if entry was clicked
-     */
-    entrySelected(entryId, selected) {
-      // if entry was selected in edit mode and list does not contain entry
-      // already - add it to the list
-      if (selected && !this.selectedListInt.includes(entryId)) {
-        this.selectedListInt.push(entryId);
-      } else if (!selected) {
-        this.selectedListInt = this.selectedListInt.filter(boxId => boxId !== entryId);
-      }
-    },
-    /**
-     * function to calc if image box is currently selected
-     *
-     * @param {Object} entry - the entry in question
-     * @returns {Boolean}
-     */
-    isEntrySelected(entry) {
-      return this.selectedListInt
-        .map(selectedEntry => this.getPropValue(this.identifierPropertyName, selectedEntry)
-        || selectedEntry).includes(this.getPropValue(this.identifierPropertyName, entry));
-    },
-    /**
-     * function triggered when user has
-     * clicked action button to go through with the action
-     */
-    submitAction(action) {
-      /**
-       * event triggered when an action is triggered (after selecting boxes)
-       *
-       * @event submit-action
-       * @param {string} - the action type
-       */
-      this.$emit('submit-action', action);
-    },
-    /**
-     * intercept escape key event and reset edit mode
-     */
-    escEventHandler(e) {
-      if (e.key === 'Escape') {
-        // first use escape key to leave drag mode
-        if (this.movableElementId) {
-          this.cancelDragMode();
-          // else use it to leave edit mode
-        } else {
-          this.editModeActive = false;
-          this.currentAssistiveText = '';
-        }
-      }
-    },
-    /**
-     * event handler on keydown 'Enter'
-     * @param {KeyboardEvent} event - the keydown event
-     * @param {Object} entry - the entry the event was triggered on
-     * @param {number} index - the index of the entry in the visibleBoxes array
-     */
-    onEnterKey(event, entry, index) {
-      if (this.editModeActive && this.draggable) {
-        event.preventDefault();
-        // check if movableElementId is null
-        if (!this.movableElementId) {
-          // if yes activate drag mode by assigning the entry id as movableElementId
-          this.movableElementId = entry.id;
-          // add assistive text for the screen reader
-          this.currentAssistiveText = this.assistiveText.activated
-            .replace('{pos}', (index + 1).toString());
-        } else {
-          // if drag mode was active before - cancel it
-          this.cancelDragMode();
-        }
-      } else {
-        this.entryClicked(this.getPropValue(this.identifierPropertyName, entry));
-      }
-    },
-    /**
-     * event handler on keydown with arrow keys
-     * @param {KeyboardEvent} event - the keydown event
-     * @param {number} index - the index of the entry on which the event was triggered
-     *  in the visibleBoxes array
-     */
-    moveEntry(event, index) {
-      // reset assistive text
-      this.currentAssistiveText = '';
-      // get key that was pressed
-      const { key } = event;
-      // determine if element should be moved up or down in the list
-      const shiftDown = ['ArrowRight', 'ArrowDown'].includes(key);
-      // get the corresponding number to add to the array index
-      const shiftIndex = shiftDown ? 1 : -1;
-      // get new Index
-      const newIndex = index + shiftIndex;
-      // check if move is possible or if item is first or last respectively already
-      if (this.isWithinArrayLimit(this.visibleBoxes, shiftDown, newIndex)) {
-        // assign box list to variable so the set() of visibleBoxes is actually triggered
-        // when it is assigned again later on (doing it directly on visibleBoxes or entryListInt
-        // has no effect)
-        const newArray = this.visibleBoxes;
-        // do swapping with array destructuring
-        [newArray[index], newArray[newIndex]] = [newArray[newIndex], newArray[index]];
-        // assign it again to visibleBoxes variable
-        this.visibleBoxes = newArray;
-        // next tick so there is time to repaint and get new order
-        this.$nextTick(() => {
-          // get all box elements
-          const movedElement = document.getElementById(`li-${this.movableElementId}`);
-          // element is loosing focus in the process of swapping so refocus here
-          movedElement.focus();
-        });
-        // add matching assistive text informing the user of the move and the new position
-        this.currentAssistiveText = this.assistiveText.moved
-          .replace('{pos}', newIndex + 1)
-          .replace('{total}', this.visibleBoxes.length);
-      }
-    },
-    /**
-     * reset drag related variable and assistive text
-     */
-    cancelDragMode() {
-      this.movableElementId = null;
-      this.currentAssistiveText = '';
-    },
-
-    /** BOX DISPLAY FUNCTIONALITIES */
-    /**
-     * timeout function for resize event to limit the number of times
-     * box number is recalculated
-     */
-    resizeBoxes() {
-      // check if there is a timeout already set and clear it if yes
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = null;
-      }
-      // if yes set timeout to recalculate box number after
-      this.resizeTimeout = setTimeout(() => {
-        this.calcBoxNumber();
-      }, 300);
-    },
-    /**
-     * calculate the box number according to available space and breaking points set
-     */
-    calcBoxNumber() {
-      // get the result boxes parent - in case of draggable active this is a vue component
-      // and $el needs to be addressed - otherwise native HTML element can be used directly
-      const resultBoxesElement = this.$refs.resultBoxesArea && this.$refs.resultBoxesArea.$el
-        ? this.$refs.resultBoxesArea.$el : this.$refs.resultBoxesArea;
-      // if such an element was found and element has children (= boxes are rendered)
-      if (resultBoxesElement) {
-        // get the element width
-        const totalWidth = resultBoxesElement.clientWidth;
-        // create a copy of the prop to avoid direct prop mutation
-        const boxBreakpointsCopy = [...this.boxBreakpoints];
-        // calculate how many items should be displayed according to
-        // breakpoints set
-        this.itemsPerRow = boxBreakpointsCopy
-          // then also sorting should not be necessary anymore (maybe keep to
-          // be on the save side?
-          .sort((a, b) => a[0] > b[0])
-          // get the correct box number
-          .reduce((prev, [size, number]) => {
-            if (totalWidth > size) {
-              return number;
-            }
-            return prev;
-          }, 0);
-        // set the styles
-        // set a css variable that is responsible for the number of items
-        this.$el.style.setProperty('--items-per-row', this.itemsPerRow);
-        // set the correct margins for the boxes
-        const nodeId = `base-result-box-section__box-style-${this.elementId}`;
-        let style = document.getElementById(nodeId);
-        // check if element already exists to only create it once
-        if (!style) {
-          // if not - create the style element
-          style = document.createElement('style');
-          // set an id
-          style.id = nodeId;
-          // append the style element
-          this.$el.appendChild(style);
-        }
-        // set the actually css in the style element
-        style.innerHTML = `
-          .base-result-box-section__box-item-${this.elementId}:nth-child(n + ${this.itemsPerRow + 1}) {
-            margin-top: var(--spacing-regular);
-          }
-          .base-result-box-section__box-item-${this.elementId}:not(:nth-child(${this.itemsPerRow}n)) {
-            margin-right: var(--spacing-regular);
-          }`;
-        this.initialBoxCalcDone = true;
-        /**
-         * communicate to parent when items per row changed, either after initial
-         * render space calculations or when window was resized
-         * @event items-per-row-changed
-         * @param {number} - the new number of items that fit in a row
-         */
-        this.$emit('items-per-row-changed', this.itemsPerRow);
-      }
-    },
-    /** PAGINATION */
-    /**
-     * function triggered when page in pagination component is selected
-     *
-     * @param {number} number - the selected page number
-     */
-    setPage(number) {
-      // set internal page number - this will also trigger an event to parent
-      this.currentPageNumberInt = number;
-      // if variable is set true jump to top of element
-      if (this.jumpToTop) {
-        window.scrollTo(0, this.$el.offsetTop - this.scrollToOffset);
-      }
-    },
-
-    /** GENERAL FUNCTIONALITIES */
-    /**
-     * triggered when an entry is clicked upon (edit mode not acive)
-     *
-     * @param {string} entryId - the entry id of the selected entry
-     */
-    entryClicked(entryId) {
-      /**
-       * event emitted from default image box when clicked
-       * @event entry-clicked
-       * @property {string} entryId - the id of the clicked entry
-       * the select mode was not active but the box was clicked
-       */
-      this.$emit('entry-clicked', { entryId });
-    },
-    /**
-     * get an internationalized string
-     *
-     * @param {string|Object} localizationArguments - string or object to look
-     * up in localization files
-     *   if it is an object it should have the following properties:
-     * @property {string} string - string to look up in a Locale messages file
-     * @property {number} count - for pluralization
-     * @property {Object} variables - locale string variables object
-     * @returns {string}
-     */
-    getI18nString(localizationArguments) {
-      // check if a string was provided
-      if (typeof localizationArguments === 'string') {
-        return this.getI18nTerm(localizationArguments);
-      }
-      // if not - assume an object with the relevant properties
-      const { string, count, variables } = { ...localizationArguments };
-      return this.getI18nTerm(string, count, variables);
-    },
-    /**
-     * to get a nested object property value from a string in dot notation
-     *
-     * @param {string} string - the nested object property path in dot notation
-     * @param {Object} object - the object from which the property value should be extracted
-     * @returns {*}
-     */
-    getPropValue(string, object) {
-      return extractNestedPropertyValue(string, object);
-    },
-  },
-};
-</script>
-
 <style lang="scss" scoped>
-@import "../../styles/variables";
+@use "sass:map";
+@use "@/styles/variables" as *;
 
 .base-result-box-section {
   position: relative;
@@ -1322,7 +1460,7 @@ export default {
     position: absolute;
     height: 100%;
     width: 100%;
-    z-index: map-get($zindex, loader);
+    z-index: map.get($zindex, loader);
     background-color: $loading-background;
 
     .base-result-box-section__loader {
@@ -1362,6 +1500,16 @@ export default {
           visibility: hidden;
         }
 
+        &:before {
+          content: '';
+          height: 100%;
+          top: 0;
+          right: 0;
+          pointer-events: none;
+          background-color: transparent;
+          padding-bottom: 100%;
+        }
+
         &:focus-within:after {
           content: '';
           width: 100%;
@@ -1369,8 +1517,9 @@ export default {
           position: absolute;
           top: 0;
           right: 0;
-          border: 1px solid $app-color-secondary;
+          box-shadow: inset 0 0 0 1px var(--app-color-secondary, #b085f5);
           pointer-events: none;
+          background-color: transparent;
         }
 
         &:focus:not(:focus-visible) {
@@ -1385,12 +1534,6 @@ export default {
         &__draggable {
           box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.25);
           cursor: move;
-        }
-
-        &__dragging {
-          &:focus-within:after {
-            border: 1px solid $app-color;
-          }
         }
       }
 
@@ -1421,7 +1564,7 @@ export default {
       text-align: center;
       color: $font-color-second;
       backface-visibility: hidden;
-      z-index: map-get($zindex, boxcontent);
+      z-index: map.get($zindex, boxcontent);
       position: relative;
 
       .base-result-box-section__message-area-text {
@@ -1453,10 +1596,14 @@ export default {
         }
       }
 
-      &::v-deep .base-button.base-button-secondary.base-button-background {
+      &:deep(.base-button.base-button--secondary.base-button--background){
         background-color: transparent;
       }
     }
   }
+}
+
+.sortable-chosen {
+  user-select: none;
 }
 </style>

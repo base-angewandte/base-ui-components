@@ -1,65 +1,10 @@
-<template>
-  <base-box
-    box-ratio="0"
-    :box-size="{}"
-    :box-hover="false"
-    :style="style"
-    :box-shadow-size="boxShadow ? 'small' : 'none'"
-    :class="[
-      'base-expand-box',
-      'base-expand-box-padding-' + padding,
-      { 'base-expand-box-auto-height': autoHeight },
-      { 'base-expand-box-open': expandInt }]">
-    <div
-      v-if="!!$slots.header"
-      class="base-expand-box-header">
-      <!-- @slot slot to add additional information before expandable content -->
-      <slot name="header" />
-    </div>
-    <div
-      ref="content"
-      :class="[
-        'base-expand-box-content',
-        { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">
-      <div
-        class="base-expand-box-content-inner">
-        <!-- div is needed for calculation of content height -->
-        <div ref="contentInner">
-          <!--
-            @slot add expand box content here
-          -->
-          <slot />
-        </div>
-      </div>
-    </div>
-
-    <base-button
-      v-if="showButton"
-      :text="expandInt ? showLessText : showMoreText"
-      :has-background-color="false"
-      align-text="left"
-      icon="drop-down"
-      icon-position="right"
-      :class="[
-        'base-expand-box-button',
-        { 'base-button-icon-rotate-180': expandInt }]"
-      @clicked="clicked" />
-
-    <div
-      v-if="!!$slots.footer"
-      class="base-expand-box-footer">
-      <div class="base-expand-box-footer-inner">
-        <!-- @slot slot to add additional information after expandable content -->
-        <slot name="footer" />
-      </div>
-    </div>
-  </base-box>
-</template>
-
 <script>
-import { debounce } from '@/utils/utils';
-import BaseBox from '../BaseBox/BaseBox';
-import BaseButton from '../BaseButton/BaseButton';
+import { debounce } from '@/utils/utils.js';
+import { useId } from '@/composables/useId.js';
+import { useSlots, useTemplateRef } from 'vue';
+import BaseBox from '@/components/BaseBox/BaseBox.vue';
+import BaseButton from '@/components/BaseButton/BaseButton.vue';
+import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 
 /**
  * Component to render content in expandable container
@@ -132,9 +77,49 @@ export default {
       default: true,
     },
   },
+  emits: ['update:expand', 'box-height'],
+  setup() {
+    /** INTERNAL ID */
+    const internalId = useId();
+
+    /** SLOT VISIBILITY */
+    const slots = useSlots();
+    /**
+     * determine if header slot has content
+     * @type {boolean}
+     */
+    const { slotHasContent: headerSlotHasContent } = useHasSlotContent(slots.header);
+    /**
+     * determine if header slot has content
+     */
+    const { slotHasContent: footerSlotHasContent } = useHasSlotContent(slots.footer);
+
+
+    /** EXPAND BUTTON AND FADE OUT VISIBILITY */
+    /**
+     * template reference to the expand box content
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const content = useTemplateRef('contentElement');
+    /**
+     *
+     * @type {Readonly<ShallowRef<HTMLElement | null>>}
+     */
+    const contentInner = useTemplateRef('contentInnerElement');
+
+    return {
+      // internal id
+      internalId,
+      // slot handling
+      headerSlotHasContent,
+      footerSlotHasContent,
+      // expand button and fade out
+      content,
+      contentInner,
+    };
+  },
   data() {
     return {
-      elementId: null,
       expandInt: false,
       initialized: false,
       showButton: false,
@@ -155,7 +140,7 @@ export default {
   mounted() {
     this.init();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.mutationObserver) this.mutationObserver.disconnect();
     if (this.resizeObserver) this.resizeObserver.disconnect();
   },
@@ -164,13 +149,10 @@ export default {
      * init
      */
     init() {
-      // create an element id to generate unique dom selectors
-      // eslint-disable-next-line no-underscore-dangle
-      this.elementId = this._uid;
       // set internal expand variable
       if (this.expand) this.expandInt = true;
       // calculate the show-more button visibility
-      this.calcButtonVisibility({});
+      this.calcButtonVisibility();
       // init observers (currently for resize and mutation)
       this.initObserver();
       // set initialization state
@@ -182,14 +164,14 @@ export default {
      */
     initObserver() {
       // create a resize observer with calculation functions
-      const resizeObserver = new ResizeObserver(debounce(50, () => this.calcButtonVisibility({})));
+      const resizeObserver = new ResizeObserver(debounce(50, this.calcButtonVisibility));
 
       // create a mutation observer with calculation functions
-      const mutationObserver = new MutationObserver(() => this.calcButtonVisibility({ collapse: true }));
+      const mutationObserver = new MutationObserver(this.calcButtonVisibility);
 
       // attach the observers to the component
-      resizeObserver.observe(this.$refs.content);
-      mutationObserver.observe(this.$refs.content, { childList: true, subtree: true });
+      resizeObserver.observe(this.content);
+      mutationObserver.observe(this.content, { childList: true, subtree: true });
 
       // store them in variables
       this.resizeObserver = resizeObserver;
@@ -197,22 +179,19 @@ export default {
     },
     /**
      * calculate visibility of 'show more' button
-     * @param {boolean} collapse - defines if the content is collapsed
      */
-    calcButtonVisibility({ collapse = false }) {
-      // check if content should be collapsed
-      if (collapse) this.expandInt = false;
-      if (this.$refs.contentInner) {
+    calcButtonVisibility() {
+      if (this.contentInner) {
         // clone inner content
-        const contentInnerTemp = this.$refs.contentInner.cloneNode(true);
+        const contentInnerTemp = this.contentInner.cloneNode(true);
         // add unique id for later use
-        contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.elementId}`);
+        contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.internalId}`);
         // append the temporary element to the component
         this.$el.appendChild(contentInnerTemp);
-        // get the height of the temporary element
-        const contentInnerTempHeight = contentInnerTemp.offsetHeight;
+        // get the height of the temporary element as fractional value
+        const contentInnerTempHeight = contentInnerTemp.getBoundingClientRect().height;
         // remove  element
-        this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.elementId}`));
+        this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.internalId}`));
         // set button visibility
         this.showButton = contentInnerTempHeight > this.maxCollapsedHeight;
 
@@ -229,7 +208,7 @@ export default {
     /**
      * click event for the show-more button
      */
-    clicked() {
+    toggle() {
       this.expandInt = !this.expandInt;
 
       /**
@@ -242,8 +221,67 @@ export default {
 };
 </script>
 
+<template>
+  <BaseBox
+    :box-ratio="'0'"
+    :box-hover="false"
+    :box-size="{}"
+    :box-shadow-size="boxShadow ? 'small' : 'none'"
+    :style="style"
+    :class="[
+      'base-expand-box',
+      'base-expand-box-padding-' + padding,
+      { 'base-expand-box-auto-height': autoHeight },
+      { 'base-expand-box-open': expandInt }]">
+    <div
+      v-if="headerSlotHasContent"
+      class="base-expand-box-header">
+      <!-- @slot slot to add additional information before expandable content -->
+      <slot name="header" />
+    </div>
+    <div
+      ref="contentElement"
+      :class="[
+        'base-expand-box-content',
+        { 'base-expand-box-content-fade-out': (!initialized || !expandInt && showButton) }]">
+      <div
+        class="base-expand-box-content-inner">
+        <!-- div is needed for calculation of content height -->
+        <div
+          ref="contentInnerElement">
+          <!--
+            @slot add expand box content here
+          -->
+          <slot />
+        </div>
+      </div>
+    </div>
+
+    <BaseButton
+      v-if="showButton"
+      :text="expandInt ? showLessText : showMoreText"
+      :has-background-color="false"
+      align-text="left"
+      icon="drop-down"
+      icon-position="right"
+      :class="[
+        'base-expand-box-button',
+        { 'base-button--rotate-icon-180': expandInt }]"
+      @clicked="toggle" />
+
+    <div
+      v-if="footerSlotHasContent"
+      class="base-expand-box-footer">
+      <div class="base-expand-box-footer-inner">
+        <!-- @slot slot to add additional information after expandable content -->
+        <slot name="footer" />
+      </div>
+    </div>
+  </BaseBox>
+</template>
+
 <style lang="scss" scoped>
-  @import "../../styles/variables";
+  @use "@/styles/variables" as *;
 
   .base-expand-box {
     flex-direction: column;

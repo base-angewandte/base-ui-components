@@ -3,30 +3,25 @@
 ```vue live
 <template>
   <div class="background">
-      <base-box
+      <BaseBox
         :box-size="{ width: 'calc(25% - 12px)' }">
         <p class="example-text">Example Content</p>
-      </base-box>
-      <base-box
+      </BaseBox>
+      <BaseBox
         :box-size="{ width: 'calc(25% - 12px)' }" />
-      <base-box
+      <BaseBox
         :box-size="{ width: 'calc(25% - 12px)' }"
         :disabled="true">
         <p class="example-text">Box disabled</p>
-      </base-box>
-      <base-box
+      </BaseBox>
+      <BaseBox
         :box-hover="false"
         :box-size="{ width: 'calc(25% - 12px)' }">
         <p class="example-text">Hover styling disabled</p>
-      </base-box>
+      </BaseBox>
   </div>
 </template>
 
-<script>
-export default {
-
-}
-</script>
 <style>
   .background {
     display: flex;
