@@ -1,9 +1,232 @@
+## 5.0.0 (2025-10-28)
+
+
+### ⚠ BREAKING CHANGE
+
+> base-ui-components library was upgraded to Vue 3 and now only supports Vue 3 applications.
+> Also minimum node version is now 20.
+>
+> Please check the [Vue 3 Migration Guide](https://v3-migration.vuejs.org/) for general framework changes. Apart from that the following breaking changes were introduced:
+
+* **[BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/BaseAutocompleteInput):** prop `input` was renamed to `modelValue`, event `input` was renamed to `update:modelValue`
+* **[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/BaseBoxButton):** change `renderElementAs` default value from `div` to `button`.
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/BaseButton):** if prop `text` or slot `text` and icon are present spacing is added
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/BaseCarousel):** default behaviour set in `swiperOptions` is now `rewind` not `loop`.
+* **[BaseCheckmark](https://base-angewandte.github.io/base-ui-components/BaseCheckmark):** prop `checked` was renamed to `modelValue`
+  event `clicked` was renamed to `update:modelValue`
+* **[BaseChip](https://base-angewandte.github.io/base-ui-components/BaseChip):**
+  * custom event `mouse-down` was removed use native event mousedown instead
+  * prop `entry` was renamed to `modelValue`, event `value-changed` was renamed to `update:modelValue`
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** prop `selectedList` was renamed to `modelValue`, event `selected-changed` was renamed to `update:modelValue`
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow):** prop `selectedList` was renamed to `modelValue`, event `selected-changed` was renamed to `update:modelValue`
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput):** rename prop `type'` to `dateType`
+* **[BaseDatePanel](https://base-angewandte.github.io/base-ui-components/BaseDatePanel):** component was removed
+  in theory a breaking change but since it was not published in styleguide it should not have been in use
+* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/BaseDropDown):** prop `selectedOption` was renamed to `modelValue`, event `value-selected` was renamed to `update:modelValue`
+* **[BaseDropDownList](https://base-angewandte.github.io/base-ui-components/BaseDropDownList):** removed prop `hasSubOptions` (boolean), now specify the complete sub-option with prop `activeSubOption`
+* **[BaseExpandList](https://base-angewandte.github.io/base-ui-components/BaseExpandList):** event `expanded-state` was renamed to `update:expanded` so that v-model can be used
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):** prop `valueList` is renamed to `modelValue`, event `values-changed` is now `update:model-value`
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** prop `fieldValue` is renamed to `modelValue`, event `field-value-changed` is now `update:model-value`
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/BaseFormGroups):** prop `valueList` is now `modelValue`
+* **[BaseHoverBox](https://base-angewandte.github.io/base-ui-components/BaseHoverBox), [BaseChip](https://base-angewandte.github.io/base-ui-components/BaseChip), [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** the component BaseHoverBox was removed. Please check out BaseTooltipBox for similar functionality.
+  This influences the following components:
+    - prop `hoverBoxData` was removed from:  BaseChip, BaseChipsInputField, BaseChipsInput, BaseChipsBelow and BaseFormFieldCreator
+    - event `hover-box-active` was removed from: BaseChip, BaseChipsInputField, BaseChipsInput and BaseChipsBelow
+    - event `fetch-info-data` was removed from BaseFormFieldCreator
+* **[BaseInfoPanel](https://base-angewandte.github.io/base-ui-components/BaseInfoPanel):** `renderPanelHeaderAs` is not considered with slot `header, provide own tag
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput):**
+  * rename `fieldType'` to `inputType`.
+  * prop `input` was renamed to `modelValue`, event `input` was renamed to `update:modelValue`.
+* **[BaseMultilineTextInput](https://base-angewandte.github.io/base-ui-components/BaseMultilineTextInput):** prop `input` was renamed to `modelValue`, event `input` was renamed to `update:modelValue`
+* **[BasePagination](https://base-angewandte.github.io/base-ui-components/BasePagination):** prop `current` was renamed to `modelValue`, event `set-page` was renamed to `update:modelValue`
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/BaseResultBoxSection):** prop `entryList` was renamed to `modelValue`, event `entries-changed` was renamed to `update:modelValue`
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch):**
+  * rename prop `type'` to `searchType`
+  * prop `input` was renamed to `modelValue`, event `input` was renamed to `update:modelValue`
+* **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/BaseSwitchButton):** prop `activeTab` was renamed to `modelValue`, event `switch` was renamed to `update:modelValue`
+* **[BaseToggle](https://base-angewandte.github.io/base-ui-components/BaseToggle):** prop `checked` was renamed to `modelValue`, event `clicked` was renamed to `update:modelValue`
+* **[BaseTooltip](https://base-angewandte.github.io/base-ui-components/BaseTooltip):** this component was replaced by [BaseTooltipBox](https://base-angewandte.github.io/base-ui-components/BaseTooltipBox)
+* **[BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/BaseAutocompleteInput), [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput), [BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput), [BaseMultilineTextInput](https://base-angewandte.github.io/base-ui-components/BaseMultilineTextInput), [BasePopUp](https://base-angewandte.github.io/base-ui-components/BasePopUp), [BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch), [BaseToggle](https://base-angewandte.github.io/base-ui-components/BaseToggle):** prop `id` was renamed to `inputId` and `headerId` (BasePopUp) respectively.
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** prop `addSelectedEntryDirectly` was removed
+* **[BaseMenuList](https://base-angewandte.github.io/base-ui-components/BaseMenuList), [BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector):** new prop `useDraggable` with default `false`. for dragging prop MUST be set!
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/BaseMenuEntry),[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/BaseBoxButton),[BaseButton](https://base-angewandte.github.io/base-ui-components/BaseButton),[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseExpandBox](https://base-angewandte.github.io/base-ui-components/BaseExpandBox), [BaseBox](https://base-angewandte.github.io/base-ui-components/BaseBox):** css class naming now follows BEM notation.
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch), [BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):** before `searchType` 'chips' added chip on enter, now `addChipsInputDirectly` needs to be true, otherwise manual handling is expected
+
+
+### Added
+* **composables**: make component composables available in library - a list of available composables can be found [here](http://localhost:6060/base-ui-components/components#composables)
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):** update prop `assistiveText` with options useful for mode `list`
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/BaseCarousel):** add swiperjs a11y module for better accessibility
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow):** add new prop `chipsEditable` to enable editing of chips
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** improve accessibility by adding aria attributes to input
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput), [BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/BaseAutocompleteInput), [BaseMultilineTextInput](https://base-angewandte.github.io/base-ui-components/BaseMultilineTextInput), [BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch):** expose the native input element(s) to parents as `inputElement` for all input components
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator), [BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):** allow `required`, `disabled`, `invalid` and `errorMessage` prop to be set individually per field (for ranges or date time)
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/BaseFormGroups), [BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):** enable passing error messages as separate prop `errorMessagesObject`
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/BaseMediaCarousel), [BaseMediaCarouselItem](https://base-angewandte.github.io/base-ui-components/BaseMediaCarouselItem):** add BasePdfViewer using BaseRangeSlider to handle zooming
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/BaseMediaCarousel), [BaseMediaCarouselItem](https://base-angewandte.github.io/base-ui-components/BaseMediaCarouselItem):** display an optional preview image for unsupported file types
+* **[BaseMenuList](https://base-angewandte.github.io/base-ui-components/BaseMenuList):**
+  * adding `update:list` event to be able to inform parent of internal list changes
+  * make vue-draggable use optional, new prop `useDraggable`
+* **[BaseNotification](https://base-angewandte.github.io/base-ui-components/BaseNotification):** add new component BaseNotification, plugin `BaseNotificationsPlugin` and composable `useNotifications`.
+* **[BasePdfViewer](https://base-angewandte.github.io/base-ui-components/BasePdfViewer):** new component to parse and render PDF pages via pdf.js library
+* **[BaseRangeSlider](https://base-angewandte.github.io/base-ui-components/BaseRangeSlider):** new component with input range slider and additional buttons to increase/decrease the current value
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/BaseResultBoxSection), [BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector):** also enable assistive text for pagination with new prop `paginationAssistiveText`
+* **[BaseTooltipBox](https://base-angewandte.github.io/base-ui-components/BaseTooltipBox):** add prop `clickOutsideOptions` to specify options for the new click outside handler
+* **useHorizontalDragScroll:** introducing new composable useHorizontalDragScroll
+
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch), [BaseCheckmark](https://base-angewandte.github.io/base-ui-components/BaseCheckmark), [BaseExpandList](https://base-angewandte.github.io/base-ui-components/BaseExpandList), [BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/BaseMenuEntry):** accessibility improvements based on eslint rule vuejs-accessibility/no-static-element
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):**
+  * chip highlighted on drag
+  * collapsed filter items shifting a px when focused
+  * wrong value used for BaseDropDown list prop `labelPropertyName`
+* **[BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/BaseAutocompleteInput):**
+  * error if results retrieved announcement is undefined
+  * internal list navigation not working with string match
+* **[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/BaseBoxButton):** tooltip not clickable if button disabled
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/BaseButton):**
+  * button `buttonStyle` `'circle'` is shrinking if container is flex and content does not fit
+  * fix styleguide slot `text` example and auto add margin if text (or slot) and icon are present
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/BaseCarousel):** update swiper, when items change externally; add default swiper options
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow):**
+  * dragging not working properly, especially on mobile
+  * make drag group name unique so fields can not bleed into each other
+  * fix styleguide multiple options remaining if toggled allow multiple options is toggled to `false`
+  * validation not working as intended in edge cases
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** fix value not shown for unknown entries if `addNewChipText` not set and i18n not available
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField):** chips should only be editable when prop `allowUnknownEntries` is also set to `true`
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseDropDownList](https://base-angewandte.github.io/base-ui-components/BaseDropDownList):** make touchstart event listeners passive
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch), [BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** fix assistiveText optionToRemoveSelected not found
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch):** error if property `optionAdded` does not exist in prop `assistiveText`
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField):**
+  * safeguard against assistive text for option removed not being set
+  * text selected while dragging
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput):**
+  * 'daterangetimerange' fields are not fillable by keyboard or datepicker
+  * calendar or clock icon and fade out not displayed consistently
+* **[BaseDropBox](https://base-angewandte.github.io/base-ui-components/BaseDropBox):**
+  * component button area should not be draggable (just allow to drop stuff)
+  * several bug fixes for drop functionality
+* **[BaseDropButton](https://base-angewandte.github.io/base-ui-components/BaseDropButton):** drop down button should have `cursor: pointer;`
+* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/BaseDropDown):**
+  * drop down height calculation not working
+  * remove min-height from drop-down body
+* **[BaseEditControl](https://base-angewandte.github.io/base-ui-components/BaseEditControl):**
+  * also consider the title (subtitle) changing in fade out calc
+  * only show fade out when title element does not fit parent
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector):** safeguard against announcement text not set
+* **[BaseExpandBox](https://base-angewandte.github.io/base-ui-components/BaseExpandBox):** unexpected closing of the expanded area due to content changes
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):**
+  * field_type 'group' (repeatable) not receiving individual field props
+  * do not remove hidden fields from cleanedAndSortedFormFieldList
+  * safeguard against no x-attrs existing
+  * update possible field_type values
+  * enable to set `isLoading` for single fields via `fieldProps`
+  * minor styling improvements for form toggle and repeatable input fields if more elements in one row
+  * x-attrs text_before and text_after actually do not have any effect
+  * do not overwrite input type 'number' `0` with `null`
+  * do not consider hidden fields for repeatable fields content evaluation
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):**
+  * also add `groupNames` and `index` to form field slot bindings
+  * also pass on index of form group if group is repeatable
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/BaseFormGroups):**
+  * add missing `formId` property
+  * fields loosing focus on typing
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput), [BaseAutocompleteInput](https://base-angewandte.github.io/base-ui-components/BaseAutocompleteInput), [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput), [BaseMultilineTextInput](https://base-angewandte.github.io/base-ui-components/BaseMultilineTextInput), [BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch), [BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator), [BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):** remove hardcoded 'clear input' text from BaseInput and make it configurable in all input components
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput):**
+  * do not take the focus away from remove icon when tabbed to
+  * styleguide demo can not take unlimited number of decimals (-1)
+  * validation not working with max or min being 0
+* **[BaseLink](https://base-angewandte.github.io/base-ui-components/BaseLink):** component description not visible in styleguide
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/BaseMap), [BaseMapLocations](https://base-angewandte.github.io/base-ui-components/BaseMapLocations):** tiles not properly displayled anymore
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/BaseMap):** use global font and styling for popup content
+* **[BaseMapLocations](https://base-angewandte.github.io/base-ui-components/BaseMapLocations):** component BaseExpandBox collapsing if a text list element is hovered
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/BaseMenuEntry):** improve transition when switching the `select-active` state
+* **[BaseMenuList](https://base-angewandte.github.io/base-ui-components/BaseMenuList):** styleguide example list and selectedList not in sync with component state
+* **[BaseMultiLineTextInput](https://base-angewandte.github.io/base-ui-components/BaseMultiLineTextInput):** text present icon in switch button not vertically centered
+* **[BaseOptions](https://base-angewandte.github.io/base-ui-components/BaseOptions):**
+  * element space not calculated correctly on initial render
+  * options not shown initially if prop `showOptions` set true from outside
+  * refactoring to make element fully responsive
+* **[BasePagination](https://base-angewandte.github.io/base-ui-components/BasePagination):** route set page param not considered on initial load
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/BaseResultBoxSection):**
+  * box select triggered on dragend in Firefox
+  * correct wrong prop name from `boxType` to `renderElementAs`
+  * improve dragging experience
+  * initial page number other than 1 set from outside not working
+* **[BaseSearch](https://base-angewandte.github.io/base-ui-components/BaseSearch):**
+  * remove input not triggered on keydown enter
+  * blur also triggered if x-scrollbar visible
+  * only update announcement text if prop was provided with a value or it is different from internal
+* **[BaseSelectOptions](https://base-angewandte.github.io/base-ui-components/BaseSelectOptions):** select all button no aligned properly with prop `reverse` true
+* **styleguide:** make caret and code highlighting visible in code editor
+* **useAnnouncer:** only issue announcer target element not found warning if announcement text was provided
+* **useElementObserver:**
+  * safeguard composable against target not available on mounted
+  * use callback function in observer constructor directly
+
+
+### Changed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):**
+  * refactor BaseCollapsedFilterRow to use new composable useHorizontalDragScroll
+  * use useHorizontalDragScroll also for scrolling the filter list on desktop window size <640px
+* **[BaseBoxButton](https://base-angewandte.github.io/base-ui-components/BaseBoxButton):** improve BaseBoxButton accessibility
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/BaseCarousel):** use `rewind` mode instead of `loop` mode by default
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow):**
+  * enable attribute (and event) inheritance to input element
+  * import VueDraggable dynamically
+  * prevent duplicate options from being added (if `allowUnknownEntries` is `true`)
+  * remove the `default` property before adding an option to selectedList
+* **[BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField):** improve drag and drop styling and remove forceFallback
+* **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput):**
+  * add new prop `fieldType` to be able to set the `type` attribute of the native HTML input field
+  * rename prop `type` to avoid interferences with native type attribute
+* **[BaseDropBox](https://base-angewandte.github.io/base-ui-components/BaseDropBox):** import VueDraggable asynchronously since it is not always needed
+* **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/BaseDropDown):** always set internal id on the component elements
+* **[BaseDropDownList](https://base-angewandte.github.io/base-ui-components/BaseDropDownList):** refactor list with sub-options list navigation
+* **[BaseExpandRow](https://base-angewandte.github.io/base-ui-components/BaseExpandRow):** allow expandable state only if the default slot has content
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):**
+  * enable clearable also for BaseDateInput and chips input fields
+  * this component does not require the client-only tag anymore in SSR context
+  * add v-model to the component
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):**
+  * also allow `null` for prop `modelValue` (former `fieldValue`)
+  * improve event handling and input sync
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/BaseFormGroups):**
+  * add v-model
+  * this component does not require the client-only tag anymore in SSR context
+* **[BaseInfoPanel](https://base-angewandte.github.io/base-ui-components/BaseInfoPanel):** only consider prop `renderPanelHeaderAs` if slot is not used
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput), [BaseDateInput](https://base-angewandte.github.io/base-ui-components/BaseDateInput):** allow hardcoded native HTML `<input>` attributes `enterkeyhint` and `autocomplete` to be overwritten with inherited attributes
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput):**
+  * display number with decimals if prop `decimals` is set (not -1)
+  * do not remove type number input that does not match min/max range
+  * exchange loader and remove icon position as this feels more natural
+  * unify prop naming for input `type` attribute, rename to `inputType`
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/BaseMenuEntry):**
+  * minor improvements by adding computed props and fix spelling mistake
+  * switch to BEM css notation
+* **[BaseMenuList](https://base-angewandte.github.io/base-ui-components/BaseMenuList), [BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector):** new prop `useDraggable` to make import of vue-draggable optional
+* **[BasePagination](https://base-angewandte.github.io/base-ui-components/BasePagination):** add prop `ariaLabels` to handle aria-label translations
+* update min node version to 20
+
+### Removed
+
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** remove prop `addSelectedEntryDirectly`
+* **[BaseDatePanel](https://base-angewandte.github.io/base-ui-components/BaseDatePanel):** remove component
+* **[BaseHoverBox](https://base-angewandte.github.io/base-ui-components/BaseHoverBox), [BaseChip](https://base-angewandte.github.io/base-ui-components/BaseChip), [BaseChipsInputField](https://base-angewandte.github.io/base-ui-components/BaseChipsInputField), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** removed component BaseHoverBox
+* **[BaseTooltip](https://base-angewandte.github.io/base-ui-components/BaseTooltip):** remove deprecated component
+
+
+
 ## 4.1.1 (2024-12-04)
 
 
 ### Chore
 
-* update .gitignore to ignore built component.md files 
+* update .gitignore to ignore built component.md files
 
 ## 4.1.0 (2024-12-04)
 
@@ -611,11 +834,11 @@
 
 ### Added
 
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** handle new x-attributes for input fields , closes #2246
-* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput):** add/handle new properties for input fields type text/number , closes #2244
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** adding optional header element settable by new `x-attrs` field `form_group_title` and new prop `renderHeaderAs` , closes #2238
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** allow to set fieldProps per actual input field for repeatable fields , closes #1978
-* **[BaseFormGroup](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroup):** new wrapper component for [BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm) added , closes #2238
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/components/BaseFormFieldCreator):** handle new x-attributes for input fields
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput):** add/handle new properties for input fields type text/number
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** adding optional header element settable by new `x-attrs` field `form_group_title` and new prop `renderHeaderAs`
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** allow to set fieldProps per actual input field for repeatable fields
+* **[BaseFormGroup](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroup):** new wrapper component for [BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm) added
 
 
 ### Removed
@@ -626,13 +849,13 @@
 ### Fixed
 
 * **[BaseBoxTooltip](https://base-angewandte.github.io/base-ui-components/components/BaseBoxTooltip):** also change icon color on focus and active
-* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel):** error if href missing in carousel list item , closes #1630
+* **[BaseCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseCarousel):** error if href missing in carousel list item
 * **[BaseCheckmark](https://base-angewandte.github.io/base-ui-components/components/BaseCheckmark):** previous changes due to eslint errors now implemented correctly
 * **[BaseDateInput](https://base-angewandte.github.io/base-ui-components/components/BaseDateInput):** remove keyboard event again added due to linter error
 * **[BaseDropDown](https://base-angewandte.github.io/base-ui-components/components/BaseDropDown):** improve accessibility and existing problems with it
-* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** fix input field slot implementation , closes #1978
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** fix input field slot implementation
 * **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** truly center plus icon of repeatable fields
-* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroups):** add missing index.js file for build , closes #2238
+* **[BaseFormGroups](https://base-angewandte.github.io/base-ui-components/components/BaseFormGroups):** add missing index.js file for build
 * **[BaseHlsVideo](https://base-angewandte.github.io/base-ui-components/components/BaseHlsVideo), [BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/components/BaseMediaCarousel):** accessibility improvements based on vuejs-accessibility
 * **[BaseInput](https://base-angewandte.github.io/base-ui-components/components/BaseInput), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/components/BaseChipsInput), [ BaseMapLocations](https://base-angewandte.github.io/base-ui-components/# basemaplocations):** improve and fix accessibility changes
 * **[BaseSwitchButton](https://base-angewandte.github.io/base-ui-components/components/BaseSwitchButton):** fixing label input linting error
