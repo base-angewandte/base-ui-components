@@ -795,6 +795,7 @@ export default {
       :list="fieldType === 'autocomplete'
         ? dropDownList?.length ? dropDownList : fieldProps.list || [] : null"
       :is-loading="autocompleteLoading"
+      :loadable="fieldType === 'autocomplete' && fieldProps.loadable !== false"
       :model-value="fieldValueInt"
       :input-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
       :invalid="invalid || fieldProps.invalid"
