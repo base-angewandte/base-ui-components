@@ -623,7 +623,6 @@ export default {
       handler() {
         this.fetchingData = false;
       },
-      deep: true,
     },
   },
   created() {

@@ -592,7 +592,6 @@ export default {
         }
       },
       immediate: true,
-      deep: true,
     },
     list: {
       /**
@@ -604,7 +603,6 @@ export default {
         this.activeOptionIndex = val.length || (this.allowUnknownEntries && this.input) ? 0 : -1;
       },
       immediate: true,
-      deep: true,
     },
     modelValue: {
       /**
