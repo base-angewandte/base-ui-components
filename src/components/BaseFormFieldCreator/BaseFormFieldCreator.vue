@@ -689,13 +689,15 @@ export default {
        * @event fetch-autocomplete
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
+       * @property {string} fieldKey - a unique identifier for the field, that was specified as prop and is assigned to the native <input> field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields e.g. for contributor roles equivalent is 'contributor'
-       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
+       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specified in this array (most nested property last)
        */
       this.$emit('fetch-autocomplete', {
         value,
         name: this.field.name,
+        fieldKey: this.fieldKey,
         source: this.formFieldXAttrs.source,
         equivalent: this.formFieldXAttrs.equivalent,
       });
@@ -819,6 +821,7 @@ export default {
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
+        fieldKey: fieldKey,
         source: formFieldXAttrs.source,
       })">
       <template

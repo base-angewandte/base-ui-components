@@ -82,8 +82,18 @@ export default {
     /**
      * enter the field name of a field that is currently fetching autocomplete
      * results
+     * WARNING: this prop is deprecated and will be removed in the next major version!
+     *  Please use fieldLoadingId instead!
      */
     fieldIsLoading: {
+      type: String,
+      default: '',
+    },
+    /**
+     * set a field id of a field that is currently fetching autocomplete
+     *  results to display a loader
+     */
+    fieldLoadingId: {
       type: String,
       default: '',
     },
@@ -401,6 +411,15 @@ export default {
       },
       immediate: true,
     },
+    /**
+     * temporary watcher to inform user that the prop is deprecated
+     * @param val
+     */
+    fieldIsLoading(val) {
+      if (val) {
+        console.warn('Prop \'fieldIsLoading\' is deprecated and will be removed in the next major version - please use \'fieldLoadingId\' instead!');
+      }
+    },
   },
   updated() {
     if (this.multiplyParams && this.multiplyParams.name) {
@@ -440,6 +459,7 @@ export default {
        *
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
+       * @property {string} fieldKey - a unique identifier for the field, generated here in BaseForm and assigned to the native <input> field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
        * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
@@ -689,6 +709,9 @@ export default {
       // create a unique string for identifier(key) purposes out of field index
       // and (if field is repeatable) value index
       const comboIndex = fieldRepeatable ? `${index}_${groupIndex}_${valueIndex}` : `${index}_${groupIndex}`;
+      // define a unique field key needed for identification and in autocomplete functionality
+      // (loader display and correct dropdown options assignment)
+      const fieldKey = `${name}_${comboIndex}_${this.formId}`;
       // get the relevant error message(s) from `errorMessagesObject` already here since we need it
       // several times
       const errorMessagesObjectExtract = this.getErrorMessage(name, valueIndex);
@@ -705,8 +728,8 @@ export default {
         language: this.language,
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
-        fieldKey: `${name}_${comboIndex}_${this.formId}`,
-        autocompleteLoading: this.fieldIsLoading === name || singleFieldProps.isLoading,
+        fieldKey: fieldKey,
+        autocompleteLoading: this.fieldIsLoading === name || this.fieldLoadingId === fieldKey ||  singleFieldProps.isLoading,
         // add component props to form fields creator props if list contains a field_type 'group'
         fieldGroupParams: this.cleanedAndSortedFormFieldList
           .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')

@@ -88,7 +88,7 @@ This is a basic (autocomplete functionality not working here) example how a form
           },
         }"
         language="en"
-        :field-is-loading="fieldIsLoading"
+        :field-loading-id="fieldIsLoading"
         :drop-down-lists="{
           date_location: {
             location: [
