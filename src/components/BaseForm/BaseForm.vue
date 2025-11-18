@@ -259,11 +259,6 @@ export default {
        */
       multiplyParams: null,
       /**
-       * remember the field for which autocomplete is fetching
-       * @type {string}
-       */
-      fetchingAutocompleteFor: '',
-      /**
        * internal representation of modelValue (containing values for all input fields)
        * @type {Object}
        * @property {?string|?Array|?Object} [the name of the input field]
@@ -431,7 +426,6 @@ export default {
     /** FORM INPUT HANDLING */
 
     fetchAutocomplete(params) {
-      this.fetchingAutocompleteFor = params.name;
       /**
        * triggered if field has an autocomplete functionality
        * (chips-input, autocomplete-input, chips-below-input)
