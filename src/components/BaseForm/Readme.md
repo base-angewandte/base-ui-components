@@ -637,6 +637,12 @@ export default {
         setTimeout(() => {
           // check if field_type is group
           if (parentFields?.length) {
+            if (!this.dropDownLists[parentFields[0]]) {
+              this.dropDownLists[parentFields[0]] = {};
+            }
+            if (!this.dropDownLists[parentFields[0]][name]) {
+              this.dropDownLists[parentFields[0]][name] = {};
+            }
             // this only works with first level nested form groups!
             this.dropDownLists[parentFields[0]][name][fieldKey] =  [];
           } else {
