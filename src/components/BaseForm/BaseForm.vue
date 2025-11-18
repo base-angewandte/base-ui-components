@@ -99,10 +99,22 @@ export default {
     },
     /**
      * provide an object that contains the options list for all
-     * fields with autocomplete / chips input
+     *  fields with autocomplete / chips input
+     * object should be provided with field names and field key as nested properties
+     * or just field names as properties if field key is not available
+     * e.g. {
+     *   [fieldName]: {
+     *     // an options list fetched via autocomplete
+     *     [fieldKey]: [[options]]
+     *   },
+     *   // a prefetched dropdown options list
+     *   [fieldName2]: [[options]]
+     * }
+     * providing options with field key should be preferred whenever possible, otherwise
+     *  problems might arise for repeatable fields
      * for field type `group` provide a nested object with field names
-     * as properties and an array for each field to ensure the correct options are assigned
-     * even if field names within different groups are identical
+     *  as properties and an array for each field to ensure the correct options are assigned
+     *  even if field names within different groups are identical
      */
     dropDownLists: {
       type: Object,
@@ -723,8 +735,8 @@ export default {
         fieldProps: singleFieldProps,
         showLabel: !this.allowMultiply({ type: element.type, xAttrs: element['x-attrs'] })
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
-        dropDownList: this.dropDownLists[name],
-        secondaryDropdown: this.dropDownLists[`${name}_secondary`],
+        dropDownList: this.getDropDown(name, fieldKey),
+        secondaryDropdown: this.getDropDown([`${name}_secondary`], fieldKey),
         language: this.language,
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
@@ -845,6 +857,27 @@ export default {
         hasContent = !schema?.['x-attrs']?.hidden && (fieldValues === 0 || !!fieldValues || hasContent);
       }
       return hasContent;
+    },
+    /**
+     * function to get the correct dropdown since fieldKey is utilized now to set
+     * drop down more targeted (but remains the same for prefetched options since
+     * we do not have the fieldKey available at the point of data fetching)
+     * @param {string} name - the field name (property) to set the dropdown list for
+     * @param {string} key - the fieldKey of the specific field that should be autocompleted
+     * @returns {[]}
+     */
+    getDropDown(name, key) {
+      const fieldLists = this.dropDownLists[name];
+      // check if field dropdown list is an object with keys
+      // this is checked first since it is the more specific option!
+      if (key && typeof fieldLists === 'object' && !fieldLists.length) {
+        return fieldLists[key] || [];
+      }
+      // check if dropdown list is array
+      if (typeof fieldLists === 'object' && fieldLists.length) {
+        return fieldLists;
+      }
+      return [];
     },
   },
 };
