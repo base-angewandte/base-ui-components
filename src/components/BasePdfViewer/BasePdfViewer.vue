@@ -126,8 +126,8 @@ const allPagesRendered = ref(false);
  * @returns {Promise<PDFDocumentProxy>}
  */
 async function loadPdf(src) {
-  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  const pdfjsWorker = await import('pdfjs-dist/legacy/build/pdf.worker.mjs?url');
+  const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
+  const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs?url');
   pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker.default;
   return pdfjsLib.getDocument(src).promise;
 }
