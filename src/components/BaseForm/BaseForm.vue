@@ -82,17 +82,39 @@ export default {
     /**
      * enter the field name of a field that is currently fetching autocomplete
      * results
+     * WARNING: this prop is deprecated and will be removed in the next major version!
+     *  Please use fieldLoadingId instead!
      */
     fieldIsLoading: {
       type: String,
       default: '',
     },
     /**
+     * set a field id of a field that is currently fetching autocomplete
+     *  results to display a loader
+     */
+    fieldLoadingId: {
+      type: String,
+      default: '',
+    },
+    /**
      * provide an object that contains the options list for all
-     * fields with autocomplete / chips input
+     *  fields with autocomplete / chips input
+     * object should be provided with field names and field key as nested properties
+     * or just field names as properties if field key is not available
+     * e.g. {
+     *   [fieldName]: {
+     *     // an options list fetched via autocomplete
+     *     [fieldKey]: [[options]]
+     *   },
+     *   // a prefetched dropdown options list
+     *   [fieldName2]: [[options]]
+     * }
+     * providing options with field key should be preferred whenever possible, otherwise
+     *  problems might arise for repeatable fields
      * for field type `group` provide a nested object with field names
-     * as properties and an array for each field to ensure the correct options are assigned
-     * even if field names within different groups are identical
+     *  as properties and an array for each field to ensure the correct options are assigned
+     *  even if field names within different groups are identical
      */
     dropDownLists: {
       type: Object,
@@ -396,6 +418,15 @@ export default {
       },
       immediate: true,
     },
+    /**
+     * temporary watcher to inform user that the prop is deprecated
+     * @param val
+     */
+    fieldIsLoading(val) {
+      if (val) {
+        console.warn('Prop \'fieldIsLoading\' is deprecated and will be removed in the next major version - please use \'fieldLoadingId\' instead!');
+      }
+    },
   },
   updated() {
     if (this.multiplyParams && this.multiplyParams.name) {
@@ -434,6 +465,7 @@ export default {
        *
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
+       * @property {string} fieldKey - a unique identifier for the field, generated here in BaseForm and assigned to the native <input> field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields. e.g. for contributor roles equivalent is `contributor`
        * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
@@ -683,6 +715,9 @@ export default {
       // create a unique string for identifier(key) purposes out of field index
       // and (if field is repeatable) value index
       const comboIndex = fieldRepeatable ? `${index}_${groupIndex}_${valueIndex}` : `${index}_${groupIndex}`;
+      // define a unique field key needed for identification and in autocomplete functionality
+      // (loader display and correct dropdown options assignment)
+      const fieldKey = `${name}_${comboIndex}_${this.formId}`;
       // get the relevant error message(s) from `errorMessagesObject` already here since we need it
       // several times
       const errorMessagesObjectExtract = this.getErrorMessage(name, valueIndex);
@@ -694,13 +729,13 @@ export default {
         fieldProps: singleFieldProps,
         showLabel: !this.allowMultiply({ type: element.type, xAttrs: element['x-attrs'] })
           || !this.multiplyButtonsInline(element) || valueIndex === 0,
-        dropDownList: this.dropDownLists[name],
-        secondaryDropdown: this.dropDownLists[`${name}_secondary`],
+        dropDownList: this.getDropDown(name, fieldKey),
+        secondaryDropdown: this.getDropDown([`${name}_secondary`], fieldKey),
         language: this.language,
         availableLocales: this.availableLocales,
         sortText: this.getI18nTerm('form.sort') || 'Sort',
-        fieldKey: `${name}_${comboIndex}_${this.formId}`,
-        autocompleteLoading: this.fieldIsLoading === name || singleFieldProps.isLoading,
+        fieldKey: fieldKey,
+        autocompleteLoading: this.fieldIsLoading === name || this.fieldLoadingId === fieldKey ||  singleFieldProps.isLoading,
         // add component props to form fields creator props if list contains a field_type 'group'
         fieldGroupParams: this.cleanedAndSortedFormFieldList
           .some(field => field['x-attrs'] && field['x-attrs'].field_type === 'group')
@@ -816,6 +851,27 @@ export default {
         hasContent = !schema?.['x-attrs']?.hidden && (fieldValues === 0 || !!fieldValues || hasContent);
       }
       return hasContent;
+    },
+    /**
+     * function to get the correct dropdown since fieldKey is utilized now to set
+     * drop down more targeted (but remains the same for prefetched options since
+     * we do not have the fieldKey available at the point of data fetching)
+     * @param {string} name - the field name (property) to set the dropdown list for
+     * @param {string} key - the fieldKey of the specific field that should be autocompleted
+     * @returns {[]}
+     */
+    getDropDown(name, key) {
+      const fieldLists = this.dropDownLists[name];
+      // check if field dropdown list is an object with keys
+      // this is checked first since it is the more specific option!
+      if (key && typeof fieldLists === 'object' && !fieldLists.length) {
+        return fieldLists[key] || [];
+      }
+      // check if dropdown list is array
+      if (typeof fieldLists === 'object' && fieldLists.length) {
+        return fieldLists;
+      }
+      return [];
     },
   },
 };
