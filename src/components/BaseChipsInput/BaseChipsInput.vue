@@ -1,7 +1,6 @@
 <script>
 import { computed, defineAsyncComponent, toRef, useTemplateRef } from 'vue';
 import { highlightText } from '@/utils/utils.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useListNavigation } from '@/composables/useListNavigation.js';
 import { useId } from '@/composables/useId.js';
@@ -19,10 +18,8 @@ export default {
   components: {
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseDropDownList: defineAsyncComponent(() => import('@/components/BaseDropDownList/BaseDropDownList.vue')),
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
     BaseChipsInputField,
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
   },
   inheritAttrs: false,
   props: {
@@ -917,15 +914,14 @@ export default {
                 :item="option"
                 name="drop-down-entry">
                 <!-- SLOT DEFAULT -->
-                <span
+                <BaseInsertTextAsHtml
                   v-if="option[identifierPropertyName]"
                   :key="option[identifierPropertyName]"
-                  v-insert-text-as-html="{
-                    value: highlightStringMatch
-                      ? highlight(getLangLabel(option[labelPropertyName], true))
-                      : getLangLabel(option[labelPropertyName], true),
-                    interpretTextAsHtml: interpretChipsLabelAsHtml,
-                  }" />
+                  :render-element-as="'span'"
+                  :text="highlightStringMatch
+                    ? highlight(getLangLabel(option[labelPropertyName], true))
+                    : getLangLabel(option[labelPropertyName], true)"
+                  :interpret-text-as-html="interpretChipsLabelAsHtml" />
               </slot>
             </template>
           </template>
