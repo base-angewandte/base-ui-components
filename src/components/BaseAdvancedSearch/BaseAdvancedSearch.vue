@@ -1,7 +1,6 @@
 <script>
 import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { createId, debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import { useId } from '@/composables/useId.js';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
@@ -33,9 +32,7 @@ export default {
     BaseCollapsedFilterRow: defineAsyncComponent(() => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue').then(m => m.default || m)),
     BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m)),
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m)),
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   props: {
     /**
@@ -1826,11 +1823,10 @@ export default {
                           .some((arrayEntry) => typeof arrayEntry === 'object'
                             && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
                               .includes(fieldName))))))">
-                <span
-                  v-insert-text-as-html="{
-                    value: option[labelPropertyName.formInputs],
-                    interpretTextAsHtml: true,
-                  }" />
+                <BaseInsertTextAsHtml
+                  :render-element-as="'span'"
+                  :text="option[labelPropertyName.formInputs]"
+                  :interpret-text-as-html="true" />
               </template>
             </slot>
           </template>
@@ -1867,11 +1863,10 @@ export default {
               && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
                 || (typeof renderFormChipsLabelAsHtml === 'object'
                   && renderFormChipsLabelAsHtml.includes(collectionId)))">
-            <span
-              v-insert-text-as-html="{
-                value: autocompleteOption[labelPropertyName.autocompleteOption],
-                interpretTextAsHtml: true,
-              }" />
+            <BaseInsertTextAsHtml
+              :render-element-as="'span'"
+              :text="autocompleteOption[labelPropertyName.autocompleteOption]"
+              :interpret-text-as-html="true" />
           </template>
         </slot>
       </template>

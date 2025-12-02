@@ -1,7 +1,6 @@
 <script>
 import { defineAsyncComponent, toRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
@@ -15,9 +14,7 @@ export default {
     BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
     BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   inheritAttrs: false,
   props: {
@@ -1147,11 +1144,10 @@ export default {
           :field-name="field.name"
           :option="item"
           name="drop-down-entry">
-          <span
-            v-insert-text-as-html="{
-              value: getLabel(item[labelPropertyName]),
-              interpretTextAsHtml: fieldProps.interpretChipsLabelAsHtml,
-            }" />
+          <BaseInsertTextAsHtml
+            :render-element-as="'span'"
+            :text="getLabel(item[labelPropertyName])"
+            :interpret-text-as-html="fieldProps.interpretChipsLabelAsHtml" />
           <span class="base-form-field-creator__chips-dropdown-second">
             {{ item.additional }}
           </span>

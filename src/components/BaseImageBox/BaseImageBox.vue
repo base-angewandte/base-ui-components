@@ -1,6 +1,5 @@
 <script>
 import { defineAsyncComponent, ref, useSlots, useTemplateRef } from 'vue';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import BaseBox from '@/components/BaseBox/BaseBox.vue';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 import { useWindowResize } from '@/composables/useWindowResize.js';
@@ -18,9 +17,7 @@ export default {
     BaseCheckmark: defineAsyncComponent(() => import('@/components/BaseCheckmark/BaseCheckmark.vue')),
     BaseImage: defineAsyncComponent(() => import('@/components/BaseImage/BaseImage.vue')),
     BaseImageGrid: defineAsyncComponent(() => import('@/components/BaseImageGrid/BaseImageGrid.vue')),
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   props: {
     /**
@@ -503,8 +500,10 @@ export default {
                  { 'base-image-box__header--separator-bottom': !hasImages && !imageShadow && !imageFirst }]">
         <div
           class="base-image-box__header__row">
-          <div
-            v-insert-text-as-html="{ value: title, interpretTextAsHtml }"
+          <BaseInsertTextAsHtml
+            :render-element-as="'div'"
+            :text="title"
+            :interpret-text-as-html="interpretTextAsHtml"
             :title="altTitleInt"
             :class="['base-image-box__header__text',
                      'base-image-box__header__text--bold',
@@ -519,8 +518,10 @@ export default {
         <div
           v-if="subtext"
           class="base-image-box__header__row">
-          <div
-            v-insert-text-as-html="{ value: subtext, interpretTextAsHtml }"
+          <BaseInsertTextAsHtml
+            :render-element-as="'div'"
+            :text="subtext"
+            :interpret-text-as-html="interpretTextAsHtml"
             :title="altSubtextInt"
             class="base-image-box__header__text" />
         </div>
@@ -597,10 +598,12 @@ export default {
               ref="boxTextInnerElement"
               :style="boxTextStyle"
               class="base-image-box__body__text__inner">
-              <div
+              <BaseInsertTextAsHtml
                 v-for="(entry, index) in boxText"
                 :key="index"
-                v-insert-text-as-html="{ value: entry, interpretTextAsHtml }" />
+                :render-element-as="'div'"
+                :text="entry"
+                :interpret-text-as-html="interpretTextAsHtml" />
             </div>
           </slot>
         </div>
@@ -618,9 +621,11 @@ export default {
           </div>
 
           <div class="base-image-box__body__footer__center">
-            <div
+            <BaseInsertTextAsHtml
               v-if="showTitleOnHover"
-              v-insert-text-as-html="{ interpretTextAsHtml, value: title }"
+              :render-element-as="'div'"
+              :text="title"
+              :interpret-text-as-html="interpretTextAsHtml"
               :title="altTitleInt"
               class="base-image-box__body__footer__title base-image-box__body__footer--bold" />
             <div

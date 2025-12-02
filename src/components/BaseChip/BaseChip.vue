@@ -1,7 +1,6 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { useId } from '@/composables/useId.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
 /**
  * Basic Chip component
@@ -11,9 +10,7 @@ export default {
   name: 'BaseChip',
   components: {
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   props: {
     /**
@@ -156,9 +153,11 @@ export default {
              { 'base-chip__linked': isLinked },
              { 'base-chip__active': chipActive }]">
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-    <div
+    <BaseInsertTextAsHtml
       ref="chipText"
-      v-insert-text-as-html="{ value: modelValueInt, interpretTextAsHtml: interpretTextAsHtml && !editable }"
+      render-element-as="div"
+      :text="modelValueInt"
+      :interpret-text-as-html="interpretTextAsHtml && !editable"
       :style="textStyling"
       :contenteditable="editable ? 'true' : undefined"
       :aria-labelledby="assistiveText ? `${internalId}_aria-label` : undefined"
