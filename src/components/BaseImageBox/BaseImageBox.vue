@@ -622,7 +622,7 @@ export default {
               v-if="showTitleOnHover"
               v-insert-text-as-html="{ interpretTextAsHtml, value: title }"
               :title="altTitleInt"
-              class="base-image-box__body__footer__title base-image-box__body__footer--bold" />
+              class="base-image-box__body__footer__title base-image-box__body__footer__title--bold" />
             <div
               v-if="description"
               :title="description"
@@ -1059,11 +1059,11 @@ export default {
 
       &--hover-show-title {
         &:hover {
-          .base-image-box__footer__text {
+          .base-image-box__body__footer__text {
             display: none;
           }
 
-          .base-image-box__footer__title {
+          .base-image-box__body__footer__title {
             display: inherit;
           }
         }
