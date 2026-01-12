@@ -875,8 +875,7 @@ export default {
        */
       handler(val) {
         // check if anything actually changed
-        if (JSON.stringify(val) !== JSON.stringify(this.filter)
-          && hasData(val.filter_values) !== hasData(this.filter.filter_values)) {
+        if (JSON.stringify(val) !== JSON.stringify(this.filter)) {
           let newFilter = JSON.parse(JSON.stringify(val || this.defaultFilter));
           newFilter = {
             ...newFilter,
