@@ -401,12 +401,12 @@ export default {
       const freetextAllowed = newFilter.freetext_allowed;
       if (type === 'date') {
         // map the date from daterange to date if necessary
-        return previousFilter?.type.includes('date')
+        return previousFilter?.type?.includes('date')
         && previousFilterValues ? previousFilterValues.date_from || previousFilterValues.date_to : '';
       }
       if (type === 'daterange') {
         // check if it can be mapped from date to daterange
-        if (previousFilter.type.includes('date')) {
+        if (previousFilter.type?.includes('date')) {
           return {
             date_from: previousFilterValues ? previousFilterValues.date_from || previousFilterValues || '' : '',
             date_to: previousFilterValues?.to ? previousFilterValues.to : '',
