@@ -33,6 +33,10 @@ const props = defineProps({
 </script>
 
 <template>
-  <!-- eslint-disable-next-line vue/max-attributes-per-line vue/no-v-html vue/no-v-text-v-html-on-component -->
-  <component :is="renderElementAs" v-text="!interpretTextAsHtml ? props.text : null" v-html="interpretTextAsHtml ? props.text : null" />
+  <!-- eslint-disable vue/no-v-html vue/no-v-text-v-html-on-component -->
+  <component
+    :is="renderElementAs"
+    v-text="!interpretTextAsHtml ? props.text : null"
+    v-html="interpretTextAsHtml ? props.text : null" />
+  <!-- eslint-enable vue/no-v-html vue/no-v-text-v-html-on-component -->
 </template>
