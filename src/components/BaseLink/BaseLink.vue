@@ -5,7 +5,6 @@ import { useEventListener } from '@/composables/useEventListener.js';
 import { useId } from '@/composables/useId.js';
 import { useHasSlotContent } from '@/composables/useHasSlotContent.js';
 import cleanDomNodes from '@/directives/cleanDomNodes.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 
 /**
  * component to display different types of links
@@ -18,10 +17,10 @@ export default {
     BaseIcon: defineAsyncComponent(() => import('@/components/BaseIcon/BaseIcon.vue')),
     BaseTooltipBox: defineAsyncComponent(() => import('@/components/BaseTooltipBox/BaseTooltipBox.vue')),
     BaseLoader: defineAsyncComponent(() => import('@/components/BaseLoader/BaseLoader.vue')),
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   directives: {
     cleanDomNodes,
-    InsertTextAsHtml,
   },
   props: {
     /**
@@ -483,8 +482,10 @@ export default {
       <slot
         name="label"
         :label="value">
-        <span
-          v-insert-text-as-html="{ value, interpretTextAsHtml }"
+        <BaseInsertTextAsHtml
+          :render-element-as="'span'"
+          :text="value"
+          :interpret-text-as-html="interpretTextAsHtml"
           :class="{ 'no-clean': interpretTextAsHtml }" />
       </slot>
     </template>
@@ -497,8 +498,10 @@ export default {
         <slot
           name="label"
           :label="value">
-          <span
-            v-insert-text-as-html="{ value, interpretTextAsHtml }"
+          <BaseInsertTextAsHtml
+            :render-element-as="'span'"
+            :text="value"
+            :interpret-text-as-html="interpretTextAsHtml"
             :class="{ 'no-clean': interpretTextAsHtml }" />
         </slot>
       </span>
@@ -539,25 +542,22 @@ export default {
             {{ tooltip.label }}
           </span>
 
-          <!-- TODO: somehow the directive `v-insert-text-as-html` is not working here.
-                     for now we remove it and use that hacky workaround -->
           <div
             v-for="(item, index) in tooltip"
             :key="index"
             class="base-tooltip__row">
             {{ item.label }}:
             <template v-if="item.url">
-              <!-- eslint-disable vue/no-v-html - just using next-line did not work -->
-              <a
+              <BaseInsertTextAsHtml
+                :render-element-as="'a'"
+                :interpret-text-as-html="interpretTextAsHtml"
+                :text="item.value"
                 :href="item.url"
                 :title="item.altTitle || undefined"
-                class="base-link--external"
-                v-text="!interpretTextAsHtml ? item.value : null"
-                v-html="interpretTextAsHtml ? item.value : null" />
-              <!-- eslint-enable vue/no-v-html -->
+                class="base-link--external" />
             </template>
-            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len vue/no-v-html vue/max-attributes-per-line -->
-            <template v-else><span v-text="!interpretTextAsHtml ? item.value : null" v-html="interpretTextAsHtml ? item.value : null" /></template>
+            <!-- eslint-disable-next-line vue/singleline-html-element-content-newline max-len vue/max-attributes-per-line -->
+            <template v-else><BaseInsertTextAsHtml :render-element-as="'span'" :interpret-text-as-html="interpretTextAsHtml" :text="item.value" /></template>
           </div>
         </slot>
       </BaseTooltipBox>

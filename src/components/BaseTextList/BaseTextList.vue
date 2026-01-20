@@ -1,6 +1,5 @@
 <script>
 import { defineAsyncComponent } from 'vue';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import cleanDomNodes from '@/directives/cleanDomNodes.js';
 import { useI18n } from '@/composables/useI18n.js';
 
@@ -13,9 +12,9 @@ export default {
   components: {
     BaseTextList: defineAsyncComponent(() => import('./BaseTextList.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   directives: {
-    insertTextAsHtml: InsertTextAsHtml,
     cleanDomNodes,
   },
   props: {
@@ -247,24 +246,26 @@ export default {
 
       <!-- String as text -->
       <!-- get rid of prepending white-space -->
-      <p
+      <BaseInsertTextAsHtml
         v-else-if="item.data && typeof item.data === 'string'"
-        v-insert-text-as-html="{ value: item.data, interpretTextAsHtml }"
+        :render-element-as="'p'"
+        :text="item.data"
+        :interpret-text-as-html="interpretTextAsHtml"
         :class="[
           'base-text-list__content',
           { 'base-text-list__content--pre-line': !interpretTextAsHtml },
-          // render single content in columns
-          // eslint-disable-next-line vue/multiline-html-element-content-newline
-          { 'base-text-list--cols': data.length === 1 }]">{{ item.data }}</p>
+          { 'base-text-list--cols': data.length === 1 }]" />
 
       <!-- Array as unordered list -->
       <ul
         v-else-if="item.data && typeof item.data === 'object' && typeof item.data[0] === 'string'"
         class="base-text-list__content">
-        <li
+        <BaseInsertTextAsHtml
           v-for="(arrayItem, listIndex) in item.data"
           :key="listIndex"
-          v-insert-text-as-html="{ value: arrayItem, interpretTextAsHtml }" />
+          :render-element-as="'li'"
+          :text="arrayItem"
+          :interpret-text-as-html="interpretTextAsHtml" />
       </ul>
 
       <!-- Array/Objects -->
