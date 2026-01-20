@@ -13,6 +13,7 @@ const cwd = path.join(__dirname, './src');
 const ignore = [
   'components/BaseTooltip/*',
   'components/BaseExpandList/BaseExpandListRow.vue',
+  'components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue',
   'components/BaseMediaCarousel/BaseMediaCarouselItem.vue',
   'components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue',
   'components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue',
