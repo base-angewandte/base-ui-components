@@ -23,7 +23,7 @@
     "styleguide:build-test": "node server.js",
     "svg": "node build/generate-svg-sprite-sheet.cjs",
     "prepare": "husky",
-    "changelog": "gulp -f gulpfile.js changelog"
+    "changelog": "bash ./create-changelog.sh"
   },
   "type": "module",
   "main": "./dist/base-ui-components.umd.cjs",
