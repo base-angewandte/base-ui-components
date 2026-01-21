@@ -15,7 +15,7 @@ git commit -m "$PACKAGE_VERSION" &&
 # push develop branch
 git push &&
 # get main ready
-git checkout master &&
+git checkout main &&
 # pull first in case there are commits by somebody else
 git pull &&
 git merge develop &&
@@ -23,15 +23,15 @@ git push &&
 git tag v$PACKAGE_VERSION &&
 git push --tags &&
 # also push main to github
-git push github master &&
-git push --tags github master &&
+git push github main &&
+git push --tags github main &&
 # publish
 npm publish &&
 # also create, commit and publish styleguide
 git checkout gh-pages &&
 # pull first in case there are new version made by somebody else
 git pull &&
-git merge master &&
+git merge main &&
 npm run styleguide:build &&
 git add styleguide/* &&
 git commit -m "docs: styleguide for v$PACKAGE_VERSION" &&
