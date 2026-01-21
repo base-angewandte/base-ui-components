@@ -1,13 +1,15 @@
 import gulp from 'gulp';
 import fs from 'fs';
 import yargs from 'yargs';
-import conventionalChangelog from 'gulp-conventional-changelog';
+import insert from 'gulp-insert';
+import { ConventionalChangelog } from 'conventional-changelog';
+import * as packageInfo from "./package.json" with { type: "json"};
 
 const argv = yargs(process.argv.slice(2)).parse();
 
 const styleguidePath = argv.styleguidePath || 'https://base-angewandte.github.io/base-ui-components/';
 
-gulp.task('changelog', (cb) => {
+gulp.task('changelog', async (cb) => {
   // check if the file exists and create it if necessary
   // fallback if user forgets to create an .env.local file
   if (!fs.existsSync('CHANGELOG.md')) {
@@ -15,20 +17,17 @@ gulp.task('changelog', (cb) => {
     console.info('CHANGELOG.md file was created.');
   }
 
-  gulp.src('CHANGELOG.md')
-    .pipe(conventionalChangelog({
-      // conventional-changelog options go here
-      preset: 'conventionalcommits',
+  const generator = new ConventionalChangelog()
+    .loadPreset('conventionalcommits')
+    .options({
       append: false,
       releaseCount: 1,
-    }, {
+    })
+    .context({
       // do not link references to github repo
       linkReferences: false,
-    }, {
-      // git-raw-commits options go here
-    }, {
-      // conventional-commits-parser options go here
-    }, {
+    })
+    .writer({
       // sections are created based on commit type
       groupBy: 'type',
       reverse: false,
@@ -56,10 +55,14 @@ gulp.task('changelog', (cb) => {
       // do transformations for every single commit here
       // (also tried with transform function of conventional-changelog options however
       // outcome was quite different so leaving it here)
+      // needing to keep this otherwise style will be the original one (Bug fixes etc)??
       transform: (commit) => {
         // initialize an object for the modified properties (so there is potential
         // to modify further props)
-        const modifiedProps = {};
+        const modifiedProps = {
+          // removes the 'closes #issue' string from the end of each commit
+          references: [],
+        };
         // check if the scope does include the string 'Base' which would indicate that a
         // component was set as scope
         if (commit.scope && commit.scope.includes('Base')) {
@@ -90,9 +93,14 @@ gulp.task('changelog', (cb) => {
         };
         return {
           ...context,
+          // need to add version and packageData manually, otherwise remains empty
+          version: packageInfo.default.version,
+          packageData: packageInfo.default,
           // create custom section headers instead of the default type derived ones
           commitGroups: context.commitGroups.map((group) => {
-            // only return groups that have a title
+            // in order to exclude all groups that are not defined in the documentation
+            // (https://hedgedoc.uni-ak.ac.at/#Changelog)
+            // if undefined groups should be left in there just leave first condition!
             if (group.title) {
               const newTitleString = changelogGroups[group.title] || group.title;
               return {
@@ -106,6 +114,17 @@ gulp.task('changelog', (cb) => {
           }),
         };
       },
+    });
+
+  // create the new content since last version and collect chunks
+  const newVersionLog = [];
+  for await (const chunk of generator.write()) {
+    newVersionLog.push(chunk);
+  }
+  // now actually open changelog file and prepend the new content
+  gulp.src('CHANGELOG.md')
+    .pipe(insert.transform(function(contents) {
+      return `${newVersionLog.join('\n\n')}\n\n${contents}`;
     }))
     .pipe(gulp.dest('./'));
   cb();
