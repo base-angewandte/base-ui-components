@@ -14,7 +14,7 @@
 
 ### Fixed
 
-* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):** #
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):**
   * change from autocomplete to date filter causes error
   * filter rows constantly re-rendered on each applied filter update
   * filter sync between search row and parent not working
