@@ -430,6 +430,8 @@ export default {
       delete newProps.additionalPropOptions;
       delete newProps.additionalPropPlaceholder;
       delete newProps.additionalPropertyName;
+      delete newProps.additionalPropAllowMultipleEntries;
+      delete newProps.additionalPropRequired;
       // since BaseInput also has a prop `validationTexts` (and also
       // BaseChipsInput does not have that prop) we dont want that passed down
       delete newProps.validationTexts;

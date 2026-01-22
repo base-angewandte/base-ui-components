@@ -1,7 +1,6 @@
 <script>
 import { computed, defineAsyncComponent, useTemplateRef } from 'vue';
 import { createId, debounce, extractNestedPropertyValue, hasData, sort } from '@/utils/utils.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useAnnouncer } from '@/composables/useAnnouncer.js';
 import { useId } from '@/composables/useId.js';
 import BaseAdvancedSearchRow from '@/components/BaseAdvancedSearch/BaseAdvancedSearchRow.vue';
@@ -33,9 +32,7 @@ export default {
     BaseCollapsedFilterRow: defineAsyncComponent(() => import('@/components/BaseAdvancedSearch/BaseCollapsedFilterRow.vue').then(m => m.default || m)),
     BaseForm: defineAsyncComponent(() => import('@/components/BaseForm/BaseForm.vue').then(m => m.default || m)),
     BaseButton: defineAsyncComponent(() => import('@/components/BaseButton/BaseButton.vue').then(m => m.default || m)),
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   props: {
     /**
@@ -750,17 +747,19 @@ export default {
         .replace('{state}', this.assistiveText.formState[this.formOpen ? 'close' : 'open']);
     },
     /**
-     * create a list of the filters with an unique id for rendering
+     * create a list of the filters with a unique id for RENDERING and HTML UPDATING
      * purposes (v-for key needs to be permanent)
      * created separate variable so appliedFiltersInt can be kept in
      * sync with appliedFilters prop without extra prop causing problems in comparison
      * @returns {(Filter&{uid: string})[]}
      */
-    keyedAppliedFiltersInt() {
-      return this.appliedFiltersInt.map((filter) => ({
-        ...filter,
-        uid: createId(),
-      }));
+    appliedFilterKeys() {
+      // if an internal id already exists use that one - if filters were set from outside
+      // add an internal id (for keying purposes)
+      // it is made sure the index is always correct by also handling appliedFilterKeys
+      // in the removeFilter function (add for addFilterRow it is ok because a new
+      // row can only be appended at the end of the list
+      return this.appliedFiltersInt.map((filter, index) => this.appliedFilterKeys?.[index] || createId());
     },
   },
   watch: {
@@ -1106,6 +1105,12 @@ export default {
      * @param {number} index - the index of the filter
      */
     removeFilter(filter, index) {
+      // when removing a filter row also update the keyed list (responsible for the correct
+      // rendering (html updating) and do it FIRST because appliedFilterKeys RELIES on
+      // appliedFiltersInt and if appliedFiltersInt is updated first the internal id (idInt)
+      // will be calculated incorrectly for appliedFilterKeys
+      this.appliedFilterKeys.splice(index, 1);
+      // now also update the applied filters list (handling the values displayed for a row)
       this.appliedFiltersInt.splice(index, 1);
       // trigger search to update search results
       this.search();
@@ -1604,8 +1609,8 @@ export default {
     <!-- FILTER ROW LIST (MODE 'LIST') -->
     <template v-if="mode === 'list' && appliedFiltersInt && appliedFiltersInt.length">
       <BaseAdvancedSearchRow
-        v-for="(filter, index) in keyedAppliedFiltersInt"
-        :key="filter.uid"
+        v-for="(filter, index) in appliedFiltersInt"
+        :key="appliedFilterKeys[index]"
         :mode="mode"
         :search-row-id="`${internalId}-${filter[identifierPropertyName.filter]}-${index}`"
         :is-main-search="false"
@@ -1826,11 +1831,10 @@ export default {
                           .some((arrayEntry) => typeof arrayEntry === 'object'
                             && extractNestedPropertyValue(groupNames.join('.'), arrayEntry)
                               .includes(fieldName))))))">
-                <span
-                  v-insert-text-as-html="{
-                    value: option[labelPropertyName.formInputs],
-                    interpretTextAsHtml: true,
-                  }" />
+                <BaseInsertTextAsHtml
+                  :render-element-as="'span'"
+                  :text="option[labelPropertyName.formInputs]"
+                  :interpret-text-as-html="true" />
               </template>
             </slot>
           </template>
@@ -1867,11 +1871,10 @@ export default {
               && ((typeof renderFormChipsLabelAsHtml === 'boolean' && renderFormChipsLabelAsHtml)
                 || (typeof renderFormChipsLabelAsHtml === 'object'
                   && renderFormChipsLabelAsHtml.includes(collectionId)))">
-            <span
-              v-insert-text-as-html="{
-                value: autocompleteOption[labelPropertyName.autocompleteOption],
-                interpretTextAsHtml: true,
-              }" />
+            <BaseInsertTextAsHtml
+              :render-element-as="'span'"
+              :text="autocompleteOption[labelPropertyName.autocompleteOption]"
+              :interpret-text-as-html="true" />
           </template>
         </slot>
       </template>

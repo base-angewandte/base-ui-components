@@ -1,3 +1,31 @@
+## 5.0.1 (2026-01-20)
+
+
+### Added
+
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** introducing new prop `fieldLoadingId` to replace `fieldIsLoading` and fix multiple loader issue
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):** add option to specify dropdown options per field key to fix issues with repeatable fields
+
+
+### Changed
+
+* **chore:** add install to publish script to make sure package-lock is in sync and only add tag on master
+* replace internally used `insertTextAsHtml` directive with BaseInsertTextAsHtml component
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):**
+  * change from autocomplete to date filter causes error
+  * filter rows constantly re-rendered on each applied filter update
+  * filter sync between search row and parent not working
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow):** component specific props forwarded to BaseChipsInput
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** remove unnecessary `deep` option in options list watchers
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** loader not displayed for field_type 'autocomplete'
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/BaseImageBox):** fix `showTitleOnHover` behaviour
+* **[BasePdfViewer](https://base-angewandte.github.io/base-ui-components/BasePdfViewer):** fix version mismatch of pdfjs and pdfjs-worker
+* **styleguide:** fix BaseForm dropDownList undefined error
+
+
 ## 5.0.0 (2025-10-28)
 
 

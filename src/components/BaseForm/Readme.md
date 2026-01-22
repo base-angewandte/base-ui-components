@@ -88,32 +88,10 @@ This is a basic (autocomplete functionality not working here) example how a form
           },
         }"
         language="en"
-        :field-is-loading="fieldIsLoading"
-        :drop-down-lists="{
-          date_location: {
-            location: [
-              {
-                label: 'Wien',
-                source: 'http://base.uni-ak.ac.at/portfolio/vienna',
-              },
-              {
-                label: 'Berlin',
-                source: 'http://base.uni-ak.ac.at/portfolio/berlin',
-              },
-            ],
-          },
-          location: [
-              {
-                label: 'Base level options 1',
-                source: 'http://base.uni-ak.ac.at/portfolio/identical1',
-              },
-              {
-                label: 'Base level options 2',
-                source: 'http://base.uni-ak.ac.at/portfolio/identical2',
-              },
-            ],
-        }"
-        class="form">
+        :field-loading-id="fieldIsLoading"
+        :drop-down-lists="dropDownLists"
+        class="form"
+        @fetch-autocomplete="fetchAutocomplete">
       <template #label-addition="{ fieldName, groupNames }">
         <template v-if="fieldName === 'isan'">
           test
@@ -153,6 +131,32 @@ export default {
           hasError: 'not validated yet.',
           valueList: {},
           fieldIsLoading: '',
+          dropDownLists: {
+            // dropdown options are set specifically for the nested field
+            date_location: {
+              location: [
+                {
+                  label: 'Wien',
+                  source: 'http://base.uni-ak.ac.at/portfolio/vienna',
+                },
+                {
+                  label: 'Berlin',
+                  source: 'http://base.uni-ak.ac.at/portfolio/berlin',
+                },
+              ],
+            },
+            // dropdown options are set for all fields named 'location'
+            location: [
+                {
+                  label: 'Base level options 1',
+                  source: 'http://base.uni-ak.ac.at/portfolio/identical1',
+                },
+                {
+                  label: 'Base level options 2',
+                  source: 'http://base.uni-ak.ac.at/portfolio/identical2',
+                },
+              ],
+          },
           fields: {
             contributors: {
               type: 'array',
@@ -271,7 +275,7 @@ export default {
               title: 'Type (Single-select)',
               'x-attrs': {
                 field_type: 'chips',
-                placeholder: 'Select Type',
+                placeholder: 'Select Type (test autocomplete here)',
                 source: '/autosuggest/v1/contributors/',
                 allow_unknown_entries: true,
                 dynamic_autosuggest: true,
@@ -591,6 +595,32 @@ export default {
               },
             },
           },
+          availableTypeOptions: [
+            {
+              label: 'Project',
+              source: 'Project',
+            },
+            {
+              label: 'Exhibition',
+              source: 'Exhibition',
+            },
+            {
+              label: 'Literature',
+              source: 'Literature',
+            },
+            {
+              label: 'Audio',
+              source: 'Audio',
+            },
+            {
+              label: 'Video',
+              source: 'Video',
+            },
+            {
+              label: 'Conference',
+              source: 'Conference',
+            }
+          ]
         }
     },
     methods: {
@@ -598,6 +628,38 @@ export default {
         this.hasError = this.$refs.formExtension.validate();
         console.log('errors', this.hasError);
       },
+      /**
+       * function to demonstrate the setting of dropdown options
+       */
+      fetchAutocomplete({ value, name, fieldKey, source, equivalent, parentFields }) {
+        this.fieldIsLoading = fieldKey;
+        // simulate the data fetching
+        setTimeout(() => {
+          // check if field_type is group
+          if (parentFields?.length) {
+            if (!this.dropDownLists[parentFields[0]]) {
+              this.dropDownLists[parentFields[0]] = {};
+            }
+            if (!this.dropDownLists[parentFields[0]][name]) {
+              this.dropDownLists[parentFields[0]][name] = {};
+            }
+            // this only works with first level nested form groups!
+            this.dropDownLists[parentFields[0]][name][fieldKey] =  [];
+          } else {
+            if (name === 'type') {
+              const lowerCasedValue = value.toLowerCase();
+              if (!this.dropDownLists[name]) {
+                this.dropDownLists[name] = {};
+              }
+              this.dropDownLists[name][fieldKey] = this.availableTypeOptions
+                .filter(({ label }) => label.toLowerCase().includes(lowerCasedValue));
+            } else {
+              this.dropDownLists[name][fieldKey] = [];
+            }
+          }
+          this.fieldIsLoading = '';
+        }, 2000);
+      }
     },
 }
 </script>

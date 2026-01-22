@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch, onUnmounted, useTemplateRef } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
-import { useId } from '@/composables/useId.js';
 import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 
 /**
@@ -66,16 +65,6 @@ const emits = defineEmits([
 ]);
 
 /**
- * internal id
- */
-const internalId = useId();
-
-/**
- * displays console messages for `renderPages`, `stopRendering` and `resumeRendering` methods.
- */
-const debug = false;
-
-/**
  * reference to the container where canvas elements (PDF pages) will be inserted.
  * bound via <div ref="canvasContainer" /> in the template.
  */
@@ -126,8 +115,8 @@ const allPagesRendered = ref(false);
  * @returns {Promise<PDFDocumentProxy>}
  */
 async function loadPdf(src) {
-  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-  const pdfjsWorker = await import('pdfjs-dist/legacy/build/pdf.worker.mjs?url');
+  const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
+  const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.mjs?url');
   pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker.default;
   return pdfjsLib.getDocument(src).promise;
 }
@@ -199,9 +188,6 @@ async function renderPages(startPage = 1) {
         console.error('PDF render error:', e);
         emits('error', true);
       }
-    } finally {
-      // eslint-disable-next-line no-console
-      if (debug) console.log(`${internalId} - page ${pageNum} rendered`);
     }
   }
 
@@ -242,8 +228,6 @@ async function renderPdf(src) {
  */
 function stopRendering() {
   renderPagesAllowed.value = false;
-  // eslint-disable-next-line no-console
-  if (debug) console.log(`${internalId} - rendering stopped on page: ${lastRenderedPage.value}`);
 }
 
 /**
@@ -257,8 +241,6 @@ function resumeRendering() {
   renderPagesAllowed.value = true;
   if (!pdfDoc || allPagesRendered.value) return;
   renderPages(lastRenderedPage.value + 1);
-  // eslint-disable-next-line no-console
-  if (debug) console.log(`${internalId} - rendering resumed on page:  ${lastRenderedPage.value + 1}`);
 }
 
 /**
@@ -293,8 +275,6 @@ watch(() => props.src, (newSrc) => {
  * watch for zoom changes and trigger re-render
  */
 watch(() => [props.zoom, props.zoomWidth], () => {
-  // eslint-disable-next-line no-console
-  if (debug) console.log(`${internalId} - render PDF with ${props.zoom ? 'high' : 'low'} resolution`);
   renderPagesAllowed.value = true;
   lastRenderedPage.value = 0;
   renderPages();

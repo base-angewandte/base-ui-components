@@ -1,7 +1,6 @@
 <script>
 import { defineAsyncComponent, toRef } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
-import InsertTextAsHtml from '@/directives/InsertTextAsHtml.js';
 import { useExtractAttrs } from '@/composables/useExtractAttrs.js';
 
 /**
@@ -15,9 +14,7 @@ export default {
     BaseDateInput: defineAsyncComponent(() => import('@/components/BaseDateInput/BaseDateInput.vue')),
     BaseToggle: defineAsyncComponent(() => import('@/components/BaseToggle/BaseToggle.vue')),
     BaseLink: defineAsyncComponent(() => import('@/components/BaseLink/BaseLink.vue')),
-  },
-  directives: {
-    insertTextAsHtml: InsertTextAsHtml,
+    BaseInsertTextAsHtml: defineAsyncComponent(() => import('@/components/BaseInsertTextAsHtml/BaseInsertTextAsHtml.vue')),
   },
   inheritAttrs: false,
   props: {
@@ -623,7 +620,6 @@ export default {
       handler() {
         this.fetchingData = false;
       },
-      deep: true,
     },
   },
   created() {
@@ -690,13 +686,15 @@ export default {
        * @event fetch-autocomplete
        * @property {string} value - the string to autocomplete
        * @property {string} name - the name of the field
+       * @property {string} fieldKey - a unique identifier for the field, that was specified as prop and is assigned to the native <input> field
        * @property {string} source - the url to request the data from
        * @property {?string} equivalent - string specified for related fields e.g. for contributor roles equivalent is 'contributor'
-       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specififed in this array (most nested property last)
+       * @property {?string[]} parentFields - in case the autocomplete event originates from a subform the subform id's (field property names) are specified in this array (most nested property last)
        */
       this.$emit('fetch-autocomplete', {
         value,
         name: this.field.name,
+        fieldKey: this.fieldKey,
         source: this.formFieldXAttrs.source,
         equivalent: this.formFieldXAttrs.equivalent,
       });
@@ -795,6 +793,7 @@ export default {
       :list="fieldType === 'autocomplete'
         ? dropDownList?.length ? dropDownList : fieldProps.list || [] : null"
       :is-loading="autocompleteLoading"
+      :loadable="fieldType === 'autocomplete' && fieldProps.loadable !== false"
       :model-value="fieldValueInt"
       :input-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
       :invalid="invalid || fieldProps.invalid"
@@ -819,6 +818,7 @@ export default {
       @fetch-dropdown-entries="$emit('fetch-autocomplete', {
         value: $event,
         name: field.name,
+        fieldKey: fieldKey,
         source: formFieldXAttrs.source,
       })">
       <template
@@ -1144,11 +1144,10 @@ export default {
           :field-name="field.name"
           :option="item"
           name="drop-down-entry">
-          <span
-            v-insert-text-as-html="{
-              value: getLabel(item[labelPropertyName]),
-              interpretTextAsHtml: fieldProps.interpretChipsLabelAsHtml,
-            }" />
+          <BaseInsertTextAsHtml
+            :render-element-as="'span'"
+            :text="getLabel(item[labelPropertyName])"
+            :interpret-text-as-html="fieldProps.interpretChipsLabelAsHtml" />
           <span class="base-form-field-creator__chips-dropdown-second">
             {{ item.additional }}
           </span>
