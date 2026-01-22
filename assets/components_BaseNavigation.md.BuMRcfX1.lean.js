@@ -1,0 +1,49 @@
+import{_ as r,a as o,b as a,o as n,aL as i,I as d}from"./chunks/framework.DNZP2baM.js";const m=JSON.parse('{"title":"BaseNavigation","description":"","frontmatter":{},"headers":[],"relativePath":"components/BaseNavigation.md","filePath":"components/BaseNavigation.md","lastUpdated":null}'),s={name:"components/BaseNavigation.md"};function l(c,e,b,h,u,p){const t=o("vue-live");return n(),a("div",null,[e[0]||(e[0]=i("",5)),d(t,{layoutProps:{lang:"vue"},code:`<template>
+  <BaseNavigation
+    :render-as="renderAs"
+    :primary-items="primaryItems"
+    :secondary-items="secondaryItems"
+  />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      primaryItems: [
+        {
+          id: "0",
+          label: "BaseNavigation",
+          shortLabel: "BNavigation",
+          routeMatch: new RegExp("/components/BaseNavigation"),
+          route: "./BaseNavigation",
+        },
+        {
+          id: "4",
+          label: "External Link to base",
+          shortLabel: "External",
+          url: "https://base.uni-ak.ac.at",
+        },
+      ],
+      secondaryItems: [
+        {
+          id: "1",
+          label: "BaseButton",
+          shortLabel: "BButton",
+          route: "./BaseButton",
+          routeMatch: new RegExp("/components/BaseButton"),
+        },
+        {
+          id: "2",
+          label: "BaseLink",
+          shortLabel: "BLink",
+          route: "./BaseLink",
+          routeMatch: new RegExp("/components/BaseLink"),
+        },
+      ],
+      renderAs: "RouterLink",
+    };
+  },
+};
+<\/script>
+`,requires:{}})])}const v=r(s,[["render",l]]);export{m as __pageData,v as default};

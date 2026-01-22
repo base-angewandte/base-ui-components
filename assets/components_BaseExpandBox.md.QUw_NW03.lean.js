@@ -1,0 +1,82 @@
+import{_ as a,a as d,b as o,o as n,aL as r,I as s}from"./chunks/framework.DNZP2baM.js";const x=JSON.parse('{"title":"BaseExpandBox","description":"","frontmatter":{},"headers":[],"relativePath":"components/BaseExpandBox.md","filePath":"components/BaseExpandBox.md","lastUpdated":1679928144000}'),i={name:"components/BaseExpandBox.md"};function l(h,t,m,p,c,u){const e=d("vue-live");return n(),o("div",null,[t[0]||(t[0]=r("",11)),s(e,{layoutProps:{lang:"vue"},code:`<template>
+  <div>
+    <BaseExpandBox>
+      <BaseTextList render-label-as="h2" :data="data" :cols="2" />
+      <template #header>
+        <h1 class="base-headline">Additional content in slot #header</h1>
+      </template>
+      <template #footer>
+        <div style="display: flex;">
+          <BaseButton
+            :icon-colored="true"
+            :has-background-color="false"
+            icon="print"
+            icon-position="top"
+            icon-size="large"
+            text="Print"
+            style="padding-left: 0;"
+          />
+
+          <BaseButton
+            :icon-colored="true"
+            :has-background-color="false"
+            icon="share"
+            icon-position="top"
+            icon-size="large"
+            text="Share"
+          />
+        </div>
+      </template>
+    </BaseExpandBox>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      data: [
+        [
+          {
+            label: "Vero eos et accusam",
+            data: \`Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+              At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+  
+              At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\`,
+          },
+          {
+            label: "Vero eos et accusam",
+            data: [
+              "Lorem ipsum dolor sit amet",
+              "Consetetur sadipscing elitr, sed diam nonumy",
+              "Eirmod tempor invidunt",
+            ],
+          },
+          {
+            label: "Vero eos et accusam",
+            data: [
+              {
+                label: "www",
+                value: "https://base.uni-ak.ac.at",
+                url: "https://base.uni-ak.ac.at",
+              },
+              {
+                label: "email",
+                value: "base@uni-ak.ac.at",
+                url: "mailto:base@uni-ak.ac.at",
+              },
+            ],
+          },
+        ],
+      ],
+    };
+  },
+};
+<\/script>
+<style>
+.base-headline {
+  margin-bottom: 16px;
+  font-size: 1.2em;
+}
+</style>
+`,requires:{}})])}const f=a(i,[["render",l]]);export{x as __pageData,f as default};
