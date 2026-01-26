@@ -42,14 +42,15 @@ npm run styleguide
 # build a new vitepress styleguide version
 npm run styleguide:build
 
+# build a new vitepress styleguide and start a test server
+npm run styleguide:build-test
+
 # create svg spriteSheet
 npm run svg
 
-# create a changelog for the newest version adding to CHANGELOG.md
-npm run changelog
-
-# an argument specifying the styleguide path to correctly link components may be specified like so
-npm run changelog -- --styleguide-path=https://base-angewandte.github.io/base-ui-components/
+# create a new branch feature/changelog, bump version and create changelog
+# version_bump values: 'major', 'minor', 'patch', {sem_ver}
+npm run changelog -- {version_bump}
 ```
 
 ## Development
