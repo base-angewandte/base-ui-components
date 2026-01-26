@@ -35,8 +35,10 @@ else
   exit 1
 fi
 
-#update the package version in package.json (and package-lock.json) without a commit
-npm version --commit-hooks false --git-tag-version false $VERSION_BUMP &&
+# update the package version in package.json (and package-lock.json) without a commit
+# adding the version bump string via echo execution instead of directly to avoid
+# npm warning "Unknown env config 'version-bump'. This will stop working in the next major version of npm."
+npm version --commit-hooks false --git-tag-version false $(echo $VERSION_BUMP)
 
 # get the updated version from package.json
 PACKAGE_VERSION=$(cat package.json \
