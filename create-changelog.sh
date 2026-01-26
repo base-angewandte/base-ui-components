@@ -32,13 +32,11 @@ then
   git checkout -b feature/changelog
 fi
 
-# get the command line argument
-version_bump=$1
 # create a regex for allowed values of the command line argument ('major'|'minor'|'patch'|{version})
 allowed_bump_values="^(major|minor|patch|[0-9]+\.[0-9]+\.[0-9]+)$"
 
 # check if the command line argument matches allowed values
-if [[ "$version_bump" =~ $allowed_bump_values ]]; then
+if [[ "$1" =~ $allowed_bump_values ]]; then
   # if yes set the variable to the specified command line argument
   VERSION_BUMP=$1
 else
@@ -71,7 +69,7 @@ gulp -f gulpfile.js changelog
 read -p "Review changelog and press 'Y' to continue when ready (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
 # commit the new version (incl. CHANGELOG)
-git add CHANGELOG.md package.json package-lock.json &&
+git add CHANGELOG.md package.json package-lock.json
 # create a commit with the version as commit message
 git commit -m "$PACKAGE_VERSION"
 
