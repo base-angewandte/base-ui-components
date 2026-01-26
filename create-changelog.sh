@@ -63,6 +63,8 @@ git add CHANGELOG.md package.json package-lock.json &&
 # create a commit with the version as commit message
 git commit -m "$PACKAGE_VERSION"
 
+# rebase before pushing
+git rebase develop
 # push to the repository
 git push --set-upstream origin feature/changelog
 # return to develop branch
