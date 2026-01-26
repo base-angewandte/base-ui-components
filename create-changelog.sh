@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# script to execute all steps for creating a changelog branch ready for a PR
+# execute via npm: `npm run changelog -- {version_bump}`
+# values for version_bump: 'major', 'minor', 'patch', {sem_ver}
+#
+# * creates a branch `feature/changelog`
+# * updates the version number in `package.json` and `package-lock.json`
+# * creates the changelog
+# * waits for the user to adapt the changelog
+# * on user confirmation then commits changelog and package.json
+# * pushes the branch to remote
+# * returns to develop
+
 # get the current branch name
 current_branch=`git rev-parse --abbrev-ref HEAD`
 
