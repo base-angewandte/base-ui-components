@@ -298,7 +298,7 @@ watch(() => props.activeSubOption, (val) => {
   }
 });
 
-watch(activeOptionIndex, (index, previousIndex) => {
+watch(activeOptionIndex, (index) => {
   // if the component has sub-options the scrolling will be handled by the props.activeSubOption
   // watcher
   if (props.activeSubOption) return;
@@ -320,16 +320,10 @@ watch(activeOptionIndex, (index, previousIndex) => {
       || elementOffsetTop + activeOptionElement.value.clientHeight > scrollContainerHeight.value;
 
     if (optionOutOfView) {
-      if (index > previousIndex) {
-        activeOptionElement.value.scrollIntoView({
-          behavior: 'auto',
-          block: 'nearest',
-        });
-      } else if (index < previousIndex) {
-        activeOptionElement.value.scrollIntoView({
-          behavior: 'auto',
-        });
-      }
+      activeOptionElement.value.scrollIntoView({
+        behavior: 'auto',
+        block: 'nearest',
+      });
     }
   }
 });
