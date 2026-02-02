@@ -1,6 +1,6 @@
 <script>
 import BaseIcon from '@/components/BaseIcon/BaseIcon.vue';
-import { onMounted, ref, useTemplateRef } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import { useElementObserver } from '@/composables/useElementObserver.js';
 import { useI18n } from '@/composables/useI18n.js';
 import { useDebounce } from '@/composables/useDebounce.js';
@@ -112,6 +112,8 @@ export default {
      * how many page numbers can be displayed
      */
     function setStartEnd() {
+      // safeguard against pagination element not rendered yet
+      if (!pagination.value) return;
       // get parent width
       const elementWidth = pagination.value.clientWidth;
       // set the subset and the max number accordingly
@@ -151,11 +153,15 @@ export default {
       callback: debounceCalculations,
     });
 
-    onMounted(() => {
+    /**
+     * called on @vue:mounted of paginationEl element
+     * (to make sure pagination is actually present)
+     */
+    function elementMounted()  {
       // calc the correct numbers for the first time as soon as component
       // is mounted
       setStartEnd();
-    });
+    }
 
     /** LOCALIZATION */
     const { getLangLabel, getI18nTerm } = useI18n();
@@ -170,6 +176,7 @@ export default {
       setStartEnd,
       getLangLabel,
       getI18nTerm,
+      elementMounted,
     };
   },
   computed: {
@@ -274,7 +281,8 @@ export default {
   <nav
     ref="paginationEl"
     :aria-label="getI18nTerm(assistiveText.pagination)"
-    class="base-pagination">
+    class="base-pagination"
+    @vue:mounted="elementMounted">
     <component
       :is="numberElement"
       :to="!!useLinkElement ? getLinkPath(active - 1 > 0 ? active - 1 : 1) : undefined"
