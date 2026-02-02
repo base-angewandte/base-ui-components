@@ -24,9 +24,11 @@ git checkout gh-pages &&
 # pull first in case there are new version made by somebody else
 git pull &&
 git merge main &&
+# remove components folder before building so removed components dont remain in the build
+rm -rf docs/components &&
 npm run styleguide:build &&
 git add styleguide/* &&
-git commit -m "docs: styleguide for v$PACKAGE_VERSION" &&
+git commit -m "docs: styleguide for $PACKAGE_VERSION" &&
 git push &&
 npm run update-pages &&
 git checkout develop
