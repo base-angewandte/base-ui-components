@@ -31,20 +31,24 @@ export function usePopUpLock(target) {
 
   watch(showElement, (val) => {
     if (val && targetElement.value) {
-      disableBodyScroll(targetElement.value);
+      disableBodyScroll(targetElement.value, {
+        reserveScrollBarGap: true,
+      });
     }
   });
 
   onUpdated(() => {
     if (targetElement?.value) {
       if (showElement.value) {
-        disableBodyScroll(targetElement.value, { allowTouchMove: () => true });
+        disableBodyScroll(targetElement.value, {
+          allowTouchMove: () => true,
+          reserveScrollBarGap: true,
+        });
       } else {
         enableBodyScroll(targetElement.value);
       }
     }
   });
-
   onBeforeUnmount(() => {
     clearAllBodyScrollLocks();
   });
