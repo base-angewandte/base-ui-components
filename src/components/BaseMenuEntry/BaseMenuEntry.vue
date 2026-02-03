@@ -251,6 +251,7 @@ export default {
              }]"
     :role="!isSelectActive ? 'option' : undefined"
     :aria-selected="isActive"
+    :aria-disabled="isDisabled"
     @keyup.enter.prevent="clicked"
     @click="clicked">
     <BaseIcon
@@ -364,9 +365,13 @@ export default {
     }
 
     &.base-menu-entry--disabled {
+      .base-menu-entry__icon {
+        color: $graytext-color;
+      }
       .base-menu-entry__text-wrapper {
         .base-menu-entry__title,
-        .base-menu-entry__description {
+        .base-menu-entry__subtext,
+        .base-menu-entry__title-description-wrapper .base-menu-entry__description {
           color: $graytext-color;
         }
       }
