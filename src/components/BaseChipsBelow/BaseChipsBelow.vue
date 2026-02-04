@@ -929,7 +929,7 @@ export default {
                 <BaseIcon
                   :key="'icon' + entry.idInt"
                   name="drag-lines"
-                  class="svg-icon base-chips-below__list-icon" />
+                  class="base-chips-below__list-icon" />
               </div>
             </div>
             <div

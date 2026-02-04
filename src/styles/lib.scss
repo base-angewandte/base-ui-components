@@ -13,6 +13,10 @@
   cursor: grabbing !important;
 }
 
+.grabbing * {
+  cursor: grabbing;
+}
+
 .scrolling {
   cursor: grabbing !important;
   user-select: none;
@@ -88,22 +92,14 @@ li {
   }
 }
 
-// Todo: check if necessary
 :focus {
   outline: none;
-  &:focus {
-    outline: 0;
-  }
 }
 
 fieldset {
   border: none;
   padding: 0;
   margin: 0;
-}
-
-datalist {
-
 }
 
 input[type='search'] {
@@ -170,37 +166,6 @@ input {
 
 button {
   padding: 0;
-}
-
-/* recommended css code for vue-svgicon */
-.svg-icon {
-  display: inline-block;
-  color: inherit;
-  vertical-align: middle;
-  fill: none;
-  stroke: currentColor;
-}
-
-.svg-fill {
-  fill: currentColor;
-  stroke: none;
-}
-
-.svg-up {
-  /* default */
-  transform: rotate(0deg);
-}
-
-.svg-right {
-  transform: rotate(90deg);
-}
-
-.svg-down {
-  transform: rotate(180deg);
-}
-
-.svg-left {
-  transform: rotate(-90deg);
 }
 
 h1, h2, h3 {
@@ -275,8 +240,4 @@ h1, h2, h3 {
   width: 1px;
   margin-left: -1000px;
   overflow: hidden;
-}
-
-.grabbing * {
-  cursor: grabbing;
 }
