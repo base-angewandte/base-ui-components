@@ -459,7 +459,7 @@ export default {
       }
 
       &.base-collapsed-filter-row__filter-list__scrollable,
-      &.base-collapsed-filter-row__filter-list__scrollable * {
+      &.base-collapsed-filter-row__filter-list__scrollable *:not(.base-chip__icon, .base-chip__icon use) {
         cursor: grab;
       }
 
