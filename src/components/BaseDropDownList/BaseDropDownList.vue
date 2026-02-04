@@ -263,7 +263,7 @@ const activeOptionElement = computed(() => {
   // array DOES NOT necessarily have the same order!
   // (https://vuejs.org/guide/essentials/template-refs#refs-inside-v-for)
   return options.value
-    .find((option) => option.id === activeOptionInt.value[props.identifierPropertyName])
+    .find((option) => option.id === activeOptionInt.value[props.identifierPropertyName]?.toString())
     || null;
 });
 
