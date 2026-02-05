@@ -508,11 +508,6 @@ export default {
       // plus an extra $spacing to account for the padding-left applied above.
       // the count of columns is calculated in the setThumbnailColumns() method.
       width: calc(var(--cols) * #{$icon-small} + (var(--cols) - 1) * #{$spacing} + #{$spacing});
-      // width and height of each thumbnail icon
-      :deep(.svg-icon) {
-        height: $icon-small;
-        width: $icon-small;
-      }
     }
 
     .base-menu-entry__checkbox {
