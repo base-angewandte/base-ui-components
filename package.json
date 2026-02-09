@@ -124,6 +124,7 @@
     "**/*.{js,vue}": "npm run lint:js"
   },
   "overrides": {
-    "conventional-changelog-conventionalcommits": "8.0.0"
+    "conventional-changelog-conventionalcommits": "8.0.0",
+    "esbuild": "^0.25"
   }
 }
