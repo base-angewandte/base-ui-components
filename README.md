@@ -94,7 +94,7 @@ Additionally, base-ui-components export the following composables for re-use:
 
 ### License
 
-See [LICENSE](LICENSE.txt)
+See [LICENSE](LICENSE)
 
 
 <!-- logo angewandte -->
