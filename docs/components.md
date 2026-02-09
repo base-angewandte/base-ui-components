@@ -98,12 +98,12 @@ See [LICENSE](https://github.com/base-angewandte/base-ui-components/blob/main/LI
 
 
 <!-- logo angewandte -->
-![alt text](./static/angewandte-logo.svg "Angewandte"){width=200}
+<img src="./static/angewandte-logo.svg" alt="Angewandte-logo" title="Angewandte" width="200px">
+<br>
 <!-- logo base -->
-![alt text](./static/base.png "base Angewandte")
-<!-- logo zukunvt?  or anything else? -->
+<img src="./static/base.png" alt="base Angewandte-logo" title="base Angewandte">
 
 ### Support
 
 This open-source project was developed (and more specifically - cross-browser tested) with the support of:
-[![Browserstack-logo](./static/browserstack.svg){width=200}](https://www.browserstack.com)
+<img src="./static/browserstack.svg" alt="Browserstack-logo" title="Browserstack" width="200px">
