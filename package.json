@@ -20,7 +20,7 @@
     "prepublishOnly": "npm run build",
     "styleguide": "concurrently \"vue-docgen -c docgen.config.js --watch\" \"vitepress dev --port 6060 docs\"",
     "styleguide:build": "vue-docgen -c docgen.config.js && vitepress build docs",
-    "styleguide:build-test": "node server.js",
+    "styleguide:build-test": "npm run styleguide:build && node server.js",
     "svg": "node build/generate-svg-sprite-sheet.cjs",
     "prepare": "husky",
     "changelog": "bash ./create-changelog.sh"
