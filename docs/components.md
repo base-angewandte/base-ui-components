@@ -94,7 +94,7 @@ Additionally, base-ui-components export the following composables for re-use:
 
 ### License
 
-See [LICENSE](LICENSE)
+See [LICENSE](https://github.com/base-angewandte/base-ui-components/blob/main/LICENSE)
 
 
 <!-- logo angewandte -->
