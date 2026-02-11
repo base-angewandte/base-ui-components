@@ -4,7 +4,7 @@
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://base.uni-ak.ac.at",
   "scripts": {
     "dev": "vite",
@@ -20,7 +20,7 @@
     "prepublishOnly": "npm run build",
     "styleguide": "concurrently \"vue-docgen -c docgen.config.js --watch\" \"vitepress dev --port 6060 docs\"",
     "styleguide:build": "vue-docgen -c docgen.config.js && vitepress build docs",
-    "styleguide:build-test": "node server.js",
+    "styleguide:build-test": "npm run styleguide:build && node server.js",
     "svg": "node build/generate-svg-sprite-sheet.cjs",
     "prepare": "husky",
     "changelog": "bash ./create-changelog.sh"
@@ -49,7 +49,7 @@
     "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
-    "pdfjs-dist": "5.4.530",
+    "pdfjs-dist": "5.4.624",
     "swiper": "^11.2.4",
     "vue-datepicker-next": "^1.0.3",
     "vue-draggable-plus": "^0.6.0"
@@ -124,6 +124,7 @@
     "**/*.{js,vue}": "npm run lint:js"
   },
   "overrides": {
-    "conventional-changelog-conventionalcommits": "8.0.0"
+    "conventional-changelog-conventionalcommits": "8.0.0",
+    "esbuild": "^0.25"
   }
 }
