@@ -50,7 +50,7 @@
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
     "pdfjs-dist": "^5.4.54",
-    "swiper": "^11.2.4",
+    "swiper": "^12.1.2",
     "vue-datepicker-next": "^1.0.3",
     "vue-draggable-plus": "^0.6.0"
   },
