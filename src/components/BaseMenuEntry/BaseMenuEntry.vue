@@ -251,6 +251,7 @@ export default {
              }]"
     :role="!isSelectActive ? 'option' : undefined"
     :aria-selected="isActive"
+    :aria-disabled="isDisabled"
     @keyup.enter.prevent="clicked"
     @click="clicked">
     <BaseIcon
@@ -342,15 +343,11 @@ export default {
     background: white;
     overflow: hidden;
 
-    &:focus, &:focus-within {
-      outline: 0;
-      fill: $app-color;
-      color: $app-color;
-
+    &:focus {
       .base-menu-entry__icon,
       .base-menu-entry__title,
       .base-menu-entry__subtext,
-      .base-menu-entry__description {
+      .base-menu-entry__text-wrapper .base-menu-entry__title-description-wrapper .base-menu-entry__description {
         fill: $app-color;
         color: $app-color;
       }
@@ -368,9 +365,13 @@ export default {
     }
 
     &.base-menu-entry--disabled {
+      .base-menu-entry__icon {
+        color: $graytext-color;
+      }
       .base-menu-entry__text-wrapper {
         .base-menu-entry__title,
-        .base-menu-entry__description {
+        .base-menu-entry__subtext,
+        .base-menu-entry__title-description-wrapper .base-menu-entry__description {
           color: $graytext-color;
         }
       }
@@ -388,18 +389,11 @@ export default {
         box-shadow: inset $border-active-width 0 0 0 $app-color;
       }
 
-      &:hover, &:focus-within {
-        fill: $app-color;
-        color: $app-color;
-
+      &:hover {
         .base-menu-entry__icon,
-        .base-menu-entry__icon path,
-        .base-menu-entry__icon use svg,
-        .base-menu-entry__icon use svg g,
-        .base-menu-entry__icon use svg g path,
         .base-menu-entry__title,
         .base-menu-entry__subtext,
-        .base-menu-entry__description {
+        .base-menu-entry__text-wrapper .base-menu-entry__title-description-wrapper .base-menu-entry__description {
           fill: $app-color;
           color: $app-color;
         }
