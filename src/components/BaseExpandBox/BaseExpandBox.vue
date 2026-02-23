@@ -188,8 +188,8 @@ export default {
         contentInnerTemp.setAttribute('id', `contentInnerTemp-${this.internalId}`);
         // append the temporary element to the component
         this.$el.appendChild(contentInnerTemp);
-        // get the height of the temporary element as fractional value
-        const contentInnerTempHeight = contentInnerTemp.getBoundingClientRect().height;
+        // get the height of the temporary element
+        const contentInnerTempHeight = contentInnerTemp.scrollHeight;
         // remove  element
         this.$el.removeChild(document.getElementById(`contentInnerTemp-${this.internalId}`));
         // set button visibility
