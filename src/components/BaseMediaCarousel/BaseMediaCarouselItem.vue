@@ -558,7 +558,6 @@ export default {
     }
 
     .base-media-preview__pdf {
-      width: 100%;
       max-height: calc(100vh - var(--footer-height) - #{$spacing-large});
       margin-top: auto;
 

@@ -3,6 +3,13 @@ import BaseImageBox from '@/components/BaseImageBox/BaseImageBox.vue';
 import { computed, defineAsyncComponent, getCurrentInstance } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
 
+// import swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/keyboard';
+import 'swiper/css/autoplay';
+
 /**
  * Component to render a image slider, based on the JS Library <a href="https://swiperjs.com/">Swiper</a>
  */
@@ -22,7 +29,7 @@ export default {
      *     **subtext** `?string` - the text below the title.
      *     **description** `?string` - the type of item.
      *     **additional** `?string` - additional information (e.g. dates).
-     *     **href** `string` - an url to follow upon item click - this is required if item should be rendered
+     *     **href** `string` - a url to follow upon item click - this is required if item should be rendered
      *      as a link element.
      *     **previews** `Object[]`- an array of image urls in different sizes in the following form:
      *     e.g. `[{ '460w': 'image-url' }, { '640w': 'image url' },...]`
@@ -214,6 +221,7 @@ export default {
       this.swiperOptionsInt.navigation = {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
+        addIcons: false,
         // override with values from outside if defined
         ...this.swiperOptions?.navigation,
       };
@@ -359,13 +367,6 @@ export default {
 
 <style lang="scss">
   @use "@/styles/variables" as *;
-
-  // import swiper styles
-  @import '../../../node_modules/swiper/swiper.scss';
-  @import '../../../node_modules/swiper/modules/navigation.scss';
-  @import '../../../node_modules/swiper/modules/pagination.scss';
-  @import '../../../node_modules/swiper/modules/keyboard.scss';
-  @import '../../../node_modules/swiper/modules/autoplay.scss';
 
   .base-carousel {
     .base-image-box-image {

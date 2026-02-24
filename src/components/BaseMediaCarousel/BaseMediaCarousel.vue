@@ -5,6 +5,14 @@ import { useTemplateRef } from 'vue';
 import { usePopUpLock } from '@/composables/usePopUpLock.js';
 import { useId } from '@/composables/useId.js';
 
+// import swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/keyboard';
+import 'swiper/css/autoplay';
+import 'swiper/css/zoom';
+
 /**
  * Component for browsing various file formats.
  * Supports images, audio, video (currently HLS only), and PDF through dedicated viewers.
@@ -206,6 +214,7 @@ export default {
         navigation: {
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev',
+          addIcons: false,
         },
         lazyPreloaderClass: 'base-media-preview-preloader',
         // Threshold value in px.
@@ -478,14 +487,6 @@ export default {
 <style lang="scss" scoped>
 @use "sass:map";
   @use "@/styles/variables" as *;
-
-  // import swiper styles
-  @use '../../../node_modules/swiper/swiper.scss';
-  @use '../../../node_modules/swiper/modules/navigation.scss';
-  @use '../../../node_modules/swiper/modules/pagination.scss';
-  @use '../../../node_modules/swiper/modules/keyboard.scss';
-  @use '../../../node_modules/swiper/modules/autoplay.scss';
-  @use '../../../node_modules/swiper/modules/zoom.scss';
 
   .base-media-carousel {
     position: fixed;
