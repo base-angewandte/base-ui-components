@@ -1450,6 +1450,8 @@ export default {
 
 .base-result-box-section {
   position: relative;
+  display: flex;
+  width: 100%;
   --items-per-row: v-bind(itemsPerRow);
   --spacing-regular: #{$spacing};
 
@@ -1466,6 +1468,7 @@ export default {
   }
 
   .base-result-box-section__container {
+    width: 100%;
     .base-result-box-section__header-row {
       display: flex;
       flex-direction: row;
