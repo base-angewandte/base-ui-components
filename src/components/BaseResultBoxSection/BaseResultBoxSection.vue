@@ -477,9 +477,6 @@ export default {
             }
             return prev;
           }, 0);
-        // set the styles
-        // set a css variable that is responsible for the number of items
-        resultBoxSection.value.style.setProperty('--items-per-row', itemsPerRow.value);
         // set the correct margins for the boxes
         const nodeId = `base-result-box-section__box-style-${elementId}`;
         let style = document.getElementById(nodeId);
@@ -1453,7 +1450,9 @@ export default {
 
 .base-result-box-section {
   position: relative;
-  --items-per-row: 0;
+  display: flex;
+  width: 100%;
+  --items-per-row: v-bind(itemsPerRow);
   --spacing-regular: #{$spacing};
 
   .base-result-box-section__loading {
@@ -1469,6 +1468,7 @@ export default {
   }
 
   .base-result-box-section__container {
+    width: 100%;
     .base-result-box-section__header-row {
       display: flex;
       flex-direction: row;
