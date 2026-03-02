@@ -1,10 +1,10 @@
 {
   "name": "base-ui-components",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://base.uni-ak.ac.at",
   "scripts": {
     "dev": "vite",
@@ -20,10 +20,10 @@
     "prepublishOnly": "npm run build",
     "styleguide": "concurrently \"vue-docgen -c docgen.config.js --watch\" \"vitepress dev --port 6060 docs\"",
     "styleguide:build": "vue-docgen -c docgen.config.js && vitepress build docs",
-    "styleguide:build-test": "node server.js",
+    "styleguide:build-test": "npm run styleguide:build && node server.js",
     "svg": "node build/generate-svg-sprite-sheet.cjs",
     "prepare": "husky",
-    "changelog": "gulp -f gulpfile.js changelog"
+    "changelog": "bash ./create-changelog.sh"
   },
   "type": "module",
   "main": "./dist/base-ui-components.umd.cjs",
@@ -49,8 +49,8 @@
     "leaflet-responsive-popup": "^1.0.0",
     "leaflet.markercluster": "^1.5.3",
     "normalize.css": "^8.0.1",
-    "pdfjs-dist": "^5.4.54",
-    "swiper": "^11.2.4",
+    "pdfjs-dist": "5.4.624",
+    "swiper": "^12.1.2",
     "vue-datepicker-next": "^1.0.3",
     "vue-draggable-plus": "^0.6.0"
   },
@@ -67,10 +67,10 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@vitejs/plugin-vue": "^5.2.0",
     "autoprefixer": "^10.4.20",
-    "axios": "^1.2.1",
     "body-parser": "^2.2.0",
     "clean-css-cli": "^5.6.3",
     "concurrently": "^9.1.0",
+    "conventional-changelog": "^7.1.1",
     "dotenv": "^17.2.3",
     "es-module-lexer": "^1.5.4",
     "eslint": "^9.15.0",
@@ -80,7 +80,7 @@
     "express": "^5.1.0",
     "globby": "^14.0.2",
     "gulp": "^5.0.0",
-    "gulp-conventional-changelog": "^4.0.0",
+    "gulp-insert": "^0.5.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.10",
     "postcss": "^8.4.41",
@@ -121,5 +121,10 @@
   ],
   "lint-staged": {
     "**/*.{js,vue}": "npm run lint:js"
+  },
+  "overrides": {
+    "conventional-changelog-conventionalcommits": "8.0.0",
+    "esbuild": "^0.25",
+    "minimatch": "^10.2.1"
   }
 }

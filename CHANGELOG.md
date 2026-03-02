@@ -1,3 +1,45 @@
+## 5.0.2 (2026-02-26)
+
+### Fixed
+
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch):**
+  * change from autocomplete to date causes error
+  * collapsed row displaying grab cursor on chip remove icon instead of pointer
+  * collapsed row styling issue with subscript text
+  * filter rows constantly re-rendered on each applied filter update
+  * filter sync between search row and parent not working
+* **[BaseAdvancedSearch](https://base-angewandte.github.io/base-ui-components/BaseAdvancedSearch),
+  [BaseChip](https://base-angewandte.github.io/base-ui-components/BaseChip),
+  [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput),
+  [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator),
+  [BaseImageBox](https://base-angewandte.github.io/base-ui-components/BaseImageBox),
+  [BaseLink](https://base-angewandte.github.io/base-ui-components/BaseLink),
+  [BaseTextList](https://base-angewandte.github.io/base-ui-components/BaseTextList):** text flickering with `insertTextAsHtml` directive - replace with `BaseInsertTextAsHtml` component
+* **[BaseChipsBelow](https://base-angewandte.github.io/base-ui-components/BaseChipsBelow):** component specific props forwarded to BaseChipsInput
+* **[BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** remove unnecessary `deep` option in options list watchers
+* **[BaseDropDownList](https://base-angewandte.github.io/base-ui-components/BaseDropDownList), [BaseChipsInput](https://base-angewandte.github.io/base-ui-components/BaseChipsInput):** options list navigation not working if identifier is type number
+* **[BaseDropDownList](https://base-angewandte.github.io/base-ui-components/BaseDropDownList):** page jumping on drop down navigation
+* **[BaseExpandBox](https://base-angewandte.github.io/base-ui-components/BaseExpandBox):** fix box calculation
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm), [BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** introducing new prop `fieldLoadingId` to replace `fieldIsLoading` and fix multiple loader issue
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/BaseForm):** add option to specify dropdown options per field key to fix issues with repeatable fields
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** loader not displayed for field_type 'autocomplete'
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/BaseImageBox):** fix `showTitleOnHover` behaviour
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/BaseMenuEntry):**
+  * improve highlighting styling on focus or hover
+  * improve disabled state
+* **[BasePdfViewer](https://base-angewandte.github.io/base-ui-components/BasePdfViewer):** fix version mismatch of pdfjs and pdfjs-worker
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/BaseResultBoxSection):** styling issues causing header and boxes interfering
+* **styleguide:**
+  * fix BaseForm dropDownList undefined error
+  * removed components remaining in styleguide
+  * fix LICENSE display for styleguide
+* **usePopUpLock:** page twitching on pop up open (sidebar issue)
+* fix image display on github README
+* update and upgrade dependencies
+* remove file ending from LICENSE file
+* switch from `master` to `main` branch naming
+
+
 ## 5.0.1 (2026-01-20)
 
 

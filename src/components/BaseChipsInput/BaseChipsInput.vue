@@ -815,7 +815,8 @@ export default {
           this.activeOptionIndex,
           true,
         );
-        if (this.activeOption && !this.activeOption[this.identifierPropertyName]) {
+        // added the .toString() method here since ids could also be numbers and IN THEORY also 0
+        if (this.activeOption && !this.activeOption[this.identifierPropertyName]?.toString()) {
           console.warn(`Selected option '${this.activeOption[this.labelPropertyName]}' will not be shown active due to missing identifier property!`);
         }
       }

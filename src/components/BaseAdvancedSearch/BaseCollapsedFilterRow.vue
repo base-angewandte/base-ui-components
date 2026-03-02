@@ -432,7 +432,6 @@ export default {
 
 .base-collapsed-filter-row {
   position: relative;
-  height: $row-height-large;
   align-items: center;
   padding-left: $spacing;
   border-top: $separation-line;
@@ -459,7 +458,7 @@ export default {
       }
 
       &.base-collapsed-filter-row__filter-list__scrollable,
-      &.base-collapsed-filter-row__filter-list__scrollable * {
+      &.base-collapsed-filter-row__filter-list__scrollable *:not(.base-chip__icon, .base-chip__icon use) {
         cursor: grab;
       }
 
@@ -495,7 +494,7 @@ export default {
           flex-direction: row;
           white-space: nowrap;
           flex: 1 0 auto;
-          height: calc(#{$line-height} + #{$spacing-small});
+          align-items: center;
 
           .base-collapsed-filter-row__group-chip--spacing-right {
             margin-right: $spacing-small;
