@@ -1455,7 +1455,7 @@ export default {
 
   .base-form-field-creator__toggle {
     &:deep(.base-toggle__container) {
-      height: $row-height-small;
+      min-height: $row-height-small;
     }
   }
 </style>
