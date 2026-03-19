@@ -212,19 +212,24 @@ export default {
      * if active number changes inform parent
      * @param {number} val - the new page number active
      */
-    active(val) {
-      // check if new number is different from prop value
-      if (this.modelValue !== val) {
-        /**
-         * triggered on page select
-         *
-         * @event update:model-value
-         * @param {number} - the new page number
-         */
-        this.$emit('update:model-value', val);
-      }
-      // adjust the start and end value accordingly (if not all numbers can be displayed)
-      this.setStartEnd();
+    active: {
+      handler(val) {
+        // check if new number is different from prop value
+        if (this.modelValue !== val) {
+          /**
+           * triggered on page select
+           *
+           * @event update:model-value
+           * @param {number} - the new page number
+           */
+          this.$emit('update:model-value', val);
+        }
+        // adjust the start and end value accordingly (if not all numbers can be displayed)
+        this.setStartEnd();
+      },
+      // since $route watcher is immediate this needs to be immediate too in
+      // case the 'page' query param was set in the url
+      immediate: true,
     },
     /**
      * check if parent prop changes
