@@ -119,6 +119,9 @@ $tablet: 1024px;
 
 /* z-indeces */
 $zindex: (
+  // just in here for reference
+  // (this is the value set in the external base-header component)
+  header: 1040,
   slidein: 1,
   boxcontent: 100,
   fadeout: 100,
@@ -130,7 +133,8 @@ $zindex: (
   dropdown: 200,
   uploadbar-content: 200,
   hoverbox: 500,
-  loader: 5000,
+  // should be lower than base-header
+  loader: 800,
   modal_bg: 10000,
   modal: 10020,
   // notification needs to be above modal
