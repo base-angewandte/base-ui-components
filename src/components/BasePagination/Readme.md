@@ -7,7 +7,7 @@ Adjust the number of pages and resize to see differences in the display.
 <template>
   <div class="pagination-example">
     <BasePagination
-      :total="total"/>
+      :total="totalNumber"/>
     <BaseInput
       v-model="total"
       field-type="number"
@@ -23,6 +23,11 @@ export default {
     return {
       total: 10,
     };
+  },
+  computed: {
+    totalNumber() {
+      return Number(this.total);
+    },
   },
 };
 </script>
