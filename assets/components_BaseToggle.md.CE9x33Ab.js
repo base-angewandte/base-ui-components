@@ -1,0 +1,44 @@
+import{_ as d,a,b as o,o as r,aM as l,I as s}from"./chunks/framework.CJiAeuRk.js";const u=JSON.parse('{"title":"BaseToggle","description":"","frontmatter":{},"headers":[],"relativePath":"components/BaseToggle.md","filePath":"components/BaseToggle.md","lastUpdated":1679928144000}'),i={name:"components/BaseToggle.md"};function n(h,t,g,b,c,p){const e=a("vue-live");return r(),o("div",null,[t[0]||(t[0]=l('<h1 id="basetoggle" tabindex="-1">BaseToggle <a class="header-anchor" href="#basetoggle" aria-label="Permalink to &quot;BaseToggle&quot;">​</a></h1><blockquote><p>Toggle Component</p></blockquote><h2 id="props" tabindex="-1">Props <a class="header-anchor" href="#props" aria-label="Permalink to &quot;Props&quot;">​</a></h2><table tabindex="0"><thead><tr><th>Prop name</th><th>Description</th><th>Type</th><th>Values</th><th>Default</th></tr></thead><tbody><tr><td>name</td><td>specify a descriptive name<br>this will not be displayed but is only there for usability purposes</td><td>string</td><td>-</td><td>&#39;baseToggle&#39;</td></tr><tr><td>label</td><td>specify label</td><td>string</td><td>-</td><td>&#39;baseToggle&#39;</td></tr><tr><td>disabled</td><td>disable the toggle button</td><td>boolean</td><td>-</td><td>false</td></tr><tr><td>modelValue</td><td>is toggle checked</td><td>boolean</td><td>-</td><td>false</td></tr><tr><td>hideLabel</td><td>specify visibility of the label</td><td>boolean</td><td>-</td><td>false</td></tr><tr><td>bindSlotToState</td><td>bind visibility of slot content to components checked state</td><td>boolean</td><td>-</td><td>false</td></tr><tr><td>inputId</td><td>if field is occurring more than once - set an id</td><td>string</td><td>-</td><td>&#39;&#39;</td></tr><tr><td>required</td><td>mark as required field</td><td>boolean</td><td>-</td><td>false</td></tr><tr><td>invalid</td><td>mark the form field as invalid and ideally also provide an error message<br>to display below the form field<br>the v-model directive might be used on this prop</td><td>boolean</td><td>-</td><td>false</td></tr><tr><td>errorMessage</td><td>add an error message to be displayed below form field if field is invalid</td><td>string</td><td>-</td><td>&#39;&#39;</td></tr><tr><td>showErrorIcon</td><td>define if error icon should be shown</td><td>boolean</td><td>-</td><td>true</td></tr></tbody></table><h2 id="events" tabindex="-1">Events <a class="header-anchor" href="#events" aria-label="Permalink to &quot;Events&quot;">​</a></h2><table tabindex="0"><thead><tr><th>Event name</th><th>Properties</th><th>Description</th></tr></thead><tbody><tr><td>update:model-value</td><td><strong>undefined</strong> <code>string, boolean</code> - emitted input value (string for Radio Button, boolean value for Checkmark)</td><td>event emitted on radio button / checkmark click</td></tr></tbody></table><h2 id="slots" tabindex="-1">Slots <a class="header-anchor" href="#slots" aria-label="Permalink to &quot;Slots&quot;">​</a></h2><table tabindex="0"><thead><tr><th>Name</th><th>Description</th><th>Bindings</th></tr></thead><tbody><tr><td>error-icon</td><td>use a custom icon instead of standard error/warning icon</td><td></td></tr><tr><td>default</td><td>slot after the label</td><td></td></tr></tbody></table><hr><h2 id="demo" tabindex="-1">Demo <a class="header-anchor" href="#demo" aria-label="Permalink to &quot;Demo&quot;">​</a></h2><p>Toggle Button Example</p>',11)),s(e,{layoutProps:{lang:"vue"},code:`<template>
+  <div>
+    <BaseToggle
+      name="BaseToggle"
+      label="This is an example of an enabled Toggle Input"
+    />
+    <br />
+    <BaseToggle
+      name="BaseToggle"
+      label="This is an example of an invalid Toggle Input"
+      :invalid="true"
+      error-message="Please set this toggle true"
+    />
+    <br />
+    <BaseToggle
+      :disabled="true"
+      :show-error-icon="false"
+      name="BaseToggle"
+      label="This is an example of an disabled Toggle Input"
+    >
+      <template #error-icon> test </template>
+    </BaseToggle>
+    <br />
+    <BaseToggle
+      v-model="checked"
+      :bind-slot-to-state="true"
+      name="BaseToggle"
+      label="Personal Showroom Page"
+    >
+      https://base.uni-ak.ac.at/showroom/PqZxTF9PdbQmdgcjcDgMBq
+    </BaseToggle>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      checked: true,
+    };
+  },
+};
+<\/script>
+`,requires:{}})])}const f=d(i,[["render",n]]);export{u as __pageData,f as default};
