@@ -37,6 +37,7 @@ import BaseLoader from '@/components/BaseLoader/BaseLoader.vue';
 import BaseMap from './BaseMap/BaseMap.vue';
 import BaseMapLocations from './BaseMapLocations/BaseMapLocations.vue';
 import BaseMediaCarousel from '@/components/BaseMediaCarousel/BaseMediaCarousel.vue';
+import BaseMediaCarouselItem from '@/components/BaseMediaCarousel/BaseMediaCarouselItem.vue';
 import BaseMenuEntry from '@/components/BaseMenuEntry/BaseMenuEntry.vue';
 import BaseMenuList from '@/components/BaseMenuList/BaseMenuList.vue';
 import BaseMultilineTextInput from '@/components/BaseMultilineTextInput/BaseMultilineTextInput.vue';
@@ -96,6 +97,7 @@ export {
   BaseMap,
   BaseMapLocations,
   BaseMediaCarousel,
+  BaseMediaCarouselItem,
   BaseMenuEntry,
   BaseMenuList,
   BaseMultilineTextInput,

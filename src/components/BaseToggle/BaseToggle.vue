@@ -63,6 +63,36 @@ export default {
       type: String,
       default: '',
     },
+    /**
+     * mark as required field
+     */
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * mark the form field as invalid and ideally also provide an error message
+     * to display below the form field
+     * the v-model directive might be used on this prop
+     */
+    invalid: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * add an error message to be displayed below form field if field is invalid
+     */
+    errorMessage: {
+      type: String,
+      default: '',
+    },
+    /**
+     * define if error icon should be shown
+     */
+    showErrorIcon: {
+      type: Boolean,
+      default: true,
+    },
   },
   emits: ['update:model-value'],
   setup(props) {
@@ -112,59 +142,76 @@ export default {
 </script>
 
 <template>
-  <!-- events are just here to handle animation - no accessibility needed -->
-  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
-    :class="['base-toggle',
-             { 'base-toggle--checked': checkedInt },
-             { 'base-toggle--disabled': disabled }]"
-    @focusin="animate = true"
-    @mouseover="animate = true"
-    @focusout="animate = false"
-    @mouseleave="animate = false">
-    <label
-      :for="`toggle-input-${idInt}`"
-      class="base-toggle__container">
-      <input
-        :id="`toggle-input-${idInt}`"
-        v-model="checkedInt"
-        :name="name"
-        :checked="checkedInt"
-        :disabled="disabled"
-        :aria-checked="checkedInt"
-        :aria-disabled="disabled"
-        :type="'checkbox'"
-        value=""
-        class="base-toggle__input"
-        @click.stop="">
-
-      <div class="base-switch">
-        <span
-          :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
-          <BaseIcon
-            v-if="checkedInt"
-            :title="hideLabel ? label : ''"
-            name="check-mark" />
-          <BaseIcon
-            v-if="!checkedInt"
-            :title="hideLabel ? label : ''"
-            name="remove" />
+    class="base-toggle">
+    <!-- events are just here to handle animation - no accessibility needed -->
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div
+      :class="['base-toggle__container',
+               { 'base-toggle__container--checked': checkedInt },
+               { 'base-toggle__container--disabled': disabled }]"
+      @focusin="animate = true"
+      @mouseover="animate = true"
+      @focusout="animate = false"
+      @mouseleave="animate = false">
+      <label
+        :for="`toggle-input-${idInt}`"
+        class="base-toggle__input-container">
+        <input
+          :id="`toggle-input-${idInt}`"
+          v-model="checkedInt"
+          :name="name"
+          :checked="checkedInt"
+          :disabled="disabled"
+          :aria-checked="checkedInt"
+          :aria-disabled="disabled"
+          :aria-required="required"
+          :required="required"
+          :type="'checkbox'"
+          value=""
+          class="base-toggle__input"
+          @click.stop="">
+        <span class="base-switch">
+          <span
+            :class="['base-switch__control', { 'base-switch__control--animate': animate }]">
+            <BaseIcon
+              v-if="checkedInt"
+              :title="hideLabel ? label : ''"
+              name="check-mark" />
+            <BaseIcon
+              v-if="!checkedInt"
+              :title="hideLabel ? label : ''"
+              name="remove" />
+          </span>
         </span>
-      </div>
-
+        <span
+          v-if="!hideLabel"
+          class="base-toggle__label">
+          {{ label }}
+        </span>
+        <template
+          v-if="invalid && showErrorIcon">
+          <!-- @slot use a custom icon instead of standard error/warning icon -->
+          <slot name="error-icon">
+            <BaseIcon
+              name="attention"
+              class="base-input__error-icon" />
+          </slot>
+        </template>
+      </label>
       <span
-        v-if="!hideLabel"
-        class="base-toggle__label">
-        {{ label }}
+        v-if="(slotHasContent && checkedInt && bindSlotToState)
+          || (slotHasContent && !bindSlotToState)"
+        class="base-toggle__subtext">
+        <!-- @slot slot after the label -->
+        <slot />
       </span>
-    </label>
-    <span
-      v-if="(slotHasContent && checkedInt && bindSlotToState)
-        || (slotHasContent && !bindSlotToState)"
-      class="base-toggle__subtext">
-      <!-- @slot slot after the label -->
-      <slot />
-    </span>
+    </div>
+    <div
+      v-if="invalid && errorMessage"
+      class="base-input__invalid-message">
+      {{ errorMessage }}
+    </div>
   </div>
 </template>
 
@@ -174,9 +221,40 @@ export default {
 
   .base-toggle {
     position: relative;
-    margin-top: calc((#{$input-field-line-height} - #{$line-height}) * 2);
+    --margin-left: calc(30px + #{$spacing-small});
 
+    // class used in BaseFormFieldCreator
     .base-toggle__container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      &--disabled {
+        color: $font-color-second;
+        cursor: not-allowed;
+      }
+
+      &--checked {
+        .base-switch {
+          .base-switch__control {
+            left: calc(100% - #{$spacing});
+            background-color: $switch-checked-color;
+
+            svg {
+              fill: $switch-svg-checked-color;
+            }
+          }
+        }
+      }
+
+      &:not(.base-toggle__container--disabled) {
+        .base-switch {
+          cursor: pointer;
+        }
+      }
+    }
+
+    .base-toggle__input-container {
       position: relative;
       user-select: none;
       display: flex;
@@ -196,6 +274,14 @@ export default {
 
     .base-toggle__label {
       padding-left: $spacing-small;
+    }
+
+    .base-input__error-icon {
+      height: $icon-large;
+      width: $icon-large;
+      margin-left: $spacing-small;
+      flex-shrink: 0;
+      color: $app-color;
     }
 
     .base-switch {
@@ -234,34 +320,17 @@ export default {
       }
     }
 
-    &--disabled {
-      color: $font-color-second;
-      cursor: not-allowed;
-    }
-
-    &--checked {
-      .base-switch {
-        .base-switch__control {
-          left: calc(100% - #{$spacing});
-          background-color: $switch-checked-color;
-
-          svg {
-            fill: $switch-svg-checked-color;
-          }
-        }
-      }
-    }
-
-    &:not(.base-toggle--disabled) {
-      .base-switch {
-        cursor: pointer;
-      }
+    .base-input__invalid-message {
+      font-size: $font-size-small;
+      color: $app-color;
+      line-height: $line-height-small;
     }
   }
 
   .base-toggle__subtext {
     display: block;
-    margin-left: calc(30px + #{$spacing-small} );
+    margin-left: var(--margin-left);
     font-size: $font-size-small;
+    line-height: $line-height-small;
   }
 </style>

@@ -10,9 +10,20 @@ Toggle Button Example
       label="This is an example of an enabled Toggle Input" />
     <br>
     <BaseToggle
-      :disabled="true"
       name="BaseToggle"
-      label="This is an example of an disabled Toggle Input" />
+      label="This is an example of an invalid Toggle Input"
+      :invalid="true"
+      error-message="Please set this toggle true" />
+    <br>
+    <BaseToggle
+      :disabled="true"
+      :show-error-icon="false"
+      name="BaseToggle"
+      label="This is an example of an disabled Toggle Input">
+      <template #error-icon>
+        test
+      </template>
+    </BaseToggle>
     <br>
     <BaseToggle
       v-model="checked"
