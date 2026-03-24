@@ -1,3 +1,18 @@
+## 5.0.3 (2026-03-24)
+
+### Added
+
+* **[BaseToggle](https://base-angewandte.github.io/base-ui-components/BaseToggle):** add invalid state to component
+
+### Fixed
+
+* **[BaseMediaCarousel](https://base-angewandte.github.io/base-ui-components/BaseMediaCarousel):** add `BaseMediaCarouselItem` to the exposed components
+* **[BasePagination](https://base-angewandte.github.io/base-ui-components/BasePagination):**
+  * error on template ref undefined on initial render
+  * parent not informed about page change on initial render
+* **styleguide:** type error on BasePagination input field value change
+
+
 ## 5.0.2 (2026-02-26)
 
 ### Fixed
