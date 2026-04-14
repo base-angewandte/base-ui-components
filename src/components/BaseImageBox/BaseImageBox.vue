@@ -1046,6 +1046,7 @@ export default {
             .base-image-box__icon--play {
               opacity: 1;
               transition: opacity 500ms ease;
+              fill: $app-color;
             }
 
             &__footer {
