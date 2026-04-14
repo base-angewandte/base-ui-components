@@ -252,7 +252,7 @@ export default {
     :role="!isSelectActive ? 'option' : undefined"
     :aria-selected="isActive"
     :aria-disabled="isDisabled"
-    @keyup.enter.prevent="clicked"
+    @keydown.enter.prevent="clicked"
     @click="clicked">
     <BaseIcon
       v-if="icon"
