@@ -595,7 +595,7 @@ export default {
             results: resultsAnnouncement,
           }"
           :class="['base-entry-selector__head__search-bar',
-                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
+                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow && !showOptions }]"
           @update:model-value="filterEntries($event, 'title')" />
       </slot>
 
