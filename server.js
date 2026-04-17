@@ -2,8 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';
 import dotenv from 'dotenv';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 let envFile = './.env.local';
 dotenv.config({
@@ -11,10 +9,7 @@ dotenv.config({
 });
 const app = express();
 
-// this is for node >= 20
-// const __dirname = import.meta.dirname;
-// for node 18
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
