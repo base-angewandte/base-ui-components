@@ -1,3 +1,28 @@
+## 5.1.0 (2026-04-21)
+
+### ⚠ BREAKING CHANGE
+
+* **[BaseLoader](https://base-angewandte.github.io/base-ui-components/BaseLoader):** `z-index` values in frontend projects might be set based on the BaseLoader `z-index` value and might need adaption as well
+
+### Changed
+
+* **[BaseDropDownList](https://base-angewandte.github.io/base-ui-components/BaseDropDownList):** safeguard against duplicated option identifiers
+
+### Fixed
+
+* **[BaseButton](https://base-angewandte.github.io/base-ui-components/BaseButton):**
+  * add top margin to button with `icon-position?` 'top
+  * fix `iconPosition: 'top'` styling
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector):**
+  * add scroll shadow to top and bottom
+  * wrong spacing to search bar in edit mode
+* **[BaseFormFieldCreator](https://base-angewandte.github.io/base-ui-components/BaseFormFieldCreator):** new props added in 3a353d58 not displayed for BaseToggle
+* **[BaseImageBox](https://base-angewandte.github.io/base-ui-components/BaseImageBox):** wrong play icon color
+* **[BaseInput](https://base-angewandte.github.io/base-ui-components/BaseInput):** fix label `line-height` otherwise differing per project
+* **[BaseLoader](https://base-angewandte.github.io/base-ui-components/BaseLoader):** adapt loader overlay z-index so it appears below base-header
+* **[BaseMenuEntry](https://base-angewandte.github.io/base-ui-components/BaseMenuEntry):** select toggle triggered twice with enter key
+
+
 ## 5.0.3 (2026-03-24)
 
 ### Added
