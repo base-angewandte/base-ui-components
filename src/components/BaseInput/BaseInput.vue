@@ -1038,6 +1038,7 @@ export default {
       align-self: flex-end;
       overflow-wrap: break-word;
       min-width: 150px;
+      line-height: $line-height;
     }
 
     .base-input__label-spacer {

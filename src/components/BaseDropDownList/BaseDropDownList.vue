@@ -187,18 +187,37 @@ const dropDownContainer = useTemplateRef('dropDownContainerEl');
 const dropDownList = useTemplateRef('dropDownListEl');
 
 /**
- * filter out options that don't have a value to display
+ * filter out duplicates and options that don't have a value to display
  * @type {ComputedRef<Object[]>}
  */
-const populatedAndLocalizedOptions = computed(() => {
+const cleanedOptions = computed(() => {
+  // get array ids to check for uniqueness (done here to limit additional looping to a minimum)
+  const arrayIds = props.dropDownOptions.map(item => item[props.identifierPropertyName]);
+  // check for duplicates
+  const hasDuplicates = new Set(arrayIds).size !== arrayIds.length;
   return props.dropDownOptions.reduce((prev, option) => {
+    let isDuplicate = false;
     const langLabel = getLangLabel(option[props.labelPropertyName], true);
-    if (langLabel) {
+    // if the array does have duplicates we need to check if the option is
+    // already in the reduced array (done so additional filtering is only done if really
+    // necessary
+    if (hasDuplicates) {
+      // check if an option with that id was already pushed to the reduced array
+      isDuplicate = prev
+        .some((reducedArrItem) => reducedArrItem[props.identifierPropertyName] === option[props.identifierPropertyName]);
+      if (isDuplicate) {
+        console.warn(`Option '${langLabel}' (identifier: ${option[props.identifierPropertyName]}) is duplicated in the options list and will be removed!`);
+      }
+    }
+    // check that option is not a duplicate and if a label string was found
+    if (!isDuplicate && langLabel) {
+      // if yes add it to the new list
       return prev.concat({
         ...option,
         [props.labelPropertyName]: langLabel,
       });
     }
+    // else just return the new array as is
     return prev;
   }, []);
 });
@@ -241,7 +260,7 @@ const scrollContainerHeight = computed(() => {
  */
 const activeOptionIndex = computed(() => {
   if (!props.activeOption) return -1;
-  return populatedAndLocalizedOptions.value.findIndex((option) => {
+  return cleanedOptions.value.findIndex((option) => {
     return option[props.identifierPropertyName] === props.activeOption[props.identifierPropertyName];
   });
 });
@@ -250,7 +269,7 @@ const activeOptionIndex = computed(() => {
  * @returns {number}
  */
 const activeOptionInt = computed(() => {
-  return populatedAndLocalizedOptions.value[activeOptionIndex.value] || null;
+  return cleanedOptions.value[activeOptionIndex.value] || null;
 });
 
 /**
@@ -384,7 +403,7 @@ const showNoOptions = computed(() => {
       role="listbox"
       class="base-drop-down-list">
       <template
-        v-for="(dropDownOption, optionIndex) in populatedAndLocalizedOptions"
+        v-for="(dropDownOption, optionIndex) in cleanedOptions"
         :key="dropDownOption[identifierPropertyName]">
         <li
           :id="dropDownOption[identifierPropertyName]"

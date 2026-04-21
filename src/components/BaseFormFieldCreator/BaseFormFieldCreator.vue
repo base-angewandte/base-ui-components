@@ -1367,6 +1367,11 @@ export default {
       :name="fieldKey"
       :label="labelInt"
       :bind-slot-to-state="fieldProps.bindSlotToState || true"
+      :input-type="isNumberField ? 'number' : fieldProps.fieldType || 'text'"
+      :invalid="invalid || fieldProps.invalid"
+      :required="required || fieldProps.required"
+      :error-message="errorMessage || fieldProps.errorMessage"
+      :show-error-icon="showErrorIcon"
       class="base-form-field-creator__toggle"
       @update:model-value="emitCompletedInputValues">
       <BaseLink

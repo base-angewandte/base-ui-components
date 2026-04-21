@@ -1,6 +1,6 @@
 {
   "name": "base-ui-components",
-  "version": "5.0.3",
+  "version": "5.1.0",
   "private": false,
   "description": "base Angewandte Component Library",
   "author": "baseAngewandte <basemail@uni-ak.ac.at>",
@@ -108,8 +108,8 @@
     "last 2 versions"
   ],
   "engines": {
-    "node": ">= 20.0.0 <21.0.0",
-    "npm": ">= 9.0.0"
+    "node": ">= 20.0.0 <25.0.0",
+    "npm": ">= 9.0.0 <12.0.0"
   },
   "repository": {
     "type": "git",

@@ -589,7 +589,7 @@ export default {
           v-if="!hasImages || !displayImage"
           ref="boxTextElement"
           class="base-image-box__body__text">
-          <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInner` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
+          <!-- @slot to display more advanced text - if you use this please specify the `ref` attribute with `boxTextInnerElement` that has the line-height css attribute set - so the text display height can be calculated correctly! -->
           <slot
             :text="boxText"
             name="text">
@@ -1046,6 +1046,7 @@ export default {
             .base-image-box__icon--play {
               opacity: 1;
               transition: opacity 500ms ease;
+              fill: $app-color;
             }
 
             &__footer {

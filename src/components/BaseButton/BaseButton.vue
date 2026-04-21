@@ -389,7 +389,7 @@ export default {
       z-index: map.get($zindex, button-active);
     }
 
-    &.base-button--align-left:not(&.base-button__icon--top) {
+    &.base-button--align-left:not(&.base-button--icon-top) {
       justify-content: flex-start;
     }
 
@@ -397,14 +397,18 @@ export default {
       justify-content: center;
     }
 
-    &.base-button--align-right:not(&.base-button__icon--top)  {
+    &.base-button--align-right:not(&.base-button--icon-top)  {
       justify-content: flex-end;
     }
 
-    &.base-button__icon--top {
+    &.base-button--icon-top {
       flex-direction: column;
       justify-content: center;
       line-height: $line-height;
+
+      .base-button__icon--margin {
+        margin-top: $spacing-small-half;
+      }
     }
 
     &.base-button--icon-left {

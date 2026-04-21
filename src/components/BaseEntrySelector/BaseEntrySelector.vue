@@ -1,7 +1,7 @@
 <script>
-import { defineAsyncComponent, ref, toRef } from 'vue';
+import {defineAsyncComponent, ref, toRef, useTemplateRef} from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useEventListener } from '@/composables/useEventListener.js';
+import { useEventListener, useElementObserver } from '@/composables';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -277,26 +277,32 @@ export default {
     const { getI18nTerm } = useI18n(toRef(props, 'language'));
 
     /** LIST FADE OUT */
-    const body = ref(null);
+    const bodyEl = useTemplateRef('body');
     const headHasShadow = ref(false);
+    const bottomHasShadow = ref(false);
     function scroll() {
-      if (body.value.scrollTop) {
-        headHasShadow.value = true;
-        return;
-      }
-      headHasShadow.value = false;
+      headHasShadow.value = bodyEl.value.scrollTop !== 0;
+      bottomHasShadow.value = bodyEl.value.clientHeight + bodyEl.value.scrollTop < bodyEl.value.scrollHeight;
     }
 
     useEventListener({
-      target: body,
+      target: bodyEl,
       event: 'scroll',
       callback: scroll,
+      callOnMounted: true,
     });
+
+    useElementObserver({
+      type: 'resize',
+      target: bodyEl,
+      callback: scroll,
+    })
 
     return {
       getI18nTerm,
-      body,
+      bodyEl,
       headHasShadow,
+      bottomHasShadow,
     };
   },
   data() {
@@ -574,7 +580,6 @@ export default {
     <div
       ref="head"
       :class="['base-entry-selector__head',
-               { 'base-entry-selector__head--shadow': headHasShadow },
                { 'base-entry-selector__head--padding': useSearch }]">
       <!-- @slot per default this element contains the search element of the component. Use this slot to replace it with your own elements -->
       <slot name="head">
@@ -590,7 +595,7 @@ export default {
             results: resultsAnnouncement,
           }"
           :class="['base-entry-selector__head__search-bar',
-                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow}]"
+                   { 'base-entry-selector__head__search-bar--margin-large': !showOptionsRow && !showOptions }]"
           @update:model-value="filterEntries($event, 'title')" />
       </slot>
 
@@ -680,75 +685,82 @@ export default {
 
     <!-- BODY -->
     <div
-      ref="body"
-      class="base-entry-selector__body">
+      ref="bodyEl"
+      class="base-entry-selector__body-wrapper">
       <div
-        v-if="isLoading"
-        class="loading-area">
-        <BaseLoader
-          :text-on-loader-show="assistiveText.loaderActive"
-          :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
-      </div>
-
-      <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
-          @binding {Object[]} entries - list of entries to display
-          @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
-          -->
-      <slot
-        name="entries"
-        :entries="entries"
-        :select-entry="selectEntry">
-        <!-- default -->
-        <BaseMenuList
-          v-if="entries.length"
-          key="menu-list"
-          ref="menuList"
-          :select-active="showOptions"
-          :list="entries"
-          :active-entry="activeEntry"
-          :selected-list="selectedListIds"
-          :use-draggable="useDraggable"
-          class="base-entry-selector__body__entries"
-          @clicked="entryClicked"
-          @selected="selectEntry">
-          <template #entry-text-content="{ item }">
-            <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
-            @binding {Object} item - the data of one single selector entry provided with `entries` -->
-            <slot
-              name="entry-text-content"
-              :item="item" />
-          </template>
-          <template #entry-right-side-elements="{ isSelected, item }">
-            <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
-               @binding { Object } item - the complete entry provided by list
-               @binding { boolean } is-selected - was item selected
-               @binding { boolean } select-active - is select mode of entry selector active -->
-            <slot
-              name="entry-right-side-elements"
-              :is-selected="isSelected"
-              :select-active="showOptions"
-              :item="item" />
-          </template>
-          <template
-            #thumbnails="{ item }">
-            <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
-              @binding { Object } item - the data of one entry provided by `entries` prop -->
-            <slot
-              :item="item"
-              name="thumbnails" />
-          </template>
-        </BaseMenuList>
+        :class="['base-entry-selector__body-shadow', { 'base-entry-selector__body-shadow--top': headHasShadow }]" />
+      <div
+        :class="['base-entry-selector__body-shadow', { 'base-entry-selector__body-shadow--bottom': bottomHasShadow }]" />
+      <div
+        ref="body"
+        class="base-entry-selector__body">
         <div
-          v-else-if="!isLoading"
-          class="base-entry-selector__no-entries">
-          <p class="base-entry-selector__no-entries__title">
-            {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
-          </p>
-          <p class="base-entry-selector__no-entries__subtext">
-            {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
-          </p>
+          v-if="isLoading"
+          class="loading-area">
+          <BaseLoader
+            :text-on-loader-show="assistiveText.loaderActive"
+            :class="{ 'base-entry-selector__loader__center': entries.length < 4 }" />
         </div>
-      </slot>
+        <!-- @slot the component [BaseMenuList](BaseMenuList) is used per default to display the list of entries - if something different is required use this slot.
+            @binding {Object[]} entries - list of entries to display
+            @binding {Function} select-entry - function to trigger when entry was selected - takes two arguments: @property **index** `number`: the index of the element in the entries list. **selected** `boolean`: if element was selected or deselected
+            -->
+        <slot
+          name="entries"
+          :entries="entries"
+          :select-entry="selectEntry">
+          <!-- default -->
+          <BaseMenuList
+            v-if="entries.length"
+            key="menu-list"
+            ref="menuList"
+            :select-active="showOptions"
+            :list="entries"
+            :active-entry="activeEntry"
+            :selected-list="selectedListIds"
+            :use-draggable="useDraggable"
+            class="base-entry-selector__body__entries"
+            @clicked="entryClicked"
+            @selected="selectEntry">
+            <template #entry-text-content="{ item }">
+              <!-- @slot text-content - use this slot to individualize the displayed text per selector entry.
+              @binding {Object} item - the data of one single selector entry provided with `entries` -->
+              <slot
+                name="entry-text-content"
+                :item="item" />
+            </template>
+            <template #entry-right-side-elements="{ isSelected, item }">
+              <!-- @slot use this slot to add elements to the right side of an entry. This slot content will be rendered in place of thumbnails and select checkbox so it will effectively disable the display of selection elements and if select mode is desired, custom elements should be provided
+                 @binding { Object } item - the complete entry provided by list
+                 @binding { boolean } is-selected - was item selected
+                 @binding { boolean } select-active - is select mode of entry selector active -->
+              <slot
+                name="entry-right-side-elements"
+                :is-selected="isSelected"
+                :select-active="showOptions"
+                :item="item" />
+            </template>
+            <template
+              #thumbnails="{ item }">
+              <!-- @slot add custom elements at the end of the item row (see also [BaseMenuList](BaseMenuList)). this slot can only be be used if the `entries` slot is not used
+                @binding { Object } item - the data of one entry provided by `entries` prop -->
+              <slot
+                :item="item"
+                name="thumbnails" />
+            </template>
+          </BaseMenuList>
+          <div
+            v-else-if="!isLoading"
+            class="base-entry-selector__no-entries">
+            <p class="base-entry-selector__no-entries__title">
+              {{ getI18nTerm(entrySelectorText.noEntriesTitle) }}
+            </p>
+            <p class="base-entry-selector__no-entries__subtext">
+              {{ getI18nTerm(entrySelectorText.noEntriesSubtext) }}
+            </p>
+          </div>
+        </slot>
+      </div>
     </div>
 
     <BasePagination
@@ -797,28 +809,55 @@ export default {
       padding-bottom: $spacing-small;
     }
 
-    &__body {
-      position: relative;
-      flex: 1 1 auto;
-      overflow-y: auto;
-      overflow-x: hidden;
+    // wrapper introduced for shadow effects
+    .base-entry-selector__body-wrapper {
+      height: 100%;
       min-height: $row-height-large;
+      position: relative;
+      overflow: hidden;
 
-      &__entries {
+      .base-entry-selector__body {
         height: 100%;
+        position: relative;
+        overflow-y: auto;
+        flex: 1 1 auto;
+        min-height: $row-height-large;
+
+        .base-entry-selector__body__entries {
+          height: 100%;
+        }
+
+        .loading-area {
+          position: absolute;
+          height: 100%;
+          width: 100%;
+          z-index: map.get($zindex, loader);
+          background-color: $loading-background;
+          overflow: hidden;
+
+          .base-entry-selector__loader__center {
+            top: 50%;
+          }
+        }
+      }
+      .base-entry-selector__body-shadow {
+        position: absolute;
+        left: 0;
+        // z-index needs to lie above BaseMenuEntry text-fade-out
+        z-index: calc(map.get($zindex, fadeout) + 2);
+        height: 8px;
+        width: 100%;
+        pointer-events: none;
       }
 
-      .loading-area {
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        z-index: map.get($zindex, loader);
-        background-color: $loading-background;
-        overflow: hidden;
+      .base-entry-selector__body-shadow--top {
+        top: 0;
+        box-shadow: inset 0 $spacing-small $spacing-small (-$spacing-small) rgba(0, 0, 0, 0.25);
+      }
 
-        .base-entry-selector__loader__center {
-          top: 50%;
-        }
+      .base-entry-selector__body-shadow--bottom {
+        bottom: 0;
+        box-shadow: inset 0 (-$spacing-small) $spacing-small (-$spacing-small) rgba(0, 0, 0, 0.25);
       }
     }
 
