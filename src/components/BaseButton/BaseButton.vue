@@ -405,6 +405,10 @@ export default {
       flex-direction: column;
       justify-content: center;
       line-height: $line-height;
+
+      .base-button__icon--margin {
+        margin-top: $spacing-small-half;
+      }
     }
 
     &.base-button--icon-left {
