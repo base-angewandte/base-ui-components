@@ -14,6 +14,17 @@ const props = defineProps({
     default: 4000,
   },
   /**
+   * set a notification group name to handle groups independently
+   *
+   * **deprecation warning**: currently default is set to 'request-notifications' to not break backwards
+   *  compatibility however this will be removed in future major versions! Add group="request-notifications"
+   *  to your component in front-end if you want to keep the group!
+   */
+  group: {
+    type: String,
+    default: 'request-notifications',
+  },
+  /**
    * define if a header is present to display notification below that header
    *
    * if a header is present make sure the css variable `--header-height` is
@@ -40,7 +51,7 @@ function notificationTitle(val) {
       <Notifications
         :duration="props.duration"
         :width="'100%'"
-        group="request-notifications"
+        :group="group"
         position="top right"
         animation-name="v-slide">
         <template
