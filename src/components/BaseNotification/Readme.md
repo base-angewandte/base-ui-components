@@ -34,7 +34,8 @@ The plugin can then be triggered with `$notify(options)` in Options API.
 <template>
   <div>
     <BaseNotification
-      :has-header="false"/>
+      :has-header="false"
+      group="custom-group" />
     <BaseButton
       text="Trigger Notification"
       @clicked="triggerNotification"/>
@@ -45,7 +46,7 @@ export default {
   methods: {
     triggerNotification() {
       this.$notify({
-        group: 'request-notifications',
+        group: 'custom-group',
         title: 'Something went wrong!!',
         text: 'This is how your error notification will look like.',
         type: 'error',
