@@ -353,9 +353,9 @@ async function init() {
   if (L.value) return;
 
   // Import Leaflet and related plugins
-  L.value = await import('leaflet');
-  const { ResponsivePopup } = await import('leaflet-responsive-popup');
-  const { MarkerClusterGroup } = await import('leaflet.markercluster');
+  L.value = await import('leaflet').then((m) => m.default || m);
+  const { ResponsivePopup } = await import('leaflet-responsive-popup').then((m) => m.default || m);
+  const { MarkerClusterGroup } = await import('leaflet.markercluster').then((m) => m.default || m);
 
   // Initialize Leaflet map
   const mapTmp = L.value.map(mapElement.value, {
