@@ -6,6 +6,8 @@ PACKAGE_VERSION=$(cat package.json \
   | awk -F: '{ print $2 }' \
   | sed 's/[", ]//g')
 
+# make sure you are currently on develop
+git checkout develop
 # do a rebase to get the approved changelog changes
 git pull --rebase
 # get main ready
