@@ -20,7 +20,11 @@ git tag $PACKAGE_VERSION &&
 git push --tags &&
 # also push main to github
 git push github main &&
-git push --tags github main &&
+git push --tags github main
+
+# instructions to create a npm token
+read -p "Create a new authentication token for the publish script on https://www.npmjs.com/settings/baseangewandte/tokens and add the token to your .npmrc file like so: //registry.npmjs.org/:_authToken=your_token . Press 'Y' to continue when ready or 'N' to abort (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+
 # publish
 npm publish &&
 # also create, commit and publish styleguide
