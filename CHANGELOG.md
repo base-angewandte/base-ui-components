@@ -1,3 +1,14 @@
+## 5.1.1 (2026-05-11)
+
+### Added
+
+* **[BaseNotification](https://base-angewandte.github.io/base-ui-components/BaseNotification):** remove hardcoded `group` prop and replace with configurable component prop 
+
+### Fixed
+
+* **[BaseMap](https://base-angewandte.github.io/base-ui-components/BaseMap):** component not working with Nuxt projects
+
+
 ## 5.1.0 (2026-04-21)
 
 ### ⚠ BREAKING CHANGE
