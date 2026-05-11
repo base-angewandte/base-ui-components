@@ -35,4 +35,7 @@ git add styleguide/* &&
 git commit -m "docs: styleguide for $PACKAGE_VERSION" &&
 git push &&
 npm run update-pages &&
+# rollback docs/components changes in git tree so branch can be switched
+git checkout --no-overlay -- docs/components
+# switch back to develop
 git checkout develop
