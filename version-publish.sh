@@ -6,10 +6,12 @@ PACKAGE_VERSION=$(cat package.json \
   | awk -F: '{ print $2 }' \
   | sed 's/[", ]//g')
 
+# do a rebase to get the approved changelog changes
+git pull --rebase
 # get main ready
 git checkout main &&
 # pull first in case there are commits by somebody else
-git pull &&
+git pull --rebase &&
 git merge develop &&
 git push &&
 git tag $PACKAGE_VERSION &&
@@ -22,7 +24,7 @@ npm publish &&
 # also create, commit and publish styleguide
 git checkout gh-pages &&
 # pull first in case there are new version made by somebody else
-git pull &&
+git pull --rebase &&
 git merge main &&
 # remove components folder before building so removed components dont remain in the build
 rm -rf docs/components &&
