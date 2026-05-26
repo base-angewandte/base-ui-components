@@ -6,23 +6,31 @@ PACKAGE_VERSION=$(cat package.json \
   | awk -F: '{ print $2 }' \
   | sed 's/[", ]//g')
 
+# make sure you are currently on develop
+git checkout develop
+# do a rebase to get the approved changelog changes
+git pull --rebase
 # get main ready
 git checkout main &&
 # pull first in case there are commits by somebody else
-git pull &&
+git pull --rebase &&
 git merge develop &&
 git push &&
 git tag $PACKAGE_VERSION &&
 git push --tags &&
 # also push main to github
 git push github main &&
-git push --tags github main &&
+git push --tags github main
+
+# instructions to create a npm token
+read -p "Create a new authentication token for the publish script on https://www.npmjs.com/settings/baseangewandte/tokens and add the token to your .npmrc file like so: //registry.npmjs.org/:_authToken=your_token . Press 'Y' to continue when ready or 'N' to abort (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+
 # publish
 npm publish &&
 # also create, commit and publish styleguide
 git checkout gh-pages &&
 # pull first in case there are new version made by somebody else
-git pull &&
+git pull --rebase &&
 git merge main &&
 # remove components folder before building so removed components dont remain in the build
 rm -rf docs/components &&
@@ -31,4 +39,7 @@ git add styleguide/* &&
 git commit -m "docs: styleguide for $PACKAGE_VERSION" &&
 git push &&
 npm run update-pages &&
+# rollback docs/components changes in git tree so branch can be switched
+git checkout --no-overlay -- docs/components
+# switch back to develop
 git checkout develop
