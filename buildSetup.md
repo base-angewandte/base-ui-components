@@ -459,7 +459,7 @@ this.$emit('fetch-dropdown-entries', { value: val });
 ```html=
 <template>
     <div class="my-component my-component--state">
-        <div class="my-component__wrapper my-new-component__wrapper--state">
+        <div class="my-component__wrapper my-component__wrapper--state">
         </div>
     </div>
 </template>
