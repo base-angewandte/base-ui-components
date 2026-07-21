@@ -58,7 +58,7 @@ npm run changelog -- {version_bump}
 The v5 of this component library is built with [Vite](https://vitejs.dev).
 
 This project uses [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). More detailed information and documentation is
-available [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
+available [here](https://base-angewandte-docs.readthedocs.io/en/latest/using_git.html#commit-guidelines).
 
 Components can be tested with front-end projects leveraging [npm link](https://docs.npmjs.com/cli/v10/commands/npm-link):
 ```bash
@@ -221,7 +221,7 @@ Additional helper classes are available in `src/styles/lib.scss` (e.g. a `.hide`
 
 ### Commit Guidelines
 
-* Please follow the conventional commit guidelines specified [here](https://basedev.uni-ak.ac.at/documentation/base/dev_guide.html#commit-guidelines).
+* Please follow the conventional commit guidelines specified [here](https://base-angewandte-docs.readthedocs.io/en/latest/using_git.html#commit-guidelines).
 * Breaking changes must be mentioned in the commit message according to conventional commit standards.
 * The `scope` should always include the name of the component that was changed (in PascalCase). If more then one component was changed they should be separated by comma. e.g. `feat(BaseIcon, BaseInput):`
 * The `footer` should include a reference to the ticket that was worked on. e.g. `Refs: #1234`
