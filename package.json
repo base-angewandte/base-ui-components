@@ -59,10 +59,10 @@
     "@babel/plugin-transform-runtime": "^7.24.7",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.28.4",
-    "@commitlint/cli": "^19.5.0",
-    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
     "@eslint/js": "^9.14.0",
-    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-dynamic-import-vars": "^2.1.5",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@vitejs/plugin-vue": "^5.2.0",
@@ -93,7 +93,7 @@
     "svgstore-cli": "^2.0.1",
     "vite": "^6.4.3",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-vue-devtools": "^7.3.1",
+    "vite-plugin-vue-devtools": "^8.2.1",
     "vitepress": "^1.2.3",
     "vue-docgen-api": "^4.78.0",
     "vue-docgen-cli": "^4.79.0",
@@ -123,7 +123,6 @@
     "**/*.{js,vue}": "npm run lint:js"
   },
   "overrides": {
-    "conventional-changelog-conventionalcommits": "8.0.0",
     "esbuild": "^0.25",
     "vite": "^6.4.3"
   }
