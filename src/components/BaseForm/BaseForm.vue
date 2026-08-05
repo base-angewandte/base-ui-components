@@ -910,7 +910,7 @@ export default {
               `base-form__input-field--${rowType}`,
               // for BaseToogle add a top margin in height of label if it is in a row with other elements
               { 'base-form__input-field--top-margin': field.type === 'boolean'
-                && (data[index-1] || data[index+1]) },
+                && data.some((rowField) => rowField.type !== 'boolean') },
               { 'base-form__input-field--date-switch-spacing': fieldIsDateSwitch(field['x-attrs'])},
             ]"
             @fetch-autocomplete="fetchAutocomplete"
