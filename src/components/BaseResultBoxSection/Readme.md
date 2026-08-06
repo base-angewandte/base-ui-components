@@ -1,3 +1,10 @@
+## CSS configuration options
+
+```
+// customize the position of the loader
+--loader-position-top: 150px;
+```
+
 ## Demo
 
 Test your component configuration on this example component!
