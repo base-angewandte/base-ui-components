@@ -1439,6 +1439,9 @@ export default {
             :assistive-text="paginationAssistiveText"
             @update:model-value="setPage" />
         </template>
+        <template v-else>
+          <slot name="no-results" />
+        </template>
       </div>
     </div>
   </div>
