@@ -47,7 +47,7 @@ export function useI18n(language) {
     if (!key) return '';
     if (hasI18n.value && te.value(key)) {
       if (count >= 0) {
-        return t.value(key, count, variables);
+        return t.value(key, variables, count);
       }
       return t.value(key, variables);
     }
