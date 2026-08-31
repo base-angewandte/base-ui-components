@@ -1,3 +1,30 @@
+## 5.2.0 (2026-08-31)
+
+### ⚠ BREAKING-CHANGE
+
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):** very minor breaking change: loader position default was changed from 50% to 150px
+
+### Added
+
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):**
+  * handle no-result display within component and add new slot `no-results`
+  * make loader position customizable via css var `--loader-position-top`
+
+### Fixed
+
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/components/BaseEntrySelector):** shadow bottom not always calculated correctly
+* **[BaseForm](https://base-angewandte.github.io/base-ui-components/components/BaseForm):** excessive spacing in form rows with only BaseToggles
+* **[BaseResultBoxSection](https://base-angewandte.github.io/base-ui-components/components/BaseResultBoxSection):** fix styleguide typo
+* **useI18n:** function `getI18nTerm` not working with `count` argument provided
+* **styleguide:**
+  * fixed typo in BEM example to make it consistent
+  * update conventional commit documentation link
+  * fix component links
+* update / upgrade dependencies
+* use vite v6 for vitepress
+* improve component publish workflow
+
+
 ## 5.1.1 (2026-05-11)
 
 ### Added
