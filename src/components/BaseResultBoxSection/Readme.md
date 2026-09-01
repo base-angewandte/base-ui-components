@@ -1,6 +1,13 @@
+## CSS configuration options
+
+```
+// customize the position of the loader
+--loader-position-top: 150px;
+```
+
 ## Demo
 
-Test you component configuration on this example component!
+Test your component configuration on this example component!
 (Some settings only have an effect in edit mode or view mode respectively)
 ```vue live
 

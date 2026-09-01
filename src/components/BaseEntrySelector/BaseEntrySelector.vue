@@ -1,7 +1,7 @@
 <script>
-import {defineAsyncComponent, ref, toRef, useTemplateRef} from 'vue';
+import { defineAsyncComponent, ref, toRef, useTemplateRef, watch } from 'vue';
 import { useI18n } from '@/composables/useI18n.js';
-import { useEventListener, useElementObserver } from '@/composables';
+import { useElementObserver, useEventListener } from '@/composables';
 
 /**
  * Component to select elements from a list, including search, options and pagination elements.
@@ -296,7 +296,16 @@ export default {
       type: 'resize',
       target: bodyEl,
       callback: scroll,
-    })
+    });
+
+    /**
+     * on firefox resize observer is not always triggered when entries change
+     * so we need an additional watcher on entries
+     */
+    watch(() => props.entries, () => {
+      // wait until all calc / rendering is done
+      setTimeout(() => scroll('Timeout'), 0);
+    });
 
     return {
       getI18nTerm,

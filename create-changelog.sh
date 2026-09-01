@@ -45,6 +45,25 @@ else
   exit 1
 fi
 
+# create a temporary git tag to make sure conventional-changelog is using the right commits
+# get the current version from package.json
+PACKAGE_VERSION_OLD=$(cat package.json \
+  | grep version \
+  | head -1 \
+  | awk -F: '{ print $2 }' \
+  | sed 's/[", ]//g')
+
+echo "Creating necessary version tag for v$PACKAGE_VERSION_OLD now"
+# search the right commit in the log and get the commit hash
+TAG_COMMIT=`git log --grep=^$PACKAGE_VERSION_OLD$ --oneline | awk '{print $1}'`
+# checkout the branch where last changelog was created
+git checkout $TAG_COMMIT
+# tag this branch with a temporary tag including 'v' (to distinguish it from the real tags (without 'v'))
+git tag v$PACKAGE_VERSION_OLD
+# return to changelog
+git checkout feature/changelog
+echo "Added tag v$PACKAGE_VERSION_OLD to commit $TAG_COMMIT"
+
 # update the package version in package.json (and package-lock.json) without a commit
 # adding the version bump string via echo execution instead of directly to avoid
 # npm warning "Unknown env config 'version-bump'. This will stop working in the next major version of npm."
@@ -79,6 +98,8 @@ git rebase develop
 git push --set-upstream origin feature/changelog
 # return to develop branch
 git checkout develop
+# delete the initially created temporary tag again
+git tag -d v$PACKAGE_VERSION_OLD
 
 # inform user everything was successfully completed
 echo "Successfully updated CHANGELOG.md, commited and pushed branch feature/changelog"

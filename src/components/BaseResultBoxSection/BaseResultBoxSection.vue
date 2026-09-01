@@ -1439,6 +1439,10 @@ export default {
             :assistive-text="paginationAssistiveText"
             @update:model-value="setPage" />
         </template>
+        <template v-else>
+          <!-- @slot slot to display user information when `modelValue` array is empty -->
+          <slot name="no-results" />
+        </template>
       </div>
     </div>
   </div>
@@ -1463,7 +1467,7 @@ export default {
     background-color: $loading-background;
 
     .base-result-box-section__loader {
-      top: 50%;
+      top: var(--loader-position-top, 150px);
     }
   }
 
