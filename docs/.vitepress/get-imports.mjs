@@ -96,18 +96,25 @@ function parseNamedImports(importClauseString) {
  */
 export const getImports = code => {
 	if (/<\/script>/.test(code)) {
-		const { descriptor, errors } = parse(code)
+        try {
+            const { descriptor, errors } = parse(code)
 
-		if (errors.length) {
-			console.error(errors)
-		}
+            if (errors.length) {
+                console.error(errors)
+            }
 
-		if (descriptor?.script || descriptor?.scriptSetup) {
-			return parseImports(
-        // eslint-disable-next-line no-constant-binary-expression
-				descriptor?.script?.content ?? '' + '\n' + descriptor?.scriptSetup?.content ?? ''
-			)
-		}
+            if (descriptor?.script || descriptor?.scriptSetup) {
+                return parseImports(
+            // eslint-disable-next-line no-constant-binary-expression
+                    descriptor?.script?.content ?? '' + '\n' + descriptor?.scriptSetup?.content ?? ''
+                )
+            }
+        } catch (e) {
+            // Not crashing with an obscure stacktrace if one template fails to parse. 
+            // There will be a more useful error message in the specific component's 
+            // page in the styleguide
+            console.error(e)
+        }
 	}
 	return {}
 }
