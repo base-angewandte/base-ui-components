@@ -694,7 +694,6 @@ export default {
 
     <!-- BODY -->
     <div
-      ref="bodyEl"
       class="base-entry-selector__body-wrapper">
       <div
         :class="['base-entry-selector__body-shadow', { 'base-entry-selector__body-shadow--top': headHasShadow }]" />
