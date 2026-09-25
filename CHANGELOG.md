@@ -1,3 +1,12 @@
+## 5.2.1 (2026-09-24)
+
+### Fixed
+
+* **[BaseEntrySelector](https://base-angewandte.github.io/base-ui-components/BaseEntrySelector):** remove obsolete element reference
+* **styleguide:**
+  * markup missing code fence
+  * preventing the vitepress build to fail on parsing errors
+
 ## 5.2.0 (2026-08-31)
 
 ### ⚠ BREAKING-CHANGE
