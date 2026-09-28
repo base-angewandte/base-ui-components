@@ -376,20 +376,22 @@ validator: val => ['normal', 'prominent'].includes(val),
 
 AND/OR (additionally) use the @values tag:
 
-    /**
-     * set a type for the button's active state rendering style
-     *  **normal**: gives the switch a more subtle, more condensed look with active item only indicated by grey border,
-     *    buttons have a label per default (`showButtonsLabel` is `true`).
-     *  **prominent**: larger buttons with more spacing and permanent border around each item, active item is
-     *    indicated by a 2px (app-)colored bottom border, button labels are not shown per default (`showButtonsLabel` is `false`)
-     *    so the property `icon` should be set for each switch item in `options`.
-     * @values 'normal', 'prominent'
-     */
-    type: {
-      type: String,
-      default: 'normal',
-      validator: val => ['normal', 'prominent'].includes(val),
-    },
+```javascript=
+/**
+ * set a type for the button's active state rendering style
+ *  **normal**: gives the switch a more subtle, more condensed look with active item only indicated by grey border,
+ *    buttons have a label per default (`showButtonsLabel` is `true`).
+ *  **prominent**: larger buttons with more spacing and permanent border around each item, active item is
+ *    indicated by a 2px (app-)colored bottom border, button labels are not shown per default (`showButtonsLabel` is `false`)
+ *    so the property `icon` should be set for each switch item in `options`.
+ * @values 'normal', 'prominent'
+ */
+type: {
+  type: String,
+  default: 'normal',
+  validator: val => ['normal', 'prominent'].includes(val),
+},
+```
 
 * Each component should have a short meaningful description at the beginning of the script tag (but after imports). This is used in the styleguide as introduction to the component.
 
